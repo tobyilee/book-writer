@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# OMC session state (tool-local, not source)
+.omc/
+
+# Workspace scratch (per-book intermediate artifacts)
+_workspace/
+_workspace_prev*/
+
+# Build output
+output/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs and temp
+*.log
+.tmp/
