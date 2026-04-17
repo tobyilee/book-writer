@@ -10,11 +10,11 @@ Thumbs.db
 .omc/
 
 # Workspace scratch (per-book intermediate artifacts)
-_workspace/
-_workspace_prev*/
+# _workspace/
+# _workspace_prev*/
 
 # Build output
-output/
+# output/
 
 # Python cache
 __pycache__/
