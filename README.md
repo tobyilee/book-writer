@@ -22,7 +22,7 @@
    ▼
 ┌────────────────────────────────────────────────────────┐
 │ Phase 0. 컨텍스트 확인                                │
-│   - _workspace/{slug}/ 존재 여부, 부분 재실행 여부 판단 │
+│   - {slug}/ 존재 여부, 부분 재실행 여부 판단          │
 └────────────────────────────────────────────────────────┘
    │
    ▼
@@ -130,7 +130,7 @@ $ claude
 > 리서치만 다시 해줘
 ```
 
-오케스트레이터 스킬이 `_workspace/{slug}/`의 존재 여부와 사용자 입력을 보고 Phase 전체 실행인지 부분 재실행인지 결정한다.
+오케스트레이터 스킬이 `{slug}/`의 존재 여부와 사용자 입력을 보고 Phase 전체 실행인지 부분 재실행인지 결정한다.
 
 ### 수동으로 Phase만 호출하고 싶다면
 
@@ -149,8 +149,10 @@ $ claude
 
 ## 산출 경로 규약
 
+각 책은 리포지토리 루트에 자기 슬러그 폴더를 하나 갖는다. EPUB은 공통 `output/` 디렉터리로 모인다.
+
 ```
-_workspace/{slug}/
+{slug}/                            (예: llm-intro/)
 ├── research/
 │   ├── web.md
 │   ├── papers.md
@@ -167,13 +169,13 @@ _workspace/{slug}/
 ├── book_manifest.json            (EPUB 빌드용 매니페스트)
 ├── cover.png · cover_thumb.png · make_cover.py · cover_prompt.md
 ├── style_log.md                  (전 챕터 스타일 리뷰 요약)
-└── build_log.md                  (EPUB 빌드 기록 + v1.0.1 개선 내역)
+└── build_log.md                  (EPUB 빌드 기록 + 개선 내역)
 
 output/
 └── {책-제목}-v{version}.epub
 ```
 
-`_workspace/`는 기본적으로 `.gitignore`에 들어 있다 (스크래치). 공개하고 싶은 책만 리포지토리 루트로 승격시키면 된다 — `llm-intro/`가 그 예시다.
+각 책 폴더와 `output/`은 기본적으로 리포지토리에 트래킹된다. 실험적·비공개 책은 `.gitignore`에 해당 슬러그를 추가해 제외할 수 있다.
 
 ## EPUB 빌드 세부
 
@@ -211,7 +213,7 @@ output/
 
 - **한국어 인쇄·조판 수준은 아직 아님** — EPUB 내부 CSS는 pandoc 기본. 시각 디자인 개선 여지 남음.
 - **이미지 생성은 Pillow 기반 타이포 위주** — AI 이미지 모델 연동은 옵션 (cyberpunk 취향을 피하려 기본 비활성).
-- **`_workspace/{slug}/` → `llm-intro/` 승격 시 빌드 스크립트 경로** — 심볼릭 링크(`_workspace/{slug} → ../{slug}`)로 처리 중. 차기 개선 항목.
+- **빌드 스크립트 경로 가정** — `.claude/skills/epub-build/scripts/build_epub.sh`는 아직 `_workspace/{slug}/` 경로를 읽도록 되어 있다. 책 폴더를 루트 슬러그로 쓰는 현재 규약에 맞추려면 스크립트에서 경로 prefix를 옵션화하거나 루트 `{slug}/`를 `_workspace/{slug}/`로 심볼릭 링크해 두고 돌리면 된다. 차기 스크립트 개선 항목.
 
 ## 라이선스
 
@@ -220,3 +222,4 @@ output/
 ---
 
 저자: **Toby-AI** (수천 개발자의 공개 기록이 뭉친 화자)
+
