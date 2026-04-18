@@ -47,6 +47,15 @@ if [[ -z "$AUTHOR" ]]; then
   echo "info: manifest author empty — falling back to default 'Toby-AI'" >&2
 fi
 
+# Fill in derived metadata for EPUB 3 required fields if the manifest leaves them blank.
+if [[ -z "$IDENTIFIER" ]]; then
+  SLUG_FIELD=$(read_field slug)
+  IDENTIFIER="urn:book:${SLUG_FIELD:-$(basename "$WS")}:v${VERSION}"
+fi
+if [[ -z "$PUB_DATE" ]]; then
+  PUB_DATE=$(date -u +%Y-%m-%d)
+fi
+
 # Slugify title for filename.
 FILENAME_TITLE=$(python3 -c "
 import re, sys
@@ -87,7 +96,7 @@ fi
 # Run pandoc.
 set +e
 pandoc "$MANUSCRIPT" \
-  --from markdown \
+  --from markdown-raw_html-raw_tex \
   --to epub3 \
   --metadata-file="$META_YAML" \
   "${COVER_ARG[@]}" \

@@ -1,0 +1,14 @@
+{
+  "title": "프롬프트 엔지니어링 — 원칙, 평가, 운영",
+  "subtitle": "감으로 쓰는 프롬프트에서, 재현 가능한 공학으로",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "slug": "prompt-engineering-guide",
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png",
+  "chapters": 13,
+  "words_korean": 244000,
+  "audience": "AI를 활용하는 소프트웨어 개발자, IT 연구자, 학생",
+  "description": "감으로 쓰던 프롬프트를 재현 가능한 공학으로 옮기는 13장의 여정. 회의론의 정직한 검토부터 컨텍스트 엔지니어링, RAG, 구조화 출력, 모델별 이식, 자동 최적화(DSPy/OPRO/TextGrad), 에이전트 프롬프팅, 평가(Evals), 보안, 운영 위생까지 2020–2025년 프롬프트 엔지니어링의 핵심을 원칙·평가·운영 세 축으로 통합한다. 월요일 아침에 이식할 수 있는 템플릿과 체크리스트로 착지한다."
+}
