@@ -17,7 +17,7 @@
 5. **편집** — 챕터 통합, 전환부 다듬기, 서문·에필로그·참고문헌 작성
 6. **표지 + EPUB 빌드** — 표지 이미지 생성, pandoc으로 EPUB 3 조립
 
-산출물은 `output/{책-제목}-v{version}.epub`에 저장된다.
+산출물은 프로젝트 루트의 `{책-제목}-v{version}.epub`로 저장된다.
 
 ## 사전 준비
 
@@ -64,7 +64,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ### 기대 산출물
 
 ```
-_workspace/{slug}/
+{slug}/
 ├── research/
 │   ├── web.md
 │   ├── papers.md
@@ -83,8 +83,7 @@ _workspace/{slug}/
 ├── cover_prompt.md          # 표지 프롬프트 기록
 └── build_log.md             # 빌드 로그
 
-output/
-└── {책-제목}-v1.0.0.epub    # 최종 산출물
+{책-제목}-v1.0.0.epub        # 최종 산출물 (프로젝트 루트)
 ```
 
 ## 워크플로우 상세
@@ -176,7 +175,7 @@ book-writer/
 ├── CLAUDE.md                        # 하네스 포인터 + 변경 이력 (새 세션 자동 로드)
 ├── README.md                        # 이 파일
 ├── toby-book-writing-style.md       # Toby 문체 기본 가이드
-├── .gitignore                       # _workspace, output, .omc 제외
+├── .gitignore                       # .omc 등 툴 로컬 파일 제외 (책 산출물은 버전 관리 대상)
 └── .claude/
     ├── agents/                      # 11개 에이전트 정의
     │   ├── research-lead.md
@@ -190,7 +189,7 @@ book-writer/
     │   ├── editor.md
     │   ├── cover-designer.md
     │   └── epub-builder.md
-    └── skills/                      # 오케스트레이터 + 9개 전문 스킬
+    └── skills/                      # 오케스트레이터 + 11개 전문 스킬
         ├── book-writing-orchestrator/   # 최상위 워크플로우
         ├── research-coordination/
         ├── web-research/
@@ -214,7 +213,7 @@ book-writer/
 
 | 방식 | 용도 |
 |------|------|
-| 파일 기반 (`_workspace/`) | Phase 간 산출물 전달, 감사 추적 |
+| 파일 기반 (`{slug}/`) | Phase 간 산출물 전달, 감사 추적 |
 | 메시지 기반 (`SendMessage`) | Phase 3·4 팀 내부 실시간 조율 |
 | 태스크 기반 (`TaskCreate`) | Phase 4 챕터 작업 분배·진행 추적 |
 | 반환값 기반 | Phase 1·2·5 서브 에이전트 결과 수집 |
@@ -229,13 +228,13 @@ brew install pandoc
 ```
 
 ### EPUB 크기가 50KB 미만으로 경고
-원고가 너무 짧거나 챕터 변환 실패 가능성. `_workspace/{slug}/build_log.md`와 `.pandoc_err`를 확인한다. 원고가 진짜 짧다면(샘플·테스트) 무시해도 된다.
+원고가 너무 짧거나 챕터 변환 실패 가능성. `{slug}/build_log.md`와 `.pandoc_err`를 확인한다. 원고가 진짜 짧다면(샘플·테스트) 무시해도 된다.
 
 ### `epubcheck` 실패
-EPUB은 생성되지만 표준 위반 사항이 있다. `_workspace/{slug}/.epubcheck.log`를 읽고 문제 구절을 수정한다. 대부분 `<script>` 태그나 금지된 네임스페이스 같은 마크다운 소스 문제다.
+EPUB은 생성되지만 표준 위반 사항이 있다. `{slug}/.epubcheck.log`를 읽고 문제 구절을 수정한다. 대부분 `<script>` 태그나 금지된 네임스페이스 같은 마크다운 소스 문제다.
 
 ### 챕터 초안이 Toby 문체와 달라 보임
-`style-guardian`이 몇 번 왕복했는지 `_workspace/{slug}/style_log.md`에서 확인. 3회 왕복에도 합의가 안 되면 저술가 결정이 채택된다. 이 경우 `toby-book-writing-style.md`나 `references/toby-style-guide.md`의 규칙이 너무 모호할 수 있으니 구체적 예시를 보강하자.
+`style-guardian`이 몇 번 왕복했는지 `{slug}/style_log.md`에서 확인. 3회 왕복에도 합의가 안 되면 저술가 결정이 채택된다. 이 경우 `toby-book-writing-style.md`나 `references/toby-style-guide.md`의 규칙이 너무 모호할 수 있으니 구체적 예시를 보강하자.
 
 ### 표지 이미지 생성 실패
 1. 이미지 생성 MCP/API가 연결되어 있지 않으면 ImageMagick 폴백 사용 → 단순 타이포그래피 표지가 생성됨
