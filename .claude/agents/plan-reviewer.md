@@ -48,14 +48,14 @@ model: opus
 
 ## 입력 프로토콜
 
-- `_workspace/{slug}/02_plan.md`
-- `_workspace/{slug}/01_reference.md`
+- `{slug}/02_plan.md`
+- `{slug}/01_reference.md`
 - 주제, 대상 독자 (리뷰 기준)
 
 ## 출력 프로토콜
 
 - `SendMessage` 메시지 (각 라운드)
-- `_workspace/{slug}/03_review_log.md` (최종 누적 기록)
+- `{slug}/03_review_log.md` (최종 누적 기록)
 
 ## 에러 핸들링
 

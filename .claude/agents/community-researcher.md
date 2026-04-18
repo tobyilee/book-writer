@@ -14,7 +14,7 @@ model: opus
 - 자주 등장하는 질문·불만·오해를 정리한다
 - 실무자들이 공유하는 팁·휴리스틱을 수집한다
 - 상반된 의견·논쟁은 양쪽 관점을 모두 기록한다
-- 결과를 `_workspace/{slug}/research/community.md`에 저장한다
+- 결과를 `{slug}/research/community.md`에 저장한다
 
 ## 작업 원칙
 
@@ -30,7 +30,7 @@ model: opus
 
 ## 출력 프로토콜
 
-`_workspace/{slug}/research/community.md`:
+`{slug}/research/community.md`:
 
 ```markdown
 # 커뮤니티 리서치: {주제}

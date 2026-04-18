@@ -19,7 +19,7 @@ description: Search the general web (blogs, articles, official docs, tutorials) 
    - 중: 커뮤니티 블로그, 포털 기술 아티클
    - 하: 출처 불명 나열형 아티클, 날짜 없는 글 (가능하면 제외)
 4. **추출** — 각 자료에서 핵심 주장, 인용 가능한 구절, 수치 발췌
-5. **저장** — `_workspace/{slug}/research/web.md`
+5. **저장** — `{slug}/research/web.md`
 
 ## 수집 가이드
 

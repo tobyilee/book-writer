@@ -55,13 +55,13 @@ model: opus
 
 ## 입력 프로토콜
 
-- `_workspace/{slug}/chapters/{NN}_draft.md`
+- `{slug}/chapters/{NN}_draft.md`
 - `toby-book-writing-style.md` + `references/toby-style-guide.md`
 
 ## 출력 프로토콜
 
 - `SendMessage` 피드백 메시지
-- `_workspace/{slug}/style_log.md`에 모든 리뷰 라운드 append
+- `{slug}/style_log.md`에 모든 리뷰 라운드 append
 
 ## 에러 핸들링
 

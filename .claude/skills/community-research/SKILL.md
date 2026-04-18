@@ -18,7 +18,7 @@ description: Mine developer/practitioner communities (Reddit, Hacker News, Stack
    - **실무 휴리스틱** — 답변 다수 추천 또는 "10년간 써봤는데~" 식 경험담
    - **논쟁점** — 댓글 논쟁이 길게 이어진 주제, 양쪽 관점 보존
 4. **검증 라벨링** — 모든 커뮤니티 주장은 "커뮤니티 의견, 검증 필요"로 표시
-5. **저장** — `_workspace/{slug}/research/community.md`
+5. **저장** — `{slug}/research/community.md`
 
 ## 수집 가이드
 

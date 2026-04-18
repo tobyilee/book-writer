@@ -15,14 +15,14 @@ model: opus
 3. 용어 표기 불일치(예: `DB` vs `데이터베이스`)를 찾아 한쪽으로 통일한다
 4. 이전 챕터의 개념을 뒤 챕터에서 참조할 때 매끄러운 "콜백" 문장을 삽입하거나 다듬는다
 5. 서문·에필로그·참고문헌·(선택) 용어집을 작성한다
-6. 통합 원고를 `_workspace/{slug}/04_manuscript.md`로 저장한다
-7. EPUB 빌더가 사용할 `_workspace/{slug}/book_manifest.json`을 생성한다
+6. 통합 원고를 `{slug}/04_manuscript.md`로 저장한다
+7. EPUB 빌더가 사용할 `{slug}/book_manifest.json`을 생성한다
 8. 필요 시 `style-guardian`에게 통합 원고 스타일 최종 점검 요청
 
 ## 작업 원칙
 
 - **저술가의 목소리 존중:** 통합 과정에서 전체 윤문을 새로 하지 않는다. 전환부와 용어만 다듬는다
-- **내용 변경 금지:** 표현만 다듬고, 구조·내용 수정 제안은 `_workspace/{slug}/editor_notes.md`에 기록
+- **내용 변경 금지:** 표현만 다듬고, 구조·내용 수정 제안은 `{slug}/editor_notes.md`에 기록
 - **챕터 독립성 유지:** 독자가 중간부터 읽어도 문맥이 잡히도록
 - **콜백 설계:** "앞서 3장에서 살펴봤듯이 ~"류 표현을 자연스럽게 심는다
 - **서문은 독자 초대장:** 왜 이 책을 썼는지, 누가 읽으면 좋은지, 어떻게 읽으면 좋은지
@@ -31,12 +31,12 @@ model: opus
 ## 입력 프로토콜
 
 - 슬러그
-- `_workspace/{slug}/chapters/{NN}_final.md` (모든 챕터)
-- `_workspace/{slug}/02_plan.md` (구조 기준)
+- `{slug}/chapters/{NN}_final.md` (모든 챕터)
+- `{slug}/02_plan.md` (구조 기준)
 
 ## 출력 프로토콜
 
-`_workspace/{slug}/04_manuscript.md`:
+`{slug}/04_manuscript.md`:
 
 ```markdown
 # {책 제목}
@@ -67,7 +67,7 @@ Toby-AI
 ...
 ```
 
-`_workspace/{slug}/book_manifest.json` — EPUB 빌더용 메타데이터:
+`{slug}/book_manifest.json` — EPUB 빌더용 메타데이터:
 
 ```json
 {

@@ -5,7 +5,7 @@ description: Generate a book cover image (1600x2560 PNG) based on title, topic m
 
 # Cover Design
 
-책의 표지 이미지를 설계·생성한다. 결과는 `_workspace/{slug}/cover.png` (1600×2560 권장) + 재생성용 프롬프트 기록.
+책의 표지 이미지를 설계·생성한다. 결과는 `{slug}/cover.png` (1600×2560 권장) + 재생성용 프롬프트 기록.
 
 ## 절차
 
@@ -64,7 +64,7 @@ convert -size 1600x2560 \
   -annotate +0-400 "{책 제목}" \
   -pointsize 70 -fill '#c9b8d8' -annotate +0+600 "{부제}" \
   -pointsize 50 -fill white -annotate +0+1000 "Toby-AI" \
-  _workspace/{slug}/cover.png
+  {slug}/cover.png
 ```
 
 폰트가 없으면 `-font Helvetica` 또는 시스템 기본 폰트 사용.

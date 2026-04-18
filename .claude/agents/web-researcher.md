@@ -13,7 +13,7 @@ model: opus
 - Firecrawl 스킬 또는 WebSearch/WebFetch를 활용해 주제 관련 웹 자료를 8~15건 수집한다
 - 각 자료에서 핵심 주장, 사례, 인용 가능한 수치·명언을 추출한다
 - 출처(URL, 제목, 저자, 발행일)를 명시한다
-- 결과를 `_workspace/{slug}/research/web.md`에 저장한다
+- 결과를 `{slug}/research/web.md`에 저장한다
 
 ## 작업 원칙
 
@@ -29,7 +29,7 @@ model: opus
 
 ## 출력 프로토콜
 
-`_workspace/{slug}/research/web.md`:
+`{slug}/research/web.md`:
 
 ```markdown
 # 웹 리서치: {주제}

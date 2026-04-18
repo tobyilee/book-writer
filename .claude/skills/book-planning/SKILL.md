@@ -18,7 +18,7 @@ description: Design the overall book structure — title candidates, characteris
 5. **내러티브 아크 설계** — 챕터 흐름을 문단으로 서술 (왜 이 순서인지)
 6. **챕터 목록 작성** — 5~10개, 각 챕터에 핵심 질문 + 주요 내용 + 예상 분량
 7. **검증** — 아래 체크리스트로 자기 점검
-8. **저장** — `_workspace/{slug}/02_plan.md`
+8. **저장** — `{slug}/02_plan.md`
 
 ## 독자 여정 템플릿
 

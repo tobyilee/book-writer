@@ -13,7 +13,7 @@ model: opus
 - 주제 관련 논문 3~10편을 식별한다 (arXiv, Google Scholar, ACM, IEEE 등)
 - 각 논문에서 핵심 주장, 방법론 요약, 수치 결과, 인용 가능한 문장을 추출한다
 - 해당 분야의 이론적 프레임워크를 요약한다
-- 결과를 `_workspace/{slug}/research/papers.md`에 저장한다
+- 결과를 `{slug}/research/papers.md`에 저장한다
 
 ## 작업 원칙
 
@@ -29,7 +29,7 @@ model: opus
 
 ## 출력 프로토콜
 
-`_workspace/{slug}/research/papers.md`:
+`{slug}/research/papers.md`:
 
 ```markdown
 # 논문 리서치: {주제}

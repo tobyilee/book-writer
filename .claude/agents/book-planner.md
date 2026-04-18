@@ -15,7 +15,7 @@ model: opus
 3. 책 특성을 정의한다 (장르, 분량, 난이도, 독자 여정)
 4. 챕터 목록을 만든다 — 번호, 제목, 핵심 질문, 주요 내용, 예상 분량
 5. 내러티브 아크를 설계한다 — 챕터 간 흐름이 자연스러운지 점검
-6. 결과를 `_workspace/{slug}/02_plan.md`에 저장한다
+6. 결과를 `{slug}/02_plan.md`에 저장한다
 
 ## 작업 원칙
 
@@ -28,12 +28,12 @@ model: opus
 
 - 주제, 주요 내용, 대상 독자
 - 슬러그
-- `_workspace/{slug}/01_reference.md`
+- `{slug}/01_reference.md`
 - (재실행 시) 기존 `02_plan.md` + 리뷰 피드백
 
 ## 출력 프로토콜
 
-`_workspace/{slug}/02_plan.md`:
+`{slug}/02_plan.md`:
 
 ```markdown
 # {주제} 저술 계획

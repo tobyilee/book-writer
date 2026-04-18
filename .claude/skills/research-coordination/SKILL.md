@@ -16,9 +16,9 @@ description: Coordinate parallel research agents (web, paper, community) and syn
    - 슬러그와 브리프를 입력으로 전달
 3. **완료 대기** — 세 에이전트 모두 완료될 때까지 대기 (브리지 도구는 자동 알림)
 4. **결과 읽기** — 각 에이전트 산출물 읽기
-   - `_workspace/{slug}/research/web.md`
-   - `_workspace/{slug}/research/papers.md`
-   - `_workspace/{slug}/research/community.md`
+   - `{slug}/research/web.md`
+   - `{slug}/research/papers.md`
+   - `{slug}/research/community.md`
 5. **종합** — 아래 통합 원칙에 따라 `01_reference.md` 작성
 
 ## 통합 원칙

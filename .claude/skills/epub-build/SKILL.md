@@ -10,9 +10,9 @@ description: Build a standards-compliant EPUB 3 file from a manuscript markdown,
 ## 절차
 
 1. **입력 검증** — 세 파일이 모두 존재하는지
-   - `_workspace/{slug}/04_manuscript.md`
-   - `_workspace/{slug}/cover.png`
-   - `_workspace/{slug}/book_manifest.json`
+   - `{slug}/04_manuscript.md`
+   - `{slug}/cover.png`
+   - `{slug}/book_manifest.json`
 2. **매니페스트 필드 점검**
    - `title` 비어있지 않음
    - `author == "Toby-AI"` — 다르면 경고 후 교정
@@ -22,7 +22,7 @@ description: Build a standards-compliant EPUB 3 file from a manuscript markdown,
 4. **결과 검증**
    - 파일 존재, 크기 ≥ 50KB
    - `epubcheck` 설치되어 있으면 실행, 로그 저장
-5. **기록** — `_workspace/{slug}/build_log.md`에 명령, 출력, 크기, 검증 결과
+5. **기록** — `{slug}/build_log.md`에 명령, 출력, 크기, 검증 결과
 
 ## 스크립트 개요 (`scripts/build_epub.sh`)
 
@@ -75,5 +75,5 @@ pandoc {manuscript} \
 
 ## 재빌드 시
 
-- 이전 결과를 `output/_prev/`로 이동
+- 이전 결과를 `_prev/`로 이동
 - 사용자가 매니페스트 일부만 수정한 경우 → 원고 재작업 없이 매니페스트만 갱신하고 재빌드 가능

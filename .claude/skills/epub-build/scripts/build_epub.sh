@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Build EPUB 3 from manuscript + cover + manifest.
 # Usage: build_epub.sh <slug>
-#   Reads: _workspace/<slug>/04_manuscript.md
-#          _workspace/<slug>/cover.png
-#          _workspace/<slug>/book_manifest.json
-#   Writes: output/<title-slug>-v<version>.epub
-#           _workspace/<slug>/build_log.md
+#   Reads: <slug>/04_manuscript.md
+#          <slug>/cover.png
+#          <slug>/book_manifest.json
+#   Writes: <title-slug>-v<version>.epub (project root)
+#           <slug>/build_log.md
 
 set -euo pipefail
 
@@ -15,7 +15,7 @@ if [[ -z "$SLUG" ]]; then
   exit 2
 fi
 
-WS="_workspace/${SLUG}"
+WS="${SLUG}"
 MANUSCRIPT="${WS}/04_manuscript.md"
 COVER="${WS}/cover.png"
 MANIFEST="${WS}/book_manifest.json"
@@ -55,14 +55,12 @@ t = re.sub(r'[\\\\/:*?\"<>|]', '', t)
 print(t)
 " "$TITLE")
 
-OUTPUT_DIR="output"
-mkdir -p "$OUTPUT_DIR"
-OUTPUT="${OUTPUT_DIR}/${FILENAME_TITLE}-v${VERSION}.epub"
+OUTPUT="${FILENAME_TITLE}-v${VERSION}.epub"
 
-# If output exists, move previous to _prev.
+# If output exists, move previous to _prev/.
 if [[ -f "$OUTPUT" ]]; then
-  mkdir -p "${OUTPUT_DIR}/_prev"
-  mv "$OUTPUT" "${OUTPUT_DIR}/_prev/$(basename "$OUTPUT" .epub)-$(date +%Y%m%d%H%M%S).epub"
+  mkdir -p "_prev"
+  mv "$OUTPUT" "_prev/$(basename "$OUTPUT" .epub)-$(date +%Y%m%d%H%M%S).epub"
 fi
 
 # Build metadata YAML for pandoc.

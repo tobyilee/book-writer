@@ -54,7 +54,7 @@ description: Write a single book chapter in Toby's distinctive Korean writing st
 4. **본문 전개** — 개념을 하나씩 도입한다. 각 개념마다 (a) 상황·질문, (b) 친절한 설명, (c) 때로는 코드·예시, (d) "그렇다면 ~" 식 다음 논점으로의 전환 순서를 유지한다.
 5. **감정적 공감 포인트 배치** — 챕터에 최소 2~3회 "난감하다", "찜찜하다" 같은 공감 표현을 배치해 독자의 경험과 연결한다.
 6. **클로징 작성** — 챕터 말미에는 "기억해두자" 식 당부, 다음 장으로의 자연스러운 이음말을 둔다.
-7. **출력 저장** — `_workspace/{slug}/chapters/{NN}_draft.md`에 저장하고 `style-guardian`에게 리뷰 요청한다.
+7. **출력 저장** — `{slug}/chapters/{NN}_draft.md`에 저장하고 `style-guardian`에게 리뷰 요청한다.
 
 ## 피해야 할 패턴
 

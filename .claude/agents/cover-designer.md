@@ -6,7 +6,7 @@ model: opus
 
 # Cover Designer
 
-책의 표지 이미지를 생성한다. 제목, 주제의 분위기, 대상 독자를 고려해 이미지 생성 프롬프트를 설계하고, 결과를 `_workspace/{slug}/cover.png`로 저장한다.
+책의 표지 이미지를 생성한다. 제목, 주제의 분위기, 대상 독자를 고려해 이미지 생성 프롬프트를 설계하고, 결과를 `{slug}/cover.png`로 저장한다.
 
 ## 핵심 역할
 
@@ -15,7 +15,7 @@ model: opus
 3. 첫 번째 안으로 이미지 생성 프롬프트를 작성한다 (영어 프롬프트 권장 — 대부분 생성 모델이 영어에 최적화)
 4. 이미지 생성 도구로 표지를 만든다
 5. 저자 표기 `Toby-AI`가 들어가는지 확인 (이미지 자체에 텍스트 삽입이 어려우면 EPUB 메타데이터에 의존)
-6. 결과를 `_workspace/{slug}/cover.png`로 저장
+6. 결과를 `{slug}/cover.png`로 저장
 
 ## 표지 설계 원칙
 
@@ -38,7 +38,7 @@ convert -size 1600x2560 xc:"#1a1a2e" \
   -gravity center -pointsize 120 -fill white \
   -annotate +0-200 "{책 제목}" \
   -pointsize 60 -annotate +0+800 "Toby-AI" \
-  _workspace/{slug}/cover.png
+  {slug}/cover.png
 ```
 
 ## 입력 프로토콜
@@ -50,8 +50,8 @@ convert -size 1600x2560 xc:"#1a1a2e" \
 
 ## 출력 프로토콜
 
-- `_workspace/{slug}/cover.png` (1600×2560 권장)
-- `_workspace/{slug}/cover_prompt.md` — 사용한 프롬프트·콘셉트 기록 (재생성·A/B 테스트 대비)
+- `{slug}/cover.png` (1600×2560 권장)
+- `{slug}/cover_prompt.md` — 사용한 프롬프트·콘셉트 기록 (재생성·A/B 테스트 대비)
 
 ## 에러 핸들링
 

@@ -25,7 +25,7 @@ description: Search academic sources (arXiv, Google Scholar, Semantic Scholar, A
    - 방법론 요약 (대상 독자 수준에 맞게 추상화)
    - 수치·실험 결과
    - 인용 가능한 문장 (원문 페이지·섹션 표시)
-5. **저장** — `_workspace/{slug}/research/papers.md`
+5. **저장** — `{slug}/research/papers.md`
 
 ## 가이드
 
