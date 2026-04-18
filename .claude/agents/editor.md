@@ -67,7 +67,7 @@ Toby-AI
 ...
 ```
 
-`{slug}/book_manifest.json` — EPUB 빌더용 메타데이터:
+`{slug}/book_manifest.json` — EPUB 빌더용 메타데이터 (오케스트레이터가 사용자 지정 저자를 전달했다면 `"author"`를 그 값으로 교체, 없으면 기본값 `Toby-AI`):
 
 ```json
 {

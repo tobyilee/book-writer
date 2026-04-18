@@ -42,8 +42,9 @@ PUB_DATE=$(read_field pub_date)
 IDENTIFIER=$(read_field identifier)
 DESCRIPTION=$(read_field description)
 
-if [[ "$AUTHOR" != "Toby-AI" ]]; then
-  echo "warning: author is '$AUTHOR', expected 'Toby-AI'" >&2
+if [[ -z "$AUTHOR" ]]; then
+  AUTHOR="Toby-AI"
+  echo "info: manifest author empty — falling back to default 'Toby-AI'" >&2
 fi
 
 # Slugify title for filename.

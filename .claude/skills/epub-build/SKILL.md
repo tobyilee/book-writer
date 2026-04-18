@@ -1,6 +1,6 @@
 ---
 name: epub-build
-description: Build a standards-compliant EPUB 3 file from a manuscript markdown, cover image, and book_manifest.json using the bundled pandoc-based script. Output is 책-제목-v{version}.epub with Toby-AI as author. Use when converting the final book manuscript to EPUB, rebuilding after edits, or testing EPUB output.
+description: Build a standards-compliant EPUB 3 file from a manuscript markdown, cover image, and book_manifest.json using the bundled pandoc-based script. Output is 책-제목-v{version}.epub with the manifest's author (defaults to Toby-AI). Use when converting the final book manuscript to EPUB, rebuilding after edits, or testing EPUB output.
 ---
 
 # EPUB Build
@@ -15,7 +15,7 @@ description: Build a standards-compliant EPUB 3 file from a manuscript markdown,
    - `{slug}/book_manifest.json`
 2. **매니페스트 필드 점검**
    - `title` 비어있지 않음
-   - `author == "Toby-AI"` — 다르면 경고 후 교정
+   - `author` 필드 존재 (기본값 `Toby-AI`, 사용자 지정 시 매니페스트 값을 그대로 사용)
    - `language` 존재 (`ko`)
    - `version` 존재 (예: `1.0.0`)
 3. **스크립트 실행** — `scripts/build_epub.sh {slug}`

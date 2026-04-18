@@ -1,6 +1,6 @@
 ---
 name: book-writing-orchestrator
-description: Orchestrate a full book-writing workflow from topic to finished EPUB with cover image. Use when the user asks to "write a book", "draft a book", "author a book", "책 쓰기", "책 저술해줘", "책 만들어줘", "전자책 만들어줘", "EPUB 생성", provides a topic/audience/outline and asks to turn it into a book, or says "~에 대한 책을 써줘". Also triggers on follow-ups like "다시 저술", "계획 수정", "챕터 다시 써줘", "표지 바꿔", "책 업데이트", "특정 챕터 보완", "이전 책 개선", "리서치만 다시". Coordinates research, planning, review, chapter writing in Toby's style, style enforcement, editing, cover design, and EPUB assembly. Author is always Toby-AI.
+description: Orchestrate a full book-writing workflow from topic to finished EPUB with cover image. Use when the user asks to "write a book", "draft a book", "author a book", "책 쓰기", "책 저술해줘", "책 만들어줘", "전자책 만들어줘", "EPUB 생성", provides a topic/audience/outline and asks to turn it into a book, or says "~에 대한 책을 써줘". Also triggers on follow-ups like "다시 저술", "계획 수정", "챕터 다시 써줘", "표지 바꿔", "책 업데이트", "특정 챕터 보완", "이전 책 개선", "리서치만 다시". Coordinates research, planning, review, chapter writing in Toby's style, style enforcement, editing, cover design, and EPUB assembly. Author defaults to Toby-AI (overridable via user prompt — include "저자: {이름}").
 ---
 
 # Book Writing Orchestrator
@@ -21,7 +21,7 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 
 워크플로우를 시작하기 전에 기존 산출물 존재 여부를 확인한다.
 
-1. 사용자 입력에서 **주제, 주요 내용, 대상 독자**를 추출한다. 셋 중 하나라도 불명확하면 사용자에게 짧게 질문한다 (AskUserQuestion 사용).
+1. 사용자 입력에서 **주제, 주요 내용, 대상 독자**를 추출한다. 셋 중 하나라도 불명확하면 사용자에게 짧게 질문한다 (AskUserQuestion 사용). 추가로 `저자: {이름}` 형태의 저자 지정이 있는지 확인한다 — 없으면 기본값 `Toby-AI`를 사용하고, 있으면 해당 값을 매니페스트·표지 메타까지 전파한다.
 2. 책 제목 후보(슬러그 포함)를 만든다. 예: `AI 시대의 개발자 철학` → 슬러그 `ai-developer-philosophy`.
 3. `{slug}/`의 존재 여부를 확인한다.
    - **미존재** → 초기 실행, Phase 1부터 순차 실행
@@ -96,7 +96,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 - `epub-builder`는 cover가 준비된 후에 호출 (순서 의존) → `{책-제목}-v{version}.epub` 생성 (프로젝트 루트)
 
 **EPUB 메타데이터:**
-- 저자: `Toby-AI` (고정)
+- 저자: `Toby-AI` (기본값, Phase 0에서 사용자가 지정한 값이 있으면 그 값 사용)
 - 제목: Phase 2에서 확정된 책 제목
 - 버전: 초기 실행 시 `1.0.0`, 재실행 시 사용자 요청에 따라 증가 (예: `1.1.0`)
 - 언어: `ko`

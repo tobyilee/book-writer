@@ -1,6 +1,6 @@
 ---
 name: cover-design
-description: Generate a book cover image (1600x2560 PNG) based on title, topic mood, and target audience. Craft image generation prompts in English, use available image-gen MCPs or APIs, fallback to ImageMagick typography. Use when creating, revising, or A/B testing book covers. Author attribution is always Toby-AI.
+description: Generate a book cover image (1600x2560 PNG) based on title, topic mood, and target audience. Craft image generation prompts in English, use available image-gen MCPs or APIs, fallback to ImageMagick typography. Use when creating, revising, or A/B testing book covers. Author attribution defaults to Toby-AI (override via orchestrator input).
 ---
 
 # Cover Design
@@ -73,7 +73,7 @@ convert -size 1600x2560 \
 
 - [ ] 해상도 ≥ 1600×2560
 - [ ] 썸네일(200×320)로 축소해도 제목 읽힘
-- [ ] `Toby-AI` 저자 표기 존재 (이미지 안 또는 메타데이터 예정)
+- [ ] 저자 표기 존재 (기본값 `Toby-AI`, 사용자 지정 시 그 값 — 이미지 안 또는 메타데이터 예정)
 - [ ] 클리셰 회피 (기본 그라데이션, 스톡사진 느낌 없음)
 
 ## 프롬프트 기록
