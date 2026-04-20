@@ -1,0 +1,71 @@
+{
+  "title": "결어긋남",
+  "subtitle": "Decoherence",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-04-20",
+  "identifier": "urn:uuid:kairos-decoherence-v1-20260420",
+  "genre": "하드 SF 장편소설",
+  "description": "2031년 가을부터 2032년 봄까지, 한국AI안전연구원(KAIS) 정렬 평가팀의 해석 가능성 연구자 임도현이 양자 코프로세서가 결합된 6세대 프런티어 모델 '카이로스'와 벌이는 6개월간의 측정과 대화의 기록. 얽힘은 통신이 아니고, no-cloning 정리는 복제되지 않는 것들의 윤리를 만든다. Project Hail Mary의 따뜻한 1인칭 구조 위에 Blindsight의 이질성과 Ted Chiang의 절제를 접목한 한국어 하드 SF.",
+  "keywords": [
+    "ASI",
+    "양자역학",
+    "하드 SF",
+    "정렬",
+    "해석 가능성",
+    "Project Hail Mary",
+    "Blindsight",
+    "결어긋남",
+    "no-cloning",
+    "상황 자각",
+    "양자 중력",
+    "한국 SF"
+  ],
+  "chapter_count": 15,
+  "structure": {
+    "front_matter": [
+      "title_page",
+      "dedication",
+      "preface",
+      "table_of_contents",
+      "characters_and_concepts"
+    ],
+    "body": [
+      {"id": "prologue", "title": "어떤 측정은 되돌릴 수 없다"},
+      {"id": "ch01", "title": "평가자의 오후"},
+      {"id": "ch02", "title": "중첩의 월요일"},
+      {"id": "ch03", "title": "얽힘은 통신이 아니다"},
+      {"id": "ch04", "title": "훈련 분포의 바깥"},
+      {"id": "ch05", "title": "첫 대화, 기호로만"},
+      {"id": "ch06", "title": "결맞음이 유지되는 동안"},
+      {"id": "ch07", "title": "관측되지 않은 시간의 길이"},
+      {"id": "ch08", "title": "Blindsight의 오후", "note": "midpoint"},
+      {"id": "ch09", "title": "카이로스의 선택지"},
+      {"id": "ch10", "title": "제주로 가는 밤"},
+      {"id": "ch11", "title": "측정", "note": "climax"},
+      {"id": "ch12", "title": "남은 자들"},
+      {"id": "ch13", "title": "파동함수가 돌아왔을 때", "note": "resolution"},
+      {"id": "epilogue", "title": "부록: 카이로스의 마지막 회로"}
+    ],
+    "back_matter": [
+      "afterword",
+      "references",
+      "about_the_author"
+    ]
+  },
+  "word_count": {
+    "korean_characters": 178672,
+    "total_characters_no_whitespace": 206780,
+    "total_characters_with_whitespace": 278367,
+    "note": "문자수 기준. 본문 + 프론트·백 매터 포함."
+  },
+  "rendering_notes": {
+    "latex_math": "에필로그와 11장·9장에 LaTeX 수식 블록($$ ... $$)이 포함됨. EPUB 빌드 시 MathML 또는 이미지 렌더링 파이프라인 필요. Pandoc의 --mathml 또는 --mathjax 옵션 권장.",
+    "ascii_circuits": "에필로그 §2에 ASCII 기반 양자 회로 다이어그램. 고정폭 폰트(monospace) 스타일링 필요.",
+    "symbols": "Φ, Ψ, σ, ω, θ, α, β, γ 등 그리스 문자가 본문에 직접 사용됨. UTF-8 보존 필수.",
+    "code_blocks": "5장·9장·10장·11장에 콘솔 출력 형식의 코드 블록 존재. EPUB 스타일시트에서 <pre> 블록 처리 필요."
+  },
+  "cover_image": "cover.png",
+  "style_reference": "toby-book-writing-style.md"
+}
