@@ -1,0 +1,22 @@
+{
+  "title": "JVM을 알아야 서버가 산다",
+  "subtitle": "백엔드 개발자를 위한 GC 원리와 실전 튜닝",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-04-20",
+  "identifier": "urn:uuid:a3f7c8d1-9e2b-4a5f-b6c0-1d8e3f4a5b6c",
+  "description": "JVM 기반 백엔드 서비스를 운영하는 개발자를 위한 GC 실전 가이드. 메모리 구조부터 세대별 GC 원리, G1/ZGC/Shenandoah 비교, 모니터링과 튜닝 워크플로우, 프로덕션 트러블슈팅까지 — 프로덕션에서 실제로 부딪히는 문제를 중심으로 필요한 만큼의 깊이로 JVM과 GC를 파헤친다.",
+  "cover_image": "cover.png",
+  "version": "1.0.0",
+  "chapters": [
+    "서문",
+    "1장. 왜 백엔드 개발자가 JVM을 알아야 하는가",
+    "2장. JVM의 구조 — 바이트코드에서 메모리까지",
+    "3장. Garbage Collection의 원리 — 쓰레기는 어떻게 찾아 치우는가",
+    "4장. GC 알고리즘 선택 가이드 — 내 서비스에는 어떤 GC가 맞는가",
+    "5장. GC 모니터링과 튜닝 — 측정하고, 이해하고, 조정하라",
+    "6장. 프로덕션 트러블슈팅 — 서버가 죽었을 때 살리는 법",
+    "7장. JVM의 내일 — Virtual Threads, 자동 튜닝, 그리고 그 너머",
+    "에필로그"
+  ]
+}
