@@ -1,0 +1,28 @@
+{
+  "title": "하네스 엔지니어링",
+  "subtitle": "Claude Code와 Codex로 에이전트를 프로덕션에 태우는 법",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-04-20",
+  "identifier": "urn:uuid:7e3c5f2a-8b4d-4a19-b7a2-7e3c5f2a8b4d",
+  "version": "1.0.0",
+  "slug": "harness-engineering-book",
+  "manuscript": "04_manuscript.md",
+  "cover_image": "cover.png",
+  "chapters": 13,
+  "appendices": 6,
+  "approx_chars": 120000,
+  "description": "현업 소프트웨어 엔지니어를 위한 하네스 엔지니어링 전문서. Claude Code와 Codex CLI를 두 달 이상 써본 개발자가 단순 사용자에서 하네스 엔지니어로 전환하는 데 필요한 규율을 다룬다. 학술 27편·실무 사례·Contrarian Signal을 엮어 '도구 숙달'이 아닌 '자동화의 가치와 감당 가능성을 증거로 판별하는 힘'을 기른다. 마지막 장의 약속은 한 장의 Pareto 플롯이다.",
+  "keywords": [
+    "harness engineering",
+    "claude code",
+    "codex cli",
+    "agentic coding",
+    "AI coding",
+    "prompt engineering",
+    "AGENTS.md",
+    "하네스 엔지니어링",
+    "에이전트",
+    "프로덕션"
+  ]
+}

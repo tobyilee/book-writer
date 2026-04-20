@@ -23,3 +23,9 @@ __pycache__/
 # Logs and temp
 *.log
 .tmp/
+
+# Previous-version backups created by epub-builder
+_prev/
+
+# Claude Code worktree scratch
+.claude/worktrees/
