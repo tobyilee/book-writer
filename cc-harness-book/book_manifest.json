@@ -1,0 +1,28 @@
+{
+  "title": "하네스 엔지니어링: Claude Code를 팀의 무기로 길들이기",
+  "subtitle": "모델은 수렴하고, 차이는 하네스에서 만들어진다",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "publisher": "Toby-AI",
+  "publication_date": "2026-04-26",
+  "pub_date": "2026-04-26",
+  "identifier": "urn:uuid:harness-engineering-cc-2026-04-26-v1",
+  "description": "5–10명 팀이 Claude Code를 팀의 무기로 길들이기 위한 하네스 엔지니어링 실전서. 메타-엔지니어링의 네 축(멀티 에이전트, 안전·권한·MCP, 자동화·PR 정책, 관측·비용)에 도메인 지식의 코드화를 더해, 안티패턴 카탈로그·사례 비교·미래 전망까지 다룬다.",
+  "keywords": ["Claude Code", "하네스 엔지니어링", "AI 코딩 에이전트", "팀 운영", "메타 엔지니어링", "MCP", "CLAUDE.md", "Skills", "Hooks", "Subagents"],
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png",
+  "epub_filename": "하네스-엔지니어링-v1.0.0.epub",
+  "chapters": [
+    {"number": 1, "title": "왜 하네스인가 — 모델 너머로 시선을 옮기자"},
+    {"number": 2, "title": "하네스의 해부학 — 우리가 다루는 것의 정의"},
+    {"number": 3, "title": "멀티 에이전트 오케스트레이션 — 한 명의 천재 vs 다섯의 직공"},
+    {"number": 4, "title": "안전과 권한 — 통과시키지 말아야 할 것들의 공학"},
+    {"number": 5, "title": "자동화의 결정성 — Hook으로 박을 것과 CLAUDE.md로 권할 것"},
+    {"number": 6, "title": "관측가능성과 비용 — 보이지 않으면 통제할 수 없다"},
+    {"number": 7, "title": "도메인 지식의 코드화 — CLAUDE.md, Skills, Ratchet Pattern"},
+    {"number": 8, "title": "안티패턴 카탈로그 — 우리가 이미 한 번씩은 한 실수들"},
+    {"number": 9, "title": "사례 비교 — Anthropic, IMWEB, Toss, GeekNews 5인 팀"},
+    {"number": 10, "title": "도구·조직·미래 — 다음 2년의 풍경과 너의 자리"}
+  ]
+}
