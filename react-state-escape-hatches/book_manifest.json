@@ -1,0 +1,38 @@
+{
+  "title": "리액트, 상태와 경계",
+  "subtitle": "흔들리지 않는 멘탈 모델로 다시 쓰는 React",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "publisher": "self-published",
+  "publication_date": "2026",
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png",
+  "chapters": [
+    { "order": 1, "title": "서문 — 왜 이 책이 필요한가", "source": "chapters/00_preface_final.md" },
+    { "order": 2, "title": "0장. 출발점 점검 — 우리가 안다고 믿는 것", "source": "chapters/00_chapter0_final.md" },
+    { "order": 3, "title": "1장. UI는 상태의 함수다 — 다섯 단계로 상태를 설계하기", "source": "chapters/01_final.md" },
+    { "order": 4, "title": "2장. 무엇을 state에 두고, 무엇을 두지 말 것인가", "source": "chapters/02_final.md" },
+    { "order": 5, "title": "3장. 상태를 어디에 둘 것인가 — 끌어올림과 콜로케이션", "source": "chapters/03_final.md" },
+    { "order": 6, "title": "4장. 보존과 리셋 — key가 정말로 하는 일", "source": "chapters/04_final.md" },
+    { "order": 7, "title": "5장. 흩어진 setState를 한 자리에 모으고 싶을 때 — useReducer", "source": "chapters/05_final.md" },
+    { "order": 8, "title": "6장. Context — prop drilling이 진짜 고통일 때", "source": "chapters/06_final.md" },
+    { "order": 9, "title": "7장. 앱이 커져서 상태가 발에 채일 때 — Reducer + Context", "source": "chapters/07_final.md" },
+    { "order": 10, "title": "8장. 도구 선택 — Context, Zustand, Redux, Jotai, 그리고 Server State", "source": "chapters/08_final.md" },
+    { "order": 11, "title": "9장. 경계 — React 안과 밖", "source": "chapters/09_final.md" },
+    { "order": 12, "title": "10장. Ref — 렌더와 무관한 값을 보관하기", "source": "chapters/10_final.md" },
+    { "order": 13, "title": "11장. Effect — 동기화의 사이클과 Reactive Value", "source": "chapters/11_final.md" },
+    { "order": 14, "title": "12장. Effect가 필요 없을 때 — 가장 자주 쓰는 안티패턴들", "source": "chapters/12_final.md" },
+    { "order": 15, "title": "13장. 의존성 배열에 거짓말하지 않기", "source": "chapters/13_final.md" },
+    { "order": 16, "title": "14장. 커스텀 훅 — 로직을 공유한다, 상태를 공유하지 않는다", "source": "chapters/14_final.md" },
+    { "order": 17, "title": "15장. 마지막 카드 세 장 — useSyncExternalStore, useImperativeHandle, flushSync", "source": "chapters/15_final.md" },
+    { "order": 18, "title": "닫는 글 — 무엇을 가지고 돌아가는가", "source": "chapters/99_closing_final.md" },
+    { "order": 19, "title": "부록 A — React 18 → 19 마이그레이션 노트", "source": "chapters/A1_appendix_migration_final.md" },
+    { "order": 20, "title": "부록 B — FAQ 30선", "source": "chapters/A2_appendix_faq_final.md" },
+    { "order": 21, "title": "부록 C — 참고문헌과 학습 경로", "source": "chapters/A3_appendix_resources_final.md" }
+  ],
+  "metadata": {
+    "topic": "React intermediate — Managing State + Escape Hatches",
+    "audience": "JS/TS-comfortable mid-level React developers"
+  }
+}
