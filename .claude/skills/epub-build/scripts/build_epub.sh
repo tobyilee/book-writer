@@ -92,7 +92,7 @@ pandoc "$MANUSCRIPT" \
   --metadata-file="$META_YAML" \
   "${COVER_ARG[@]}" \
   --toc --toc-depth=2 \
-  --split-level=1 \
+  --split-level=2 \
   --output "$OUTPUT" 2>"${WS}/.pandoc_err"
 PANDOC_EXIT=$?
 set -e
