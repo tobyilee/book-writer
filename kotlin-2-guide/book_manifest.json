@@ -1,0 +1,16 @@
+{
+  "title": "Kotlin 2.x로 건너가는 길",
+  "subtitle": "1.9에서 멈춰 있는 코드베이스를 위한 누적 변경 안내서",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "publication_date": "2026-04-27",
+  "pub_date": "2026-04-27",
+  "identifier": "urn:uuid:00b4dd05-ca1b-44be-8b73-edc2ae50da04",
+  "slug": "kotlin-2-guide",
+  "manuscript_path": "kotlin-2-guide/04_manuscript.md",
+  "cover_path": "kotlin-2-guide/cover.png",
+  "output_filename": "Kotlin-2.x로-건너가는-길-v1.0.0.epub",
+  "rights": "본 책은 자동화된 도구로 생성되었으며 학습 자료로 무료 배포된다.",
+  "description": "Kotlin 1.9까지 사용한 실무 개발자를 위한 Kotlin 2.0~2.3 누적 변경 안내서. K2 컴파일러, 언어 기능, deprecation 캐스케이드, 마이그레이션 플레이북을 시간 순서로 정리한다."
+}
