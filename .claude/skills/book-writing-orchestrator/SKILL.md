@@ -93,13 +93,15 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 두 작업이 독립적이므로 병렬로 호출한다.
 
 - `cover-designer` → 표지 이미지 생성, `{slug}/cover.png` 저장
-- `epub-builder`는 cover가 준비된 후에 호출 (순서 의존) → `{책-제목}-v{version}.epub` 생성 (프로젝트 루트)
+- `epub-builder`는 cover가 준비된 후에 호출 (순서 의존) → `{책-제목}-v{version}.epub` 생성 (프로젝트 루트) **+ 같은 폴더에 책 소개 markdown `{책-제목}-v{version}.md` 동시 산출**
 
 **EPUB 메타데이터:**
 - 저자: `Toby-AI` (기본값, Phase 0에서 사용자가 지정한 값이 있으면 그 값 사용)
 - 제목: Phase 2에서 확정된 책 제목
 - 버전: 초기 실행 시 `1.0.0`, 재실행 시 사용자 요청에 따라 증가 (예: `1.1.0`)
 - 언어: `ko`
+
+**책 소개 markdown:** EPUB과 짝을 이루는 외부 독자용 소개 문서. 블로그·스토어·SNS에 바로 쓸 수 있도록 logline, 책 설명, 대상 독자, 핵심 약속, 차례, 저자 소개, 책 정보로 구성된다. 파일명은 EPUB과 같은 stem (`{책-제목}-v{version}.md`). 작성 규약은 `epub-builder` 에이전트 정의의 "책 소개 markdown" 섹션을 따른다.
 
 ## 에러 핸들링
 
@@ -124,7 +126,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 ## 실행 후 피드백
 
 모든 Phase 완료 및 EPUB 산출 후:
-1. 사용자에게 EPUB 경로와 요약 보고
+1. 사용자에게 EPUB 경로 + 책 소개 markdown 경로 + 요약 보고
 2. "개선할 부분이 있나요?"를 짧게 물어본다 (강요하지 않음)
 3. 피드백이 오면 Phase 7-2 매트릭스에 따라 해당 Phase만 재실행
 

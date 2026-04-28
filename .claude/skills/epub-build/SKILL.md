@@ -1,11 +1,11 @@
 ---
 name: epub-build
-description: Build a standards-compliant EPUB 3 file from a manuscript markdown, cover image, and book_manifest.json using the bundled pandoc-based script. Output is 책-제목-v{version}.epub with the manifest's author (defaults to Toby-AI). Use when converting the final book manuscript to EPUB, rebuilding after edits, or testing EPUB output.
+description: Build a standards-compliant EPUB 3 file from a manuscript markdown, cover image, and book_manifest.json using the bundled pandoc-based script. Output is 책-제목-v{version}.epub with the manifest's author (defaults to Toby-AI), accompanied by a paired 책 소개 markdown ({책-제목}-v{version}.md) in the same folder. Use when converting the final book manuscript to EPUB, rebuilding after edits, or testing EPUB output.
 ---
 
 # EPUB Build
 
-통합 원고·표지·매니페스트를 입력받아 EPUB 3 파일을 생성한다. 결정적 빌드를 위해 `scripts/build_epub.sh` 스크립트에 위임한다.
+통합 원고·표지·매니페스트를 입력받아 EPUB 3 파일을 생성하고, 같은 폴더에 책 소개 markdown을 함께 만든다. EPUB 변환은 결정적 빌드를 위해 `scripts/build_epub.sh` 스크립트에 위임하고, 책 소개 markdown은 `epub-builder` 에이전트가 매니페스트·계획·통합 원고를 읽어 직접 작성한다.
 
 ## 절차
 
@@ -22,7 +22,12 @@ description: Build a standards-compliant EPUB 3 file from a manuscript markdown,
 4. **결과 검증**
    - 파일 존재, 크기 ≥ 50KB
    - `epubcheck` 설치되어 있으면 실행, 로그 저장
-5. **기록** — `{slug}/build_log.md`에 명령, 출력, 크기, 검증 결과
+5. **책 소개 markdown 생성** — EPUB과 같은 폴더(프로젝트 루트)에 `{책-제목}-v{version}.md` 작성
+   - 파일명 슬러그화 규칙은 EPUB과 동일 (공백→하이픈, 특수문자 제거)
+   - 콘텐츠 템플릿·작성 원칙은 `epub-builder` 에이전트의 "책 소개 markdown" 섹션 참조
+   - 소스: `book_manifest.json` (메타), `02_plan.md` (독자·아크), `04_manuscript.md` (실제 차례)
+   - 같은 버전 파일이 이미 있으면 `_prev/`로 이동 후 신규 작성
+6. **기록** — `{slug}/build_log.md`에 명령, 출력, 크기, 검증 결과, 책 소개 md 경로
 
 ## 스크립트 개요 (`scripts/build_epub.sh`)
 
@@ -62,6 +67,7 @@ pandoc {manuscript} \
 - [ ] `unzip -l`로 내부 구조 확인 가능
 - [ ] 메타 조회: `pandoc -f epub -t plain --template=metadata.tpl` 등
 - [ ] `epubcheck` 통과 (설치되어 있는 경우)
+- [ ] 책 소개 md (`{책-제목}-v{version}.md`)가 EPUB 옆에 존재하고, 차례·저자·버전이 매니페스트와 일치
 
 ## 실패 대응
 

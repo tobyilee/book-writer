@@ -15,9 +15,12 @@
 3. **계획 리뷰** — 저자와 리뷰어 에이전트가 2회 왕복 토론 후 계획 확정
 4. **챕터 저술** — 에이전트 팀이 Toby 문체로 초안 작성, 스타일 가디언이 실시간 감수
 5. **편집** — 챕터 통합, 전환부 다듬기, 서문·에필로그·참고문헌 작성
-6. **표지 + EPUB 빌드** — 표지 이미지 생성, pandoc으로 EPUB 3 조립
+6. **표지 + EPUB 빌드 + 책 소개** — 표지 이미지 생성, pandoc으로 EPUB 3 조립, 짝을 이루는 책 소개 markdown 작성
 
-산출물은 프로젝트 루트의 `{책-제목}-v{version}.epub`로 저장된다.
+산출물은 프로젝트 루트에 두 파일이 짝으로 저장된다.
+
+- `{책-제목}-v{version}.epub` — 본문 EPUB
+- `{책-제목}-v{version}.md` — 외부 독자용 책 소개 (logline, 대상 독자, 핵심 약속, 차례, 저자 소개, 책 정보). 블로그·스토어·SNS에 바로 붙여 쓸 수 있도록 작성된다.
 
 ## 사전 준비
 
@@ -84,6 +87,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 └── build_log.md             # 빌드 로그
 
 {책-제목}-v1.0.0.epub        # 최종 산출물 (프로젝트 루트)
+{책-제목}-v1.0.0.md          # 책 소개 markdown (EPUB과 같은 폴더, 같은 stem)
 ```
 
 ## 워크플로우 상세
@@ -116,12 +120,13 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 **왜 팀 모드인가?** 여러 챕터를 병렬로 쓸 때 문체가 갈라지는 게 가장 흔한 실패 지점이다. 팀 내 `SendMessage`로 실시간 조율하고, 전담 스타일 가디언이 일관성을 잡는다.
 
-### Phase 5: 표지 + EPUB 빌드 (팬아웃)
+### Phase 5: 표지 + EPUB 빌드 + 책 소개 (팬아웃)
 
 - `cover-designer`가 이미지 생성 (MCP > API > ImageMagick 폴백 순)
 - `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드
 - `pandoc`으로 `04_manuscript.md` + `cover.png` + `book_manifest.json`을 EPUB 3로 변환
 - `epubcheck` 설치 시 자동 검증
+- EPUB 빌드 직후 `epub-builder`가 `02_plan.md`·`04_manuscript.md`·매니페스트를 읽어 **책 소개 markdown**(`{책-제목}-v{version}.md`)을 EPUB 옆에 작성
 
 ## 후속 작업
 

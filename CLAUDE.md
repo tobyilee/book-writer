@@ -12,5 +12,7 @@
 
 **산출 경로:**
 - 중간 산출물: `{book-slug}/`
-- 최종 산출물: `{책-제목}-v{version}.epub`
+- 최종 산출물(프로젝트 루트, 같은 폴더에 짝으로 산출):
+  - `{책-제목}-v{version}.epub` — 본문 EPUB
+  - `{책-제목}-v{version}.md` — 외부 독자용 책 소개 markdown (logline·대상 독자·차례·저자 소개)
 
