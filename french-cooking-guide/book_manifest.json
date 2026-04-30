@@ -1,0 +1,97 @@
+{
+  "title": "브리즈번의 부엌에서, 프렌치를 시작하자",
+  "subtitle": "한식이 익숙한 우리를 위한 프랑스 가정식 입문",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "slug": "french-cooking-guide",
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png",
+  "pub_date": "2026-04-30",
+  "identifier": "urn:uuid:2c48c8cb-1320-5bfc-8ab6-0603ed41d1c4",
+  "description": "브리즈번 거주 한국인 홈쿡을 위한 프랑스 가정식 입문서. 호주 마트 재료만으로 모체 소스 4종과 가정식 12가지를 만들고, 한식 손이 알던 동작과 프렌치 테크닉의 다리를 매번 짚는다. 평어체·청유형의 동반자 화법으로 풀어쓴 약 11만 자 입문서.",
+  "chapters": [
+    {
+      "id": "prologue",
+      "title": "우리가 이 책을 시작한 이유",
+      "file": "chapters/00_final.md"
+    },
+    {
+      "id": "ch01",
+      "title": "프렌치 요리는 무엇을 발명했나 — Escoffier에서 Nouvelle까지",
+      "file": "chapters/01_final.md"
+    },
+    {
+      "id": "ch02",
+      "title": "도구와 부엌 — 사워도우 베이커가 새로 들여야 할 것",
+      "file": "chapters/02_final.md"
+    },
+    {
+      "id": "ch03",
+      "title": "일곱 가지 테크닉 사전 — sauté부터 émulsion까지",
+      "file": "chapters/03_final.md"
+    },
+    {
+      "id": "ch04",
+      "title": "Pan sauce — 가장 작고 가장 자주 만드는 소스",
+      "file": "chapters/04_final.md"
+    },
+    {
+      "id": "ch05",
+      "title": "5대 모체 소스, 뼈대를 잡아보자",
+      "file": "chapters/05_final.md"
+    },
+    {
+      "id": "ch06",
+      "title": "봄·여름의 식탁 — 가벼운 비스트로 네 접시",
+      "file": "chapters/06_final.md"
+    },
+    {
+      "id": "ch07",
+      "title": "짧은 쿨 시즌의 식탁 — Braise의 기술과 시간의 요리",
+      "file": "chapters/07_final.md"
+    },
+    {
+      "id": "ch08",
+      "title": "보존의 부엌 — 시간을 저장하는 두 방식",
+      "file": "chapters/08_final.md"
+    },
+    {
+      "id": "ch09",
+      "title": "식탁의 마무리 — 두 개의 디저트",
+      "file": "chapters/09_final.md"
+    },
+    {
+      "id": "ch10",
+      "title": "프렌치는 끝없이 깊다 — 자력 확장의 지도",
+      "file": "chapters/10_final.md"
+    },
+    {
+      "id": "epilogue",
+      "title": "양파를 갈색이 될 때까지 — 우리가 함께 지나온 자리",
+      "file": "chapters/99_final.md"
+    }
+  ],
+  "appendices": [
+    {
+      "id": "appendix-a",
+      "title": "호주 식재료 변환표"
+    },
+    {
+      "id": "appendix-b",
+      "title": "모체 소스 한눈 매트릭스"
+    },
+    {
+      "id": "appendix-c",
+      "title": "퀸즐랜드 농산물 월별 캘린더"
+    },
+    {
+      "id": "appendix-d",
+      "title": "추천 도서·블로그·매장 리스트"
+    },
+    {
+      "id": "appendix-e",
+      "title": "호주 와인 미니 페어링표"
+    }
+  ]
+}
