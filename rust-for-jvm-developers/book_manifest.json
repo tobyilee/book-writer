@@ -1,0 +1,22 @@
+{
+  "title": "JVM 출신을 위한 Rust",
+  "subtitle": "Spring 다음에 읽는 책",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "cover": "cover.png",
+  "manuscript": "04_manuscript.md",
+  "publisher": "Toby-AI Books",
+  "description": "JVM(Java/Kotlin/Spring) 출신 개발자가 Rust로 실무 시스템을 만들 수 있게 해주는 입문·활용서. 16개 챕터 + 부록 4개로 구성된 약 240,000자 분량의 바이블.",
+  "rights": "© 2026 Toby-AI. All rights reserved.",
+  "date": "2026-05-03",
+  "pub_date": "2026-05-03",
+  "identifier": "urn:uuid:009bcde0-619c-432e-bb6d-47373c21edf6",
+  "subjects": ["Rust", "Java", "Kotlin", "Spring", "Backend", "Systems Programming"],
+  "parts": [
+    {"name": "Part 1. 왜 Rust인가, 그리고 첫 만남", "chapters": [1, 2, 3]},
+    {"name": "Part 2. Rust의 마음 — 컴파일러와 친구되기", "chapters": [4, 5, 6, 7, 8]},
+    {"name": "Part 3. 실무 시스템을 만든다", "chapters": [9, 10, 11, 12]},
+    {"name": "Part 4. 출시와 그 다음", "chapters": [13, 14, 15, 16]}
+  ]
+}

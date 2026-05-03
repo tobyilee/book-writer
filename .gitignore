@@ -13,6 +13,9 @@ Thumbs.db
 # _workspace/
 # _workspace_prev*/
 
+# EPUB build backup (stale rebuilds moved here by build_epub.sh)
+_prev/
+
 # Build output
 # output/
 
