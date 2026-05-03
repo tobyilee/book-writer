@@ -1,0 +1,38 @@
+{
+  "title": "개발자를 위한 학습의 기술",
+  "subtitle": "새 기술을 빠르게 흡수하는 시스템",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "identifier": "urn:uuid:025fd383-f63f-4a7a-934f-acb9790be68e",
+  "pub_date": "2026-05-03",
+  "description": "튜토리얼은 한 시즌에 다섯 개씩 봐도 머리에 안 남고, Anki 카드 만 장을 쌓아도 면접에서 무너지고, 사이드 프로젝트는 매번 시작만 하고 묻힌다. 이 책은 그 자괴감을 게으름이 아니라 학습 시스템 부재의 신호로 읽는다. 인지 부하 이론·바람직한 어려움·시험 효과·의도적 연습 같은 30년 학습 과학과 PACER·GRIND·RAIL·FIT·자이가르닉 같은 17개 프레임워크를 개발자 일상에 다시 박는다. Kafka 공식 문서 한 페이지를 PACER로 해체하고, Rust를 두 달 안에 자기 것으로 만들고, '느려요' 한 줄 장애 보고를 비선형성으로 펼치고, AI 답변에 가설을 먼저 적는 30일 챌린지로 메타인지 잠식을 막는다. 1장의 의지력에서 시작해 5장의 메타인지에 도착하는 여정은 학습이 재능이 아니라 시스템임을 보여준다.",
+  "keywords": [
+    "개발자 학습",
+    "프로그래밍 학습",
+    "메타인지",
+    "PACER",
+    "RAIL",
+    "스킬 습득",
+    "집중력",
+    "학습 시스템",
+    "자기계발",
+    "AI 학습",
+    "코드 리뷰",
+    "페어 프로그래밍",
+    "정밀 연습",
+    "사다리 학습법",
+    "GRIND 마인드맵"
+  ],
+  "chapters": [
+    { "number": 0, "title": "머리말. 왜 이 책을 펼쳤을까", "file": "chapters/00_preface_final.md", "chars": 5327 },
+    { "number": 1, "title": "1장. 퇴근 후 한 시간이 매번 무너지는 이유", "file": "chapters/01_final.md", "chars": 12093 },
+    { "number": 2, "title": "2장. 학습 시스템의 세 기둥을 다시 세우자", "file": "chapters/02_final.md", "chars": 10214 },
+    { "number": 3, "title": "3장. 정보를 분류하고, 그림으로 묶는다", "file": "chapters/03_final.md", "chars": 10502 },
+    { "number": 4, "title": "4장. 새 기술을 두 달 안에 자기 것으로", "file": "chapters/04_final.md", "chars": 12078 },
+    { "number": 5, "title": "5장. 자기 학습을 외부에서 바라보기", "file": "chapters/05_final.md", "chars": 15554 },
+    { "number": 6, "title": "맺음말. 다음 30일, 90일, 그리고 1년", "file": "chapters/06_epilogue_final.md", "chars": 7586 }
+  ],
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png"
+}

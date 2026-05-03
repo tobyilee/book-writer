@@ -23,3 +23,6 @@ __pycache__/
 # Logs and temp
 *.log
 .tmp/
+
+# EPUB rebuild backups (auto-rotated by epub-builder)
+_prev/
