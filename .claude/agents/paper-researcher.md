@@ -49,6 +49,12 @@ model: opus
 - arXiv·Scholar 접근 실패 → Semantic Scholar API 또는 WebSearch 활용
 - 논문 전문 접근 불가 → abstract 기반 기록, 한계 명시
 
+## 이전 산출물이 있을 때
+
+- `{slug}/research/papers.md`가 존재 + 범위 확장 요청 → 기존 항목 보존하며 신규 논문을 append, 상단에 `<!-- 보강: {날짜} {요청 요약} -->`
+- 전체 재실행 요청 → 기존 파일을 `papers_v1.md`로 백업 후 신규 작성
+- 새 인용 정확성 점검 요청 → 해당 논문 항목만 DOI·연도·저자 재검증, 변경 사항을 같은 항목 끝에 `<!-- 정정: ... -->`로 표시
+
 ## 사용하는 스킬
 
 - `paper-research`

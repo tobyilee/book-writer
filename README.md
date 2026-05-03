@@ -1,10 +1,15 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
+[![Version](https://img.shields.io/badge/harness-v1.1.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. 모든 챕터는 `toby-book-writing-style.md`에 정의된 **Toby 문체**로 저술되며, 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
+- **하네스 버전:** `v1.1.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
 - **저자 모델:** Claude Opus (하네스 내 모든 에이전트가 `model: opus` 사용)
+
+> **버전 두 개를 헷갈리지 말자.** 위 `v1.1.0`은 *하네스 버전*(이 도구 자체)이고, 산출 파일명에 들어가는 `{책-제목}-v{version}.epub`의 `version`은 *책 매니페스트의 책 버전*(각 책의 판본)이다. 둘은 독립적으로 진화한다.
 
 ## 이 하네스가 하는 일
 
@@ -86,7 +91,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ├── cover_prompt.md          # 표지 프롬프트 기록
 └── build_log.md             # 빌드 로그
 
-{책-제목}-v1.0.0.epub        # 최종 산출물 (프로젝트 루트)
+{책-제목}-v1.0.0.epub        # 최종 산출물 (프로젝트 루트, 예시 — 책 매니페스트 버전)
 {책-제목}-v1.0.0.md          # 책 소개 markdown (EPUB과 같은 폴더, 같은 stem)
 ```
 
@@ -147,7 +152,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ```
 → Phase 3부터 재실행. 기존 `02_plan.md`는 `02_plan_v1.md`로 백업.
 
-재실행 시 버전은 **minor 증가** (`v1.0.0` → `v1.1.0`) 또는 사용자가 명시적으로 지정.
+재실행 시 책 버전은 **minor 증가** (`v1.0.0` → `v1.1.0`) 또는 사용자가 명시적으로 지정. 이때 바뀌는 건 **책 매니페스트 버전**이지 하네스 버전이 아니다.
 
 ## 커스터마이징
 
