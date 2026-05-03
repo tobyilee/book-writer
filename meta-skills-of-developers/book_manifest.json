@@ -1,0 +1,36 @@
+{
+  "title": "코드 밖에서 결정된다",
+  "subtitle": "잘 일하는 개발자의 메타 스킬",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "slug": "meta-skills-of-developers",
+  "pub_date": "2026-05-03",
+  "identifier": "urn:uuid:bd6a29ac-e52b-5cdd-ab13-7914d9037d85",
+  "description": "같은 회사, 같은 햇수, 비슷한 코드 실력으로 시작한 두 개발자가 5년 뒤 완전히 다른 위치에 가 있는 이유를 풀어내는 책. 메타 스킬(코드 작성 스킬에 대한 스킬)을 사고·결정·실행·소통·학습·시스템·확장의 일곱 카테고리로 분해하고, 각 카테고리를 의지력이 아니라 환경·루틴·도구화의 시스템으로 외부화하는 길을 안내한다. AI 시대의 결합 장에서 그 시스템들이 한 사람의 영향력을 어떻게 폭발시키는지를 데이터와 사례로 보여준다.",
+  "target_audience": "4~10년차 시니어 진입기 개발자 (주니어·시니어 부수)",
+  "structure": [
+    {"role": "preface", "title": "머리말", "file": "preface.md"},
+    {"role": "chapter", "number": 1, "title": "코드 밖에서 결정된다", "subtitle": "같은 10년차가 왜 다른 위치에 있는가", "file": "chapters/01_final.md"},
+    {"role": "chapter", "number": 2, "title": "보는 능력이 답을 만든다", "subtitle": "사고를 시스템으로", "file": "chapters/02_final.md"},
+    {"role": "chapter", "number": 3, "title": "70%에서 결정한다", "subtitle": "불완전한 정보 속에서 움직이는 기술", "file": "chapters/03_final.md"},
+    {"role": "chapter", "number": 4, "title": "끝내는 자가 가져간다", "subtitle": "실행을 시스템으로", "file": "chapters/04_final.md"},
+    {"role": "chapter", "number": 5, "title": "글로 일한다", "subtitle": "코드보다 큰 레버리지를 가지는 문장들", "file": "chapters/05_final.md"},
+    {"role": "chapter", "number": 6, "title": "분산 투자하듯 학습한다", "subtitle": "Knowledge Portfolio로 평생 가는 자산 만들기", "file": "chapters/06_final.md"},
+    {"role": "chapter", "number": 7, "title": "시스템이 의지를 이긴다", "subtitle": "환경·루틴·도구화로 외부화하기", "file": "chapters/07_final.md"},
+    {"role": "interlude", "title": "시스템에서 레버리지로 — 왜 다음이 AI인가", "file": "chapters/07b_interlude_final.md"},
+    {"role": "chapter", "number": 8, "title": "레버리지의 원리", "subtitle": "한 사람의 시간을 어떻게 다른 사람의 시간으로 바꾸는가", "file": "chapters/08_final.md"},
+    {"role": "chapter", "number": 9, "title": "한 사람이 팀을 이긴다", "subtitle": "AI 시대의 결합", "file": "chapters/09_final.md"},
+    {"role": "appendix", "title": "AI 코딩 도구의 분기 — Aider / Cursor / Claude Code", "file": "chapters/99_appendix_final.md"},
+    {"role": "epilogue", "title": "후기", "file": "epilogue.md"},
+    {"role": "references", "title": "참고문헌", "file": "references.md"},
+    {"role": "index", "title": "찾아보기", "file": "index.md"}
+  ],
+  "stats": {
+    "chapter_count": 9,
+    "interlude_count": 1,
+    "appendix_count": 1,
+    "total_korean_chars_estimate": 105000,
+    "total_pages_estimate": 295
+  }
+}
