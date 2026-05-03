@@ -1,0 +1,22 @@
+{
+  "title": "에이전틱 코딩의 시대: 모델을 통제하는 하네스 엔지니어링",
+  "subtitle": "프롬프트의 시대는 끝났다. 이제 하네스를 설계하라.",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-05-02",
+  "identifier": "urn:uuid:cd3cf909-a628-512c-aa27-197ec0d08985",
+  "description": "AI 코딩과 에이전트의 기본 활용을 마친 현업 개발자가 본격적으로 하네스 엔지니어링을 적용하기 위해 알아야 할 지식·실천법·참고 자료를 방대하게 다룬 종합 바이블. CAR(Control-Agency-Runtime)·Guides·Sensors·ACI 4원칙·Generator-Evaluator·Lethal Trifecta·MicroVM 격리·메타 하네스를 5부 26장 + 에필로그 + 부록 8종으로 정리.",
+  "manuscript": "agentic-coding-harness-engineering/04_manuscript.md",
+  "cover_image": "agentic-coding-harness-engineering/cover.png",
+  "slug": "agentic-coding-harness-engineering",
+  "audience": "AI 코딩과 에이전트의 기본 활용을 이미 하고 있는 현업 개발자",
+  "table_of_contents_summary": [
+    "1부 패러다임의 전환 (4장)",
+    "2부 하네스 아키텍처 (5장)",
+    "3부 장기 실행과 컨텍스트 (6장)",
+    "4부 보안과 격리 (6장)",
+    "5부 평가·생태계·팀·미래 (5장 + 에필로그)",
+    "부록 A~H (8종)"
+  ]
+}
