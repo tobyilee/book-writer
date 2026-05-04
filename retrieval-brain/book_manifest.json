@@ -1,0 +1,36 @@
+{
+  "title": "꺼내 쓰는 뇌",
+  "subtitle": "지식을 성과로 바꾸는 완벽한 기억과 인출의 과학",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "slug": "retrieval-brain",
+  "manuscript_path": "retrieval-brain/04_manuscript.md",
+  "cover_path": "retrieval-brain/cover.png",
+  "publisher": "Toby-AI",
+  "year": 2026,
+  "pub_date": "2026-05-04",
+  "identifier": "urn:uuid:49c0b096-7a08-448b-8d01-4d667fa133a9",
+  "description": "공부했는데 안 떠올라 좌절한 적 있는가? 이 책은 망각·인코딩·인출의 학습과학을 바탕으로, 정보를 장기 기억으로 전환하고 실전에서 자유자재로 꺼내 쓰는 훈련법을 제시한다. 단순 spaced repetition·플래시카드의 한계를 비판하고, 인코딩 우선론·생성적 자유 인출·기회주의적 인출·메타인지+시스템·AI 시대의 인지 부채 게이트라는 다섯 가지 약속을 5개 챕터에 풀어 놓았다. 직장인·수험생·자기 지식 체계 구축자 모두를 위한 실전 가이드다.",
+  "keywords": [
+    "학습법",
+    "기억",
+    "인출",
+    "메타인지",
+    "인지심리학",
+    "인코딩",
+    "파인만 기법",
+    "기회주의적 인출",
+    "백지 인출",
+    "PACER",
+    "AI 시대 학습"
+  ],
+  "genre": "학습법/자기계발/인지과학 대중서",
+  "estimated_word_count_korean": 65000,
+  "chapter_count": 5,
+  "audience": [
+    "방대한 전문 지식을 빠르게 습득해야 하는 직장인·전문가",
+    "시험장에서 인출 실패로 좌절하는 수험생",
+    "자기만의 통찰력 있는 지식 체계를 만들고 싶은 사람"
+  ]
+}
