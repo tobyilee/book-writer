@@ -1,0 +1,11 @@
+{
+  "title": "시니어의 학습법",
+  "subtitle": "FIT, PACER, RAIL로 다시 짜는 집중과 학습의 운영체제",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-04",
+  "identifier": "urn:uuid:82c4c88f-0cdc-42f0-b96e-275eeee0d036",
+  "description": "5년+ 시니어 개발자가 학습 시스템을 6개 레이어(집중·학습 시스템·인코딩·스킬 습득·AI·메타인지)로 분해해 자가 진단할 수 있도록 돕는 책. FIT·PACER·RAIL·Bloom Revised·Lewin Force Field 같은 학습 과학 도구를 개발자 일상에 매핑한다.",
+  "cover_image": "cover.png",
+  "version": "1.0.0"
+}
