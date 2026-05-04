@@ -1,0 +1,31 @@
+{
+  "title": "자바 개발자를 위한 Node.js",
+  "subtitle": "Spring 직관을 그대로 들고 가는 두 번째 런타임 가이드",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-05-04",
+  "identifier": "urn:uuid:nodejs-for-java-developer-1.0.0",
+  "slug": "nodejs-for-java-developer",
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png",
+  "cover_image": "cover.png",
+  "summary": "Java/Spring/Kotlin 경력 개발자를 위한 Node.js 비교·실무 가이드. 런타임·언어·프레임워크·운영·마이그레이션을 11개 챕터에 담았다.",
+  "description": "Java/Spring/Kotlin으로 5년 이상 백엔드를 짜온 손이 두 번째 런타임을 받아들이는 자리에 놓인 책이다. 서블릿 스레드 모델과 이벤트 루프, Spring Boot와 NestJS, Hibernate와 Prisma, JVM 도구 체인과 Node 도구 체인, fat jar와 Docker 이미지 — 11개 챕터가 모든 비교를 1차 자료에 근거해 평어체로 풀어낸다. PayPal·LinkedIn·Netflix·Walmart·당근마켓·Uber 사례를 결정 차원으로 다시 보고, 마지막에 그 결정을 조직 안에서 설득할 언어로 옮긴다.",
+  "logline": "Spring 직관을 그대로 들고 가는 두 번째 런타임 가이드.",
+  "keywords": ["Node.js", "TypeScript", "NestJS", "Spring Boot", "마이그레이션", "Strangler Fig", "Java", "Kotlin", "Prisma", "백엔드"],
+  "target_audience": "Java/Spring/Kotlin 백엔드 5년 이상 시니어/미드 개발자",
+  "chapters": [
+    {"order": 0, "id": "prologue", "title": "프롤로그. Spring 개발자가 Node.js 폴더를 처음 열었을 때"},
+    {"order": 1, "id": "ch01", "title": "1장. 단일 스레드는 정말 일감을 감당할 수 있는가"},
+    {"order": 2, "id": "ch02", "title": "2장. JavaScript와 TypeScript"},
+    {"order": 3, "id": "ch03", "title": "3장. 활용 패턴의 지형 — REST·GraphQL·CLI·워커·WebSocket·서버리스"},
+    {"order": 4, "id": "ch04", "title": "4장. NestJS와 Spring Boot — 가장 닮은 두 프레임워크의 정면 비교"},
+    {"order": 5, "id": "ch05", "title": "5장. ORM과 데이터베이스 — Hibernate의 마법이 사라진 자리"},
+    {"order": 6, "id": "ch06", "title": "6장. 디버깅 — JVM 도구 체인을 Node 도구 체인으로 옮기기"},
+    {"order": 7, "id": "ch07", "title": "7장. 배포·운영·보안·CI/CD — 컨테이너 시대의 Node 운영 매뉴얼"},
+    {"order": 8, "id": "ch08", "title": "8장. Java/Spring에서 Node.js로 — 마이그레이션 전략"},
+    {"order": 9, "id": "ch09", "title": "9장. 결정과 설득 — 팀과 커리어에 Node를 들이는 법"},
+    {"order": 10, "id": "epilogue", "title": "에필로그. 두 런타임을 같이 돌리는 백엔드 개발자"}
+  ]
+}
