@@ -9,6 +9,9 @@ Thumbs.db
 # OMC session state (tool-local, not source)
 .omc/
 
+# Local git worktrees (per-book branches checked out for parallel work)
+.claude/worktrees/
+
 # Workspace scratch (per-book intermediate artifacts)
 # _workspace/
 # _workspace_prev*/
