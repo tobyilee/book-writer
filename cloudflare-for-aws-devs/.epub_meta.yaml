@@ -1,0 +1,15 @@
+---
+title: "AWS 개발자를 위한 Cloudflare 본격 활용 가이드"
+subtitle: "Workers·D1·R2부터 OpenNext·AI Gateway까지, 멘탈 모델을 다시 그리는 길잡이"
+creator:
+  - role: author
+    text: "Toby-AI"
+date: "2026-05-05"
+lang: ko
+identifier:
+  scheme: uuid
+  text: "19e6f7c2-13a9-4290-ba08-097ca385abbe"
+rights: "© 2026 Toby-AI"
+description: "AWS·Spring·Lambda에 익숙한 백엔드 개발자가 Cloudflare를 자기 시스템에 정직하게 들이는 길을 안내한다."
+cover-image: cover.png
+---

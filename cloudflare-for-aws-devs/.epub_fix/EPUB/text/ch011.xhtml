@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch011.xhtml</title>
+  <style>
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-데이터-2-durable-objects와-r2-그리고-cache-api" class="level2">
+<h2>8장. 데이터 2 — Durable Objects와 R2, 그리고 Cache API</h2>
+<p>재고가 정확히 1개 남은 상품이 있다고 해보자. 블랙 프라이데이 자정에 그 한 상품을 노리고 있던 두 사용자가 있다. 둘이 거의 동시에 결제 버튼을 누른다. 한 명은 서울 PoP에서, 다른 한 명은 도쿄 PoP에서. 두 요청이 0.3초 차이로 백엔드에 도착한다. 그 0.3초 사이에 무슨 일이 벌어져야 옳을까. 한 명은 결제 성공, 다른 한 명은 “재고 없음” 안내. 절대로 두 명 모두 성공하면 안 된다. <em>재고가 -1이 되는 순간 회사 슬랙에 사장의 호통이 떨어진다.</em></p>
+<p>이 문제를 어떻게 푸는가. Spring 개발자라면 익숙한 답이 있다. <code>@Transactional</code>로 묶고 데이터베이스에 <code>SELECT ... FOR UPDATE</code> 락을 건다. 또는 Redis에 분산 락(Redisson)을 건다. 또는 RabbitMQ로 직렬화 큐를 만든다. 어느 길로 가든 핵심은 하나다. <em>동일 자원에 대한 쓰기를 한 줄로 세운다.</em> 한 줄로 세우는 사람이 어디에 있는지 — 그것이 DB냐, Redis냐, 큐 시스템이냐 — 가 다를 뿐이다.</p>
+<p>그런데 7장에서 우리가 손에 쥔 도구는 KV와 D1뿐이다. KV는 eventually consistent니까 -1 사고가 정확히 그 60초 전파 창에서 터진다. D1은 SQL 트랜잭션이 되긴 하지만 글로벌 PoP에서 동시에 들어오는 race condition을 대놓고 직렬화하기에는 모양이 매끄럽지 않다. 그렇다면 무엇이 필요한가. <em>전역에서 단 하나뿐인, 그 자원을 위한 전용 서버가 필요하다.</em> 한 줄로 세우는 사람을 데이터베이스 안에 두지 말고, 자원 자체에 박아 두는 발상이다. 재고 자원에는 재고를 위한 단일 actor가, 채팅방에는 그 방을 위한 단일 actor가, 사용자 세션에는 사용자 본인을 위한 단일 actor가.</p>
+<p>이게 Durable Objects다. AWS에 정확한 등가물이 없다. 굳이 한 줄로 매핑하면 <em>DynamoDB + Lambda + ElastiCache를 한 추상으로 묶은 것</em> 정도지만, 정확하지 않다. 4장에서 이미 이야기했다 — DynamoDB의 한 줄 매핑은 거짓말이다. 8장은 그 거짓말의 정직한 답을 손에 쥐는 챕터다. Durable Objects로 강한 일관성·실시간 협업·WebSocket을 다시 그리고, R2로 미디어 storage의 egress 청구서를 내려놓고, Cache API로 요청 단위 캐시를 손에 쥔다.</p>
+<p>자, Durable Objects부터 살펴보자.</p>
+<section id="durable-objects-actor-모델로-다시-생각하기" class="level3">
+<h3>Durable Objects — Actor 모델로 다시 생각하기</h3>
+<section id="객체가-글로벌에서-단-하나뿐이라는-발상" class="level4">
+<h4>“객체”가 글로벌에서 단 하나뿐이라는 발상</h4>
+<p>Durable Objects를 처음 만나면 이름부터 헷갈린다. “Durable”이라니, 영속 저장소인가? “Object”라니, S3 같은 거? 둘 다 살짝 맞고 살짝 틀리다. 본질을 한 줄로 적으면 이렇다.</p>
+<blockquote>
+<p><strong>Durable Object는 ID로 지칭되는 단일 인스턴스다. 전역에서 그 ID에 대해 인스턴스는 정확히 하나만 존재하고, 한 곳의 PoP에 고정 위치를 갖고, 자체 영속 스토리지를 갖는다.</strong></p>
+</blockquote>
+<p>세 단어가 핵심이다. <strong>단일·고정·영속</strong>.</p>
+<p>단일이라는 말은 무엇을 뜻하는가. <code>room-12345</code>라는 채팅방 ID가 있다고 해보자. 서울에서 누가 메시지를 보내든, 도쿄에서 누가 보내든, 상파울루에서 누가 보내든, 그 메시지는 결국 <em>같은 인스턴스</em>에 도달한다. 인스턴스가 여러 PoP에 복제돼 있는 게 아니다. 한 PoP에 진짜로 한 개만 있다. 그래서 그 인스턴스 안에서 코드를 쓰는 동안에는 마치 single-threaded JavaScript처럼 동작한다. <em>race condition이 없다.</em> 두 요청이 동시에 들어오면 한 요청이 먼저 처리되고 다른 요청은 대기열에 줄을 선다. 마음 편한 일이다.</p>
+<p>고정이라는 말도 중요하다. 한 번 인스턴스가 만들어진 PoP에서, 그 인스턴스는 그 자리를 지킨다. <code>idFromName('room-12345')</code>로 처음 깨운 사용자가 도쿄에 있었다면 그 채팅방 인스턴스는 도쿄 PoP에 자리를 잡는다. 그 뒤에 서울 사용자가 같은 방에 들어오면, 서울에서 도쿄까지 한 hop을 더 가는 셈이다. 글로벌 분산이 아니라 <em>지역 고정</em>이다. KV의 글로벌 균등 분산과는 정반대 모델이다. location hint로 어느 대륙에 둘지 일부 제어할 수 있지만, 본질은 <em>한 자원에는 한 자리</em>다.</p>
+<p>영속이라는 말은 인스턴스 안에 자체 스토리지가 들어 있다는 뜻이다. <code>state.storage.put('inventory', 99)</code> 한 줄로 영속 저장된다. SQLite 백엔드 위에 트랜잭션·serializable 격리 수준까지 보장된다. D1처럼 별도의 DB 바인딩을 부를 필요가 없다 — 객체 안에 내장돼 있다. 그래서 재고 차감 같은 transactional 워크로드가 한 객체 안에서 깔끔하게 닫힌다. 락을 따로 걸 필요도, 분산 트랜잭션을 짤 필요도 없다.</p>
+<p>이 셋을 묶으면 무엇이 보이는가. <em>Erlang의 actor가 보인다.</em> Akka, Orleans, Elixir GenServer를 알고 있다면 거의 같은 자리다. 메시지를 받아 자기 상태를 일관되게 갱신하는 actor 한 개가 자원 하나에 매달려 있는 것이다. Spring 개발자에게는 멀게 느껴질 수 있는데, 가장 가까운 비유를 찾자면 이렇다 — <em><code>@Transactional</code>을 데이터베이스에 거는 게 아니라 자원 그 자체에 거는 모델이다.</em> 데이터베이스 락 경합을 만들 필요가 없다. 자원 안에 락이 이미 있다.</p>
+</section>
+<section id="가장-단순한-do-카운터-한-개부터" class="level4">
+<h4>가장 단순한 DO — 카운터 한 개부터</h4>
+<p>말로만 풀면 손끝이 가렵다. 가장 단순한 DO를 손으로 한 번 만들어 보자. 카운터 한 개. 호출할 때마다 1씩 증가하고, 현재 값을 돌려준다. 두 요청이 동시에 들어와도 절대로 같은 값을 반환하지 않는다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/counter.ts</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { DurableObject } <span class="im">from</span> <span class="st">&#39;cloudflare:workers&#39;</span><span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">class</span> Counter <span class="kw">extends</span> DurableObject {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">increment</span>()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">number</span><span class="op">&gt;</span> {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> current <span class="op">=</span> (<span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">get</span><span class="op">&lt;</span><span class="dt">number</span><span class="op">&gt;</span>(<span class="st">&#39;count&#39;</span>)) <span class="op">??</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> next <span class="op">=</span> current <span class="op">+</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">put</span>(<span class="st">&#39;count&#39;</span><span class="op">,</span> next)<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> next<span class="op">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">value</span>()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">number</span><span class="op">&gt;</span> {</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (<span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">get</span><span class="op">&lt;</span><span class="dt">number</span><span class="op">&gt;</span>(<span class="st">&#39;count&#39;</span>)) <span class="op">??</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>이게 전부다. <code>DurableObject</code>를 상속하고, 메서드 두 개를 둔다. <code>this.ctx.storage</code>가 영속 스토리지의 핸들이다. <code>get</code>·<code>put</code>은 자동으로 트랜잭션 단위로 묶인다. 한 메서드 호출 안에서 일어난 모든 storage 연산은 atomic하다. <em><code>SELECT FOR UPDATE</code>가 자동으로 걸려 있는 셈이다.</em></p>
+<p>그러면 이 객체를 Worker에서 어떻게 부르는가. Worker 진입점은 평소처럼 <code>fetch</code>이고, 그 안에서 DO를 namespace로 받아 ID로 인스턴스를 깨운다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// src/index.ts</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> { Counter } <span class="im">from</span> <span class="st">&#39;./counter&#39;</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">fetch</span>(req<span class="op">:</span> Request<span class="op">,</span> env<span class="op">:</span> Env)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>Response<span class="op">&gt;</span> {</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> url <span class="op">=</span> <span class="kw">new</span> <span class="fu">URL</span>(req<span class="op">.</span><span class="at">url</span>)<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> name <span class="op">=</span> url<span class="op">.</span><span class="at">searchParams</span><span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;name&#39;</span>) <span class="op">??</span> <span class="st">&#39;default&#39;</span><span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> id <span class="op">=</span> env<span class="op">.</span><span class="at">COUNTER</span><span class="op">.</span><span class="fu">idFromName</span>(name)<span class="op">;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> stub <span class="op">=</span> env<span class="op">.</span><span class="at">COUNTER</span><span class="op">.</span><span class="fu">get</span>(id)<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (url<span class="op">.</span><span class="at">pathname</span> <span class="op">===</span> <span class="st">&#39;/inc&#39;</span>) {</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> v <span class="op">=</span> <span class="cf">await</span> stub<span class="op">.</span><span class="fu">increment</span>()<span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> Response<span class="op">.</span><span class="fu">json</span>({ value<span class="op">:</span> v })<span class="op">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (url<span class="op">.</span><span class="at">pathname</span> <span class="op">===</span> <span class="st">&#39;/val&#39;</span>) {</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> v <span class="op">=</span> <span class="cf">await</span> stub<span class="op">.</span><span class="fu">value</span>()<span class="op">;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> Response<span class="op">.</span><span class="fu">json</span>({ value<span class="op">:</span> v })<span class="op">;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(<span class="st">&#39;not found&#39;</span><span class="op">,</span> { status<span class="op">:</span> <span class="dv">404</span> })<span class="op">;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>} satisfies ExportedHandler<span class="op">&lt;</span>Env<span class="op">&gt;;</span></span></code></pre></div>
+<p><code>wrangler.toml</code>에는 한 묶음의 선언이 들어간다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-do&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">main</span> <span class="op">=</span> <span class="st">&quot;src/index.ts&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">compatibility_date</span> <span class="op">=</span> <span class="st">&quot;2026-04-01&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[[durable_objects.bindings]]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;COUNTER&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">class_name</span> <span class="op">=</span> <span class="st">&quot;Counter&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">[[migrations]]</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="dt">tag</span> <span class="op">=</span> <span class="st">&quot;v1&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="dt">new_sqlite_classes</span> <span class="op">=</span> <span class="op">[</span><span class="st">&quot;Counter&quot;</span><span class="op">]</span></span></code></pre></div>
+<p><code>[[migrations]]</code> 항목이 처음 보면 낯설다. 2장에서 살짝 짚고 넘어왔지만 여기서 다시 짚자. DO는 클래스가 곧 데이터다. 클래스를 추가하거나 이름을 바꾸면 명시적인 migration tag로 그 변경을 선언해야 한다. 안 그러면 <em>배포 자체가 거부된다.</em> 처음에는 번거롭다 싶지만, 이 강제가 운영에서 큰 사고를 막아 준다. 내가 모르는 사이에 데이터가 매여 있는 클래스가 사라지는 일을 시스템이 거부해 준다.</p>
+<p>이걸 배포하고 한 번 두드려 보자.</p>
+<pre><code>$ wrangler deploy
+$ curl &#39;https://toby-shop-do.&lt;sub&gt;.workers.dev/inc?name=room-1&#39;
+{&quot;value&quot;:1}
+$ curl &#39;https://toby-shop-do.&lt;sub&gt;.workers.dev/inc?name=room-1&#39;
+{&quot;value&quot;:2}
+$ curl &#39;https://toby-shop-do.&lt;sub&gt;.workers.dev/inc?name=room-2&#39;
+{&quot;value&quot;:1}</code></pre>
+<p><code>name</code>을 바꾸면 다른 인스턴스다. 같은 <code>name</code>은 글로벌에서 단 하나뿐이다. <em>서울에서 두 번, 도쿄에서 한 번 누르든 정확히 한 줄로 직렬화된다.</em> 이 작은 카운터가 재고 차감의 본질을 그대로 담고 있다.</p>
+</section>
+<section id="spring-transactional-redis-락의-자리를-do가-가져가는-방식" class="level4">
+<h4>Spring <code>@Transactional</code> + Redis 락의 자리를 DO가 가져가는 방식</h4>
+<p>Spring 멘탈로 같은 일을 짠다고 해보자. 재고 차감 코드는 어떻게 생겼는가.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Spring 멘탈</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">@Service</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> InventoryService <span class="op">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Autowired</span> <span class="kw">private</span> InventoryRepository repo<span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Autowired</span> <span class="kw">private</span> RedissonClient redisson<span class="op">;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Transactional</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">reserve</span><span class="op">(</span><span class="bu">String</span> sku<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        RLock lock <span class="op">=</span> redisson<span class="op">.</span><span class="fu">getLock</span><span class="op">(</span><span class="st">&quot;inventory:&quot;</span> <span class="op">+</span> sku<span class="op">);</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(!</span>lock<span class="op">.</span><span class="fu">tryLock</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="bu">TimeUnit</span><span class="op">.</span><span class="fu">SECONDS</span><span class="op">))</span> <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span> <span class="op">{</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            Inventory inv <span class="op">=</span> repo<span class="op">.</span><span class="fu">findBySku</span><span class="op">(</span>sku<span class="op">).</span><span class="fu">orElseThrow</span><span class="op">();</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">(</span>inv<span class="op">.</span><span class="fu">getStock</span><span class="op">()</span> <span class="op">&lt;</span> <span class="dv">1</span><span class="op">)</span> <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            inv<span class="op">.</span><span class="fu">setStock</span><span class="op">(</span>inv<span class="op">.</span><span class="fu">getStock</span><span class="op">()</span> <span class="op">-</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>            repo<span class="op">.</span><span class="fu">save</span><span class="op">(</span>inv<span class="op">);</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">finally</span> <span class="op">{</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            lock<span class="op">.</span><span class="fu">unlock</span><span class="op">();</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>세 가지가 보인다. (1) Redisson 분산 락으로 같은 SKU에 대한 동시 호출을 직렬화한다. (2) <code>@Transactional</code>로 DB read·write를 트랜잭션 안에 묶는다. (3) <code>tryLock</code> 타임아웃·예외 처리를 손으로 챙긴다. <em>마음을 졸이는 일이다.</em> Redis가 죽으면 어떻게 되는가. 락 키가 expire 안 되면? 트랜잭션 격리 수준이 잘못 설정돼 있으면? 운영 중에 정말로 -1 사고가 한 번이라도 터지면 그날 새벽이 길어진다.</p>
+<p>같은 일을 DO로 짜면 이렇다.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">class</span> Inventory <span class="kw">extends</span> DurableObject {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">reserve</span>()<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>{ ok<span class="op">:</span> <span class="dt">boolean</span><span class="op">;</span> remaining<span class="op">:</span> <span class="dt">number</span> }<span class="op">&gt;</span> {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> stock <span class="op">=</span> (<span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">get</span><span class="op">&lt;</span><span class="dt">number</span><span class="op">&gt;</span>(<span class="st">&#39;stock&#39;</span>)) <span class="op">??</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (stock <span class="op">&lt;</span> <span class="dv">1</span>) <span class="cf">return</span> { ok<span class="op">:</span> <span class="kw">false</span><span class="op">,</span> remaining<span class="op">:</span> <span class="dv">0</span> }<span class="op">;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">put</span>(<span class="st">&#39;stock&#39;</span><span class="op">,</span> stock <span class="op">-</span> <span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> { ok<span class="op">:</span> <span class="kw">true</span><span class="op">,</span> remaining<span class="op">:</span> stock <span class="op">-</span> <span class="dv">1</span> }<span class="op">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>여기에는 락 코드가 없다. 트랜잭션 어노테이션도 없다. <em>그래도 race condition이 없다.</em> 인스턴스가 글로벌에서 단 하나라서, 두 요청이 동시에 들어와도 한 요청이 먼저 끝난 뒤에야 다음 요청의 코드가 실행된다. storage <code>get</code>·<code>put</code>은 그 호출 안에서 atomic하다. 사장의 호통을 부를 -1 사고가 architecture 단에서 차단된다.</p>
+<p>물론 공짜는 없다. 두 줄을 적어 두자.</p>
+<ul>
+<li>DO는 <em>하나</em>만 있어서 안전하지만, 그 하나에 트래픽이 몰리면 한 줄에 줄을 서야 한다. 한 인스턴스의 처리량이 곧 그 자원의 처리량이다. 그래서 핫한 SKU 하나가 초당 1만 reserve를 받아야 한다면 DO의 단일 인스턴스 모델로는 무리다. 그때는 자원을 쪼갠다 — <code>inventory-{sku}-{shard0~9}</code> 같은 식으로 1차 샤딩을 두든지, write-heavy 영역은 Hyperdrive 너머의 Postgres에 두는 편이 낫다. 5장의 결정 프레임이 여기서 다시 등장한다.</li>
+<li>DO는 한 PoP에 고정 위치를 갖는다. <code>idFromName('inventory-sku-1')</code>을 도쿄 사용자가 처음 깨우면 도쿄에 자리잡는다. 그 뒤에 미국 사용자가 같은 SKU를 찌르면 도쿄까지 한 hop을 가야 한다. <em>정상이다.</em> 그래서 멀티테넌트 SaaS의 per-tenant DO는 location hint로 그 테넌트의 주 사용 지역에 배치하는 게 좋다.</li>
+</ul>
+<p>자, 카운터를 손에 쥐었으니 이제 채팅방으로 가보자. 그리고 그 김에 <em>DO의 가격 모델을 뒤집은 한 수</em> — WebSocket Hibernation을 만나자.</p>
+</section>
+<section id="websocket-hibernation-영속-연결의-비용-모델을-뒤집는-한-수" class="level4">
+<h4>WebSocket Hibernation — 영속 연결의 비용 모델을 뒤집는 한 수</h4>
+<p>채팅방을 운영해 본 사람은 알 것이다. WebSocket 연결 1만 개를 한 서버가 들고 있으면, 그 서버 메모리는 하루 종일 떠 있어야 한다. AWS에서는 ECS Fargate 한 컨테이너가 24시간 떠 있고, 사용자가 메시지를 안 보내고 가만히 있어도 메모리·CPU 청구서가 계속 적힌다. 진짜로 메시지가 오가는 시간은 전체의 1%도 안 되는데 <em>나머지 99%의 시간에도 비용이 적힌다.</em> 찜찜하다.</p>
+<p>DO에 WebSocket을 그냥 얹어도 같은 문제가 일어난다. 클라이언트가 <code>WebSocket</code> 연결을 유지하는 동안 그 DO 인스턴스는 메모리에 떠 있어야 하고, GB-s 과금이 계속 잡힌다. 그래서 Cloudflare가 WebSocket Hibernation API를 따로 만들었다. 본질은 한 줄이다.</p>
+<blockquote>
+<p><strong>연결은 살아 있되, DO 인스턴스는 메시지 사이의 휴면기에 메모리에서 내려간다. 메시지가 도착하면 DO가 깨어나 핸들러를 실행한다. 그 깨어 있는 시간만 과금된다.</strong></p>
+</blockquote>
+<p>WebSocket 표준 위에 위장된 마술이 한 겹 들어 있다. 클라이언트는 연결이 정상으로 살아 있다고 본다. 서버는 메시지가 도착할 때만 메모리를 차지한다. 1만 명이 채팅방에 가만히 있는 시간 동안에는 <em>과금이 멈춘다.</em> 영속 연결의 비용 모델이 처음으로 정직해졌다.</p>
+<p>이걸 코드로 보면 차이가 분명하다. 일반 WebSocket DO와 Hibernation API의 결정적 차이는 <em>연결 상태를 메서드 인자로 받는다</em>는 점이다. 인스턴스 변수에 보관하면 sleep 동안 그게 사라지니까.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { DurableObject } <span class="im">from</span> <span class="st">&#39;cloudflare:workers&#39;</span><span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">class</span> ChatRoom <span class="kw">extends</span> DurableObject {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">fetch</span>(request<span class="op">:</span> Request)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>Response<span class="op">&gt;</span> {</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (request<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;Upgrade&#39;</span>) <span class="op">!==</span> <span class="st">&#39;websocket&#39;</span>) {</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(<span class="st">&#39;expected websocket&#39;</span><span class="op">,</span> { status<span class="op">:</span> <span class="dv">426</span> })<span class="op">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> pair <span class="op">=</span> <span class="kw">new</span> <span class="fu">WebSocketPair</span>()<span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> [client<span class="op">,</span> server] <span class="op">=</span> [pair[<span class="dv">0</span>]<span class="op">,</span> pair[<span class="dv">1</span>]]<span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Hibernation API — DO가 잠들어도 연결은 유지된다.</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="fu">acceptWebSocket</span>(server)<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(<span class="kw">null</span><span class="op">,</span> { status<span class="op">:</span> <span class="dv">101</span><span class="op">,</span> webSocket<span class="op">:</span> client })<span class="op">;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">webSocketMessage</span>(ws<span class="op">:</span> <span class="bu">WebSocket</span><span class="op">,</span> message<span class="op">:</span> <span class="dt">string</span> <span class="op">|</span> <span class="bu">ArrayBuffer</span>)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">void</span><span class="op">&gt;</span> {</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="kw">typeof</span> message <span class="op">!==</span> <span class="st">&#39;string&#39;</span>) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> text <span class="op">=</span> message<span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> <span class="dv">2000</span>)<span class="op">;</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 영속 저장 — 마지막 50개 메시지를 보관해 늦게 들어온 사람도 문맥을 본다.</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> recent <span class="op">=</span> (<span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">get</span><span class="op">&lt;</span><span class="dt">string</span>[]<span class="op">&gt;</span>(<span class="st">&#39;recent&#39;</span>)) <span class="op">??</span> []<span class="op">;</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    recent<span class="op">.</span><span class="fu">push</span>(text)<span class="op">;</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (recent<span class="op">.</span><span class="at">length</span> <span class="op">&gt;</span> <span class="dv">50</span>) recent<span class="op">.</span><span class="fu">shift</span>()<span class="op">;</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="at">storage</span><span class="op">.</span><span class="fu">put</span>(<span class="st">&#39;recent&#39;</span><span class="op">,</span> recent)<span class="op">;</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 같은 방에 연결된 모든 클라이언트에 브로드캐스트.</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> peer <span class="kw">of</span> <span class="kw">this</span><span class="op">.</span><span class="at">ctx</span><span class="op">.</span><span class="fu">getWebSockets</span>()) {</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>      <span class="cf">try</span> {</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>        peer<span class="op">.</span><span class="fu">send</span>(text)<span class="op">;</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">catch</span> {</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>        <span class="co">// 보낼 수 없는 소켓은 닫혀 있다 — 무시하자.</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">webSocketClose</span>(ws<span class="op">:</span> <span class="bu">WebSocket</span><span class="op">,</span> code<span class="op">:</span> <span class="dt">number</span><span class="op">,</span> reason<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> wasClean<span class="op">:</span> <span class="dt">boolean</span>)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span><span class="dt">void</span><span class="op">&gt;</span> {</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span> { ws<span class="op">.</span><span class="fu">close</span>(code<span class="op">,</span> reason)<span class="op">;</span> } <span class="cf">catch</span> {}</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>세 가지가 눈에 띈다. (1) <code>this.ctx.acceptWebSocket(server)</code> — 이 한 줄이 일반 <code>server.accept()</code>와 갈라지는 지점이다. Hibernation 모드를 켜는 스위치다. (2) 메시지 핸들러가 <code>webSocketMessage</code>라는 <em>메서드</em>다. 클로저로 잡지 않는다. DO가 sleep에서 깨어나면 이 메서드가 호출된다. 인스턴스 변수는 사라져 있을 수 있어서, 필요한 상태는 모두 storage에 두거나 메시지에 실어야 한다. (3) <code>this.ctx.getWebSockets()</code>로 현재 살아 있는 소켓 목록을 받는다. 인스턴스 변수에 손으로 모아 두지 않아도 된다. <em>플랫폼이 기억해 준다.</em></p>
+<p>그리고 진입점.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> { ChatRoom } <span class="im">from</span> <span class="st">&#39;./chat-room&#39;</span><span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">fetch</span>(req<span class="op">:</span> Request<span class="op">,</span> env<span class="op">:</span> Env)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>Response<span class="op">&gt;</span> {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> url <span class="op">=</span> <span class="kw">new</span> <span class="fu">URL</span>(req<span class="op">.</span><span class="at">url</span>)<span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> room <span class="op">=</span> url<span class="op">.</span><span class="at">searchParams</span><span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;room&#39;</span>) <span class="op">??</span> <span class="st">&#39;lobby&#39;</span><span class="op">;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> id <span class="op">=</span> env<span class="op">.</span><span class="at">CHAT</span><span class="op">.</span><span class="fu">idFromName</span>(<span class="vs">`room:</span><span class="sc">${</span>room<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> stub <span class="op">=</span> env<span class="op">.</span><span class="at">CHAT</span><span class="op">.</span><span class="fu">get</span>(id)<span class="op">;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> stub<span class="op">.</span><span class="fu">fetch</span>(req)<span class="op">;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>} satisfies ExportedHandler<span class="op">&lt;</span>Env<span class="op">&gt;;</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[[durable_objects.bindings]]</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;CHAT&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="dt">class_name</span> <span class="op">=</span> <span class="st">&quot;ChatRoom&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[[migrations]]</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="dt">tag</span> <span class="op">=</span> <span class="st">&quot;v1&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="dt">new_sqlite_classes</span> <span class="op">=</span> <span class="op">[</span><span class="st">&quot;ChatRoom&quot;</span><span class="op">]</span></span></code></pre></div>
+<p>이걸 띄우고 브라우저 콘솔에서 <code>new WebSocket('wss://.../?room=cs-001')</code> 두 개를 두 탭에 열어 보자. 한쪽에서 보낸 메시지가 다른 쪽에 즉시 도착한다. 그 둘이 잠시 메시지를 안 보내는 동안에는, 가격표상 <em>과금이 멈춰 있다.</em> 1시간 동안 두 사용자가 가만히 있었다면 그 1시간은 거의 공짜다.</p>
+<p>이게 어떤 변화를 만드는가. 고객지원 채팅방을 ECS에 띄워 1만 동시 연결을 유지하는 비용과, DO + Hibernation으로 같은 1만 연결을 유지하는 비용을 비교해 보자. 후자는 <em>실제로 메시지를 주고받는 시간만</em> 비용이 잡힌다. 야간·주말 idle 트래픽이 그대로 청구서에서 빠진다. 한국 SaaS의 고객지원 채팅처럼 idle 비율이 90%를 넘는 워크로드에서는 비용 모델 자체가 다르다.</p>
+<p>물론 정직해지자. 전송 메시지 수는 여전히 과금된다. 메시지가 폭주하는 라이브 스트림 채팅(분당 수만 건)이라면 <em>별로 매력적이지 않을 수 있다.</em> Hibernation은 <em>대기 시간이 긴</em> 워크로드에 빛난다. 5장의 결정 프레임을 다시 들고 와서, 트래픽 형상이 idle-heavy인지 burst-heavy인지부터 본다.</p>
+</section>
+<section id="migrations라는-안전장치-무심코-넘기면-안-되는-한-줄" class="level4">
+<h4><code>[[migrations]]</code>라는 안전장치 — 무심코 넘기면 안 되는 한 줄</h4>
+<p>DO를 운영하다 보면 한 번은 마주치는 실수가 있다. 클래스 이름을 바꾸거나 새 DO 클래스를 추가하면서 <code>[[migrations]]</code> 태그를 깜빡한다. 그 상태로 <code>wrangler deploy</code>를 누르면 <em>배포가 그냥 거부된다.</em> 처음 보면 짜증스럽지만, 이 거부가 큰 사고를 막아 준다.</p>
+<p>DO에서 클래스는 곧 데이터다. 클래스 이름을 바꾸면 그 이름으로 매여 있던 영속 데이터가 <em>고아</em>가 될 수 있다. 그래서 Cloudflare는 강제로 명시적인 결정을 요구한다 — “이 클래스 이름이 바뀌었습니다, 기존 데이터는 새 클래스에 매달려 있다고 봐도 됩니까?”, “이 클래스를 추가했고 SQLite 백엔드를 씁니다, 맞습니까?” 같은 식으로.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[[migrations]]</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="dt">tag</span> <span class="op">=</span> <span class="st">&quot;v1&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="dt">new_sqlite_classes</span> <span class="op">=</span> <span class="op">[</span><span class="st">&quot;Counter&quot;</span><span class="op">]</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[[migrations]]</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="dt">tag</span> <span class="op">=</span> <span class="st">&quot;v2&quot;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="dt">new_sqlite_classes</span> <span class="op">=</span> <span class="op">[</span><span class="st">&quot;ChatRoom&quot;</span><span class="op">]</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">[[migrations]]</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="dt">tag</span> <span class="op">=</span> <span class="st">&quot;v3&quot;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="dt">renamed_classes</span> <span class="op">=</span> <span class="op">[{ </span><span class="dt">from</span><span class="op"> =</span> <span class="st">&quot;ChatRoom&quot;</span><span class="op">, </span><span class="dt">to</span><span class="op"> =</span> <span class="st">&quot;SupportRoom&quot;</span><span class="op"> }]</span></span></code></pre></div>
+<p>태그는 누적이다. v1·v2·v3가 순서대로 적용된다. 한 번 적용된 태그를 바꾸면 안 된다. 운영하면서 가장 많이 보는 에러 메시지가 “tag X already applied”인데, 이 메시지를 만나면 새 태그를 추가하는 게 답이지 기존 태그를 수정하는 게 답이 아니다. <em>기억해두자.</em> <code>[[migrations]]</code>는 번거로워도 선물이다.</p>
+<p>자, DO 이야기는 여기까지. 이제 큰 파일이 머무는 자리, R2로 가보자.</p>
+</section>
+</section>
+<section id="r2-egress-free라는-한-줄이-바꾸는-풍경" class="level3">
+<h3>R2 — egress free라는 한 줄이 바꾸는 풍경</h3>
+<section id="s3에-익숙한-손이-r2를-만났을-때" class="level4">
+<h4>S3에 익숙한 손이 R2를 만났을 때</h4>
+<p>R2를 가장 빠르게 이해하는 길은 한 줄이다. <em>S3 호환 API에 egress free를 더한 것.</em> 이게 핵심이고, 거의 전부다. AWS S3로 코드를 짜본 사람이라면 R2의 SDK 사용법은 별다른 학습이 필요 없다. <code>aws-sdk</code>의 endpoint만 R2로 바꾸면 거의 그대로 동작한다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { S3Client<span class="op">,</span> PutObjectCommand<span class="op">,</span> GetObjectCommand } <span class="im">from</span> <span class="st">&#39;@aws-sdk/client-s3&#39;</span><span class="op">;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { getSignedUrl } <span class="im">from</span> <span class="st">&#39;@aws-sdk/s3-request-presigner&#39;</span><span class="op">;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">// R2도 같은 SDK를 쓴다. endpoint와 region만 다르다.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> r2 <span class="op">=</span> <span class="kw">new</span> <span class="fu">S3Client</span>({</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  region<span class="op">:</span> <span class="st">&#39;auto&#39;</span><span class="op">,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  endpoint<span class="op">:</span> <span class="vs">`https://</span><span class="sc">${</span>env<span class="op">.</span><span class="at">R2_ACCOUNT_ID</span><span class="sc">}</span><span class="vs">.r2.cloudflarestorage.com`</span><span class="op">,</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  credentials<span class="op">:</span> {</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    accessKeyId<span class="op">:</span> env<span class="op">.</span><span class="at">R2_ACCESS_KEY_ID</span><span class="op">,</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    secretAccessKey<span class="op">:</span> env<span class="op">.</span><span class="at">R2_SECRET_ACCESS_KEY</span><span class="op">,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">// 업로드 — S3 코드와 동일.</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> r2<span class="op">.</span><span class="fu">send</span>(</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">new</span> <span class="fu">PutObjectCommand</span>({</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    Bucket<span class="op">:</span> <span class="st">&#39;toby-shop-attachments&#39;</span><span class="op">,</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    Key<span class="op">:</span> <span class="vs">`chat/</span><span class="sc">${</span>roomId<span class="sc">}</span><span class="vs">/</span><span class="sc">${</span>crypto<span class="op">.</span><span class="fu">randomUUID</span>()<span class="sc">}</span><span class="vs">.jpg`</span><span class="op">,</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    Body<span class="op">:</span> imageBytes<span class="op">,</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    ContentType<span class="op">:</span> <span class="st">&#39;image/jpeg&#39;</span><span class="op">,</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  })<span class="op">,</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">// presigned URL — 이것도 S3와 동일. 클라이언트 직접 업로드용.</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> presignedUrl <span class="op">=</span> <span class="cf">await</span> <span class="fu">getSignedUrl</span>(</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  r2<span class="op">,</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="kw">new</span> <span class="fu">PutObjectCommand</span>({</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    Bucket<span class="op">:</span> <span class="st">&#39;toby-shop-attachments&#39;</span><span class="op">,</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    Key<span class="op">:</span> <span class="vs">`chat/</span><span class="sc">${</span>roomId<span class="sc">}</span><span class="vs">/</span><span class="sc">${</span>crypto<span class="op">.</span><span class="fu">randomUUID</span>()<span class="sc">}</span><span class="vs">.jpg`</span><span class="op">,</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    ContentType<span class="op">:</span> <span class="st">&#39;image/jpeg&#39;</span><span class="op">,</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  })<span class="op">,</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  { expiresIn<span class="op">:</span> <span class="dv">600</span> }<span class="op">,</span> <span class="co">// 10분</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+<p>S3로 짜본 코드라면 한 줄도 다르지 않다. 그래서 <em>마이그레이션 부담이 가장 낮은 자리</em>가 보통 R2다. 14장의 8단계 시퀀스에서 데이터 영역의 첫 줄에 R2가 오는 이유가 이것이다. SDK 호환·도구 호환(rclone·s3cmd·Mountpoint 등 거의 모두 동작)·동작 의미가 거의 같다.</p>
+<p>Worker 안에서는 SDK 없이 더 매끄럽게 부르는 길도 있다. R2 binding을 wrangler.toml에 선언하면, env 안에 type-safe한 R2 핸들이 들어온다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[[r2_buckets]]</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;ATTACHMENTS&quot;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="dt">bucket_name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-attachments&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Worker 안에서 — SDK 없이.</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> env<span class="op">.</span><span class="at">ATTACHMENTS</span><span class="op">.</span><span class="fu">get</span>(key)<span class="op">;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (obj <span class="op">===</span> <span class="kw">null</span>) <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(<span class="st">&#39;not found&#39;</span><span class="op">,</span> { status<span class="op">:</span> <span class="dv">404</span> })<span class="op">;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(obj<span class="op">.</span><span class="at">body</span><span class="op">,</span> {</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  headers<span class="op">:</span> { <span class="st">&#39;content-type&#39;</span><span class="op">:</span> obj<span class="op">.</span><span class="at">httpMetadata</span><span class="op">?.</span><span class="at">contentType</span> <span class="op">??</span> <span class="st">&#39;application/octet-stream&#39;</span> }<span class="op">,</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">// 업로드.</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> env<span class="op">.</span><span class="at">ATTACHMENTS</span><span class="op">.</span><span class="fu">put</span>(key<span class="op">,</span> request<span class="op">.</span><span class="at">body</span><span class="op">,</span> {</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  httpMetadata<span class="op">:</span> { contentType<span class="op">:</span> request<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;content-type&#39;</span>) <span class="op">??</span> <span class="dt">undefined</span> }<span class="op">,</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>binding 방식은 IAM key 회전·SDK 의존성·credential 노출이 없다. <em>2장에서 살펴본 Bindings의 위력이 R2에서도 그대로다.</em> 외부에서 부르는 게 필요한 경우(예: 다른 클라우드의 batch가 R2에 쓰는 경우)에는 SDK + S3 endpoint, 자기 Worker 안에서 부르는 경우에는 binding이 권장 패턴이다. 두 길을 자기 워크로드에 맞게 골라 쓰자.</p>
+</section>
+<section id="egress-free가-진짜-의미를-갖는-자리" class="level4">
+<h4>egress free가 진짜 의미를 갖는 자리</h4>
+<p>R2의 결정타는 가격이다. 본문 표지 한 줄이 “egress free”인 게 마케팅 카피가 아니라 실제 청구서의 차이를 만든다. 미디어 스트리밍·대형 백업·LLM 학습 데이터셋처럼 <em>outbound 트래픽이 큰 워크로드</em>에서 90~99% 절감 사례가 흔하다. 한 번 숫자로 그려 보자.</p>
+<p>가상 시나리오 — 사용자 업로드 미디어를 매월 30TB 다운로드(egress)하는 서비스. 50TB까지 넘어가는 시나리오로 잡고, AWS S3와 R2를 비교한다 (2026년 5월 시점 표준 단가 기준).</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>AWS S3 Standard</th>
+<th>R2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Storage 50TB·월</td>
+<td>$1,150 (~$0.023/GB)</td>
+<td>$750 (~$0.015/GB)</td>
+</tr>
+<tr>
+<td>Egress 50TB·월</td>
+<td>$4,500 (~$0.09/GB)</td>
+<td><strong>$0</strong></td>
+</tr>
+<tr>
+<td>Class A operations(쓰기)</td>
+<td>별도 (요청 수 따라)</td>
+<td>별도 ($4.50/M)</td>
+</tr>
+<tr>
+<td>Class B operations(읽기)</td>
+<td>별도</td>
+<td>별도 ($0.36/M)</td>
+</tr>
+<tr>
+<td><strong>월 합계 (단순 추정)</strong></td>
+<td><strong>약 $5,650+</strong></td>
+<td><strong>약 $750+</strong></td>
+</tr>
+</tbody>
+</table>
+<p>90% 가까운 절감이 한 줄에서 나온다. 미디어를 많이 내보내는 서비스라면 <em>옮기지 않는 게 더 이상한</em> 자리다. 5장에서 이 워크로드 패턴이 “Move now”로 분류된 이유가 여기에 있다.</p>
+<p>물론 한 줄로 다 말하면 거짓말이다. egress free의 <em>정직한 한계</em>도 적어두자.</p>
+<ul>
+<li>Class A·Class B operations은 과금된다. 100TB를 쌓더라도 그것을 read하는 GET 요청 수가 한 번에 수억 건이라면 Class B 청구가 누적된다. 작은 객체를 매우 많이 read하는 패턴(예: 매 요청마다 1KB tile 50개를 가져오는 지도 서비스)에서는 절감 효과가 줄어든다.</li>
+<li>처음 옮길 때 <em>AWS의 inbound가 아니라 AWS의 outbound가 청구된다.</em> S3 → R2로 50TB를 동기화하는 한 번의 작업에 AWS 측 egress $4,500이 한꺼번에 청구된다. 매월의 장기 절감을 위한 일회성 비용이지만, 모르고 시작하면 <em>깜짝 놀란다.</em> 미리 재무팀에 알려 두는 편이 낫다.</li>
+<li>multipart upload, presigned URL, lifecycle 일부, S3 API 거의 다 호환되지만 완전 호환은 아니다. 특히 <em>Object Lock, Glacier, S3 Intelligent-Tiering, Lifecycle policy의 일부 고급 동작</em>은 부재 또는 제한이 있다. compliance 목적의 immutable storage(WORM)가 핵심 요구라면 R2를 그대로 받아쓰지 못할 수 있다.</li>
+<li>강한 region lock 워크로드에서는 R2의 글로벌 분산이 정책과 충돌한다. 한국 데이터를 한국 안에서만 보관해야 한다면 jurisdiction 옵션과 조합으로도 완전한 해결이 어렵다. 5장의 컴플라이언스 축에서 빨간불이 켜지는 자리.</li>
+</ul>
+<p>이 한계를 알고 옮기면 된다. <em>모든 S3를 옮기라는 말이 아니다.</em> egress가 큰 버킷부터, enterprise 기능에 매여 있지 않은 자산부터, 점진적으로 옮긴다. 14장의 8단계에서 데이터 이전의 첫 줄에 항상 “egress 큰 버킷부터”가 적혀 있는 게 우연이 아니다.</p>
+</section>
+<section id="multipartpresigned외부-origin-실무-패턴" class="level4">
+<h4>multipart·presigned·외부 origin — 실무 패턴</h4>
+<p>채팅방 이야기로 다시 돌아오자. 사용자가 큰 이미지(예: 8MB 스크린샷)를 첨부 파일로 올리면 어떻게 받는가. 두 가지 길이 있다.</p>
+<p><strong>첫째, 클라이언트가 Worker로 보내고 Worker가 R2에 쓴다.</strong> 단순하지만 Worker의 요청 본문 크기 한도(plan에 따라 다르지만 대체로 100MB 수준)와 CPU time 한도를 의식해야 한다. 작은 파일에는 깔끔한 선택.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// /upload — 작은 첨부 (~10MB 미만)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/upload&#39;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> roomId <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">query</span>(<span class="st">&#39;room&#39;</span>)<span class="op">;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> key <span class="op">=</span> <span class="vs">`chat/</span><span class="sc">${</span>roomId<span class="sc">}</span><span class="vs">/</span><span class="sc">${</span>crypto<span class="op">.</span><span class="fu">randomUUID</span>()<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">ATTACHMENTS</span><span class="op">.</span><span class="fu">put</span>(key<span class="op">,</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="at">raw</span><span class="op">.</span><span class="at">body</span><span class="op">,</span> {</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    httpMetadata<span class="op">:</span> { contentType<span class="op">:</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">header</span>(<span class="st">&#39;content-type&#39;</span>) }<span class="op">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ key })<span class="op">;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p><strong>둘째, presigned URL을 발급해 클라이언트가 R2에 직접 PUT한다.</strong> 큰 파일에 적합한 표준 패턴. Worker는 토큰 발급만 한다 — 본문이 흐르지 않는다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { S3Client<span class="op">,</span> PutObjectCommand } <span class="im">from</span> <span class="st">&#39;@aws-sdk/client-s3&#39;</span><span class="op">;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { getSignedUrl } <span class="im">from</span> <span class="st">&#39;@aws-sdk/s3-request-presigner&#39;</span><span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/presign&#39;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r2 <span class="op">=</span> <span class="kw">new</span> <span class="fu">S3Client</span>({</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    region<span class="op">:</span> <span class="st">&#39;auto&#39;</span><span class="op">,</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    endpoint<span class="op">:</span> <span class="vs">`https://</span><span class="sc">${</span>c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">R2_ACCOUNT_ID</span><span class="sc">}</span><span class="vs">.r2.cloudflarestorage.com`</span><span class="op">,</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    credentials<span class="op">:</span> {</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>      accessKeyId<span class="op">:</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">R2_ACCESS_KEY_ID</span><span class="op">,</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>      secretAccessKey<span class="op">:</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">R2_SECRET_ACCESS_KEY</span><span class="op">,</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> roomId <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">query</span>(<span class="st">&#39;room&#39;</span>)<span class="op">;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> key <span class="op">=</span> <span class="vs">`chat/</span><span class="sc">${</span>roomId<span class="sc">}</span><span class="vs">/</span><span class="sc">${</span>crypto<span class="op">.</span><span class="fu">randomUUID</span>()<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> url <span class="op">=</span> <span class="cf">await</span> <span class="fu">getSignedUrl</span>(</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    r2<span class="op">,</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">new</span> <span class="fu">PutObjectCommand</span>({</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>      Bucket<span class="op">:</span> <span class="st">&#39;toby-shop-attachments&#39;</span><span class="op">,</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>      Key<span class="op">:</span> key<span class="op">,</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>      ContentType<span class="op">:</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">query</span>(<span class="st">&#39;type&#39;</span>) <span class="op">??</span> <span class="st">&#39;application/octet-stream&#39;</span><span class="op">,</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    })<span class="op">,</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    { expiresIn<span class="op">:</span> <span class="dv">600</span> }<span class="op">,</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ url<span class="op">,</span> key })<span class="op">;</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>큰 파일·다량 업로드에는 multipart upload도 그대로 쓸 수 있다. R2 binding은 multipart API를 직접 노출한다.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 큰 파일 multipart — Worker binding 방식.</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> upload <span class="op">=</span> <span class="cf">await</span> env<span class="op">.</span><span class="at">ATTACHMENTS</span><span class="op">.</span><span class="fu">createMultipartUpload</span>(key)<span class="op">;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> part1 <span class="op">=</span> <span class="cf">await</span> upload<span class="op">.</span><span class="fu">uploadPart</span>(<span class="dv">1</span><span class="op">,</span> chunk1)<span class="op">;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> part2 <span class="op">=</span> <span class="cf">await</span> upload<span class="op">.</span><span class="fu">uploadPart</span>(<span class="dv">2</span><span class="op">,</span> chunk2)<span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> upload<span class="op">.</span><span class="fu">complete</span>([part1<span class="op">,</span> part2])<span class="op">;</span></span></code></pre></div>
+<p>세 길 중 자기 워크로드에 맞는 자리를 고르자. 작은 첨부는 binding 직접 PUT, 큰 미디어는 presigned로 클라이언트 직접 업로드, 분할이 필요하면 multipart. 채팅방 첨부 같은 시나리오에서는 <em>5MB 미만은 직접, 그 이상은 presigned</em>가 흔한 분기점이다.</p>
+<p>자, R2까지 손에 쥐었으니 마지막 한 조각이 남았다. 요청 단위 캐시, Cache API.</p>
+</section>
+</section>
+<section id="cache-api-cloudfront-behavior가-코드로-들어왔다고-생각하자" class="level3">
+<h3>Cache API — CloudFront behavior가 코드로 들어왔다고 생각하자</h3>
+<section id="cache-api가-채우는-자리" class="level4">
+<h4>Cache API가 채우는 자리</h4>
+<p>Cache API는 Workers 안에서 직접 캐시를 조작하는 표준 인터페이스다. CloudFront의 behavior 설정이 <em>대시보드에서 yaml로 적는 일</em>이라면, Cache API는 <em>Worker 코드 안에서 한 줄로 적는 일</em>이다. 자유도가 다르다.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> cache <span class="op">=</span> caches<span class="op">.</span><span class="at">default</span><span class="op">;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">// 캐시 hit 시도.</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> cached <span class="op">=</span> <span class="cf">await</span> cache<span class="op">.</span><span class="fu">match</span>(request)<span class="op">;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (cached) <span class="cf">return</span> cached<span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">// 미스면 origin에서 가져와서 캐시에 넣는다.</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> upstream <span class="op">=</span> <span class="cf">await</span> <span class="fu">fetch</span>(originUrl)<span class="op">;</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> response <span class="op">=</span> <span class="kw">new</span> <span class="fu">Response</span>(upstream<span class="op">.</span><span class="at">body</span><span class="op">,</span> upstream)<span class="op">;</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>response<span class="op">.</span><span class="at">headers</span><span class="op">.</span><span class="fu">set</span>(<span class="st">&#39;cache-control&#39;</span><span class="op">,</span> <span class="st">&#39;public, max-age=300&#39;</span>)<span class="op">;</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> cache<span class="op">.</span><span class="fu">put</span>(request<span class="op">,</span> response<span class="op">.</span><span class="fu">clone</span>())<span class="op">;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> response<span class="op">;</span></span></code></pre></div>
+<p><code>caches.default</code>가 한 PoP에 있는 ephemeral 캐시 핸들이다. <code>match</code>로 hit를 시도하고, 미스면 <code>put</code>으로 채운다. 응답의 <code>Cache-Control</code> 헤더가 TTL을 결정한다. CloudFront에서 behavior에 TTL을 박는 것과 같은 일을 코드로 한다.</p>
+<p>CloudFront와 결정적으로 다른 한 가지가 있다. <em>분기 로직을 마음껏 짤 수 있다.</em> 사용자 plan에 따라 다른 캐시 키를 쓴다거나, 특정 헤더가 있을 때만 캐싱을 우회한다거나, 응답 본문을 일부 변형해서 캐시에 넣는다거나. CloudFront에서 Lambda@Edge로 풀던 자리가 Worker 안에 자연스럽게 들어와 있다. 4장에서 살펴본 <em>Lambda@Edge가 Workers에 사실상 흡수됐다</em>는 매핑의 본문이 여기에 보인다.</p>
+</section>
+<section id="ttlvarypurge-운영의-세-줄" class="level4">
+<h4>TTL·Vary·purge — 운영의 세 줄</h4>
+<p>Cache API를 운영에서 다룰 때 짚어야 할 세 가지가 있다.</p>
+<p><strong>TTL은 응답 헤더로.</strong> <code>Cache-Control: public, max-age=300</code> 한 줄이 5분 캐시를 만든다. 응답마다 다른 TTL을 동적으로 잡을 수 있다. CloudFront의 behavior 단위 일괄 설정이 <em>유연한 코드 단위 결정</em>이 된다. 다만 너무 짧은 TTL(예: 10초)은 cache thrash를 일으켜 origin 요청이 거의 안 줄어들 수 있다. <em>짚어두자.</em></p>
+<p><strong>Vary는 캐시 키 분기.</strong> <code>Vary: Accept-Encoding</code>은 익숙하지만, 사용자별 캐시·plan별 캐시를 짜려면 캐시 키 자체를 손으로 만드는 편이 낫다. <code>cache.match(request)</code> 대신 <code>cache.match(new Request('https://cache.local/' + customKey))</code> 식으로 가짜 URL을 키로 쓴다. 헤더 기반 분기보다 명시적이고 디버깅하기 쉽다.</p>
+<p><strong>Purge는 Cache API 자체로는 거의 못 한다.</strong> Cache API의 TTL이 끝나야 자동으로 빠지거나, Cloudflare 대시보드/API의 cache purge로 일괄 비운다. <em>세밀한 single-key purge는 거의 손에 잡히지 않는다.</em> 이게 가장 큰 한계다. 빈번하게 invalidate해야 하는 데이터라면 Cache API보다 KV가 더 잘 맞을 수 있다 — KV는 명시적 delete가 있다.</p>
+</section>
+<section id="cache-api가-빛나는-자리-무너지는-자리" class="level4">
+<h4>Cache API가 빛나는 자리, 무너지는 자리</h4>
+<p>빛나는 자리부터 적자. <em>외부 API 응답의 짧은 캐시</em>가 가장 자연스럽다. 환율·날씨·검색 결과처럼 5분 정도 stale해도 되는 데이터를 origin에 매번 부르지 말고 PoP 단위로 받아 둔다. Worker가 PoP에서 응답하니까 cache hit는 PoP-local에서 끝난다 — 사용자가 도쿄에 있으면 도쿄 PoP의 캐시에서 미리 굳어 있던 응답이 즉시 떠난다.</p>
+<p>무너지는 자리도 분명하다.</p>
+<ul>
+<li><em>PoP-local</em> 캐시다. 글로벌 균등 캐시가 아니다. 도쿄 PoP에서 한 번 hit가 들어왔다고 서울 PoP의 캐시가 따라 채워지지 않는다. 글로벌 일관성이 필요한 캐시에는 KV가 맞다.</li>
+<li>TTL이 끝나면 자동 expire이지만 <em>그 사이에 데이터를 비우는 단일 키 purge</em>가 약하다. invalidate-heavy 워크로드에는 안 맞다.</li>
+<li>응답 크기가 큰 자산(수십 MB의 비디오 chunk)은 Cache API가 처리하긴 하지만, 그런 패턴이라면 <em>Cloudflare CDN 자체</em>에 맡기는 편이 낫다. CDN 단의 캐시는 더 큰 캐시 풀을 가진다.</li>
+</ul>
+<p>요약하면 Cache API는 <em>작은 응답·짧은 TTL·요청 단위 분기 로직</em>에 잘 맞고, <em>글로벌 일관 캐시·세밀한 invalidate·큰 자산</em>에는 다른 도구로 가는 편이 낫다. KV는 글로벌 일관·invalidate에, R2는 큰 자산에, CDN은 정적 자산 캐시에. 각자의 자리가 있다.</p>
+</section>
+</section>
+<section id="의사결정-플로차트완성판-6갈래로-정리한다" class="level3">
+<h3>의사결정 플로차트(완성판) — 6갈래로 정리한다</h3>
+<p>7장 끝에서 KV·D1까지 그렸던 의사결정 플로차트를 8장 여기서 6갈래로 닫자. 자기 워크로드의 데이터 형상을 보고 한 번에 어디로 갈지 묻는 짧은 질문 묶음이다.</p>
+<pre><code>시작: 이 데이터의 형상은?
+│
+├─ 1) 큰 파일·미디어·백업 (객체 storage)
+│      → R2 (egress free + S3 호환)
+│
+├─ 2) 짧은 응답을 PoP-local 캐시 (요청 단위 ephemeral)
+│      → Cache API (TTL 짧음, invalidate 적음)
+│
+├─ 3) read-heavy + 글로벌 일관 + eventual OK
+│      세션·플래그·API key·설정
+│      → KV (60초 전파, per-key 1 write/s OK)
+│
+├─ 4) SQL 쿼리·관계형·moderate write
+│      사용자·주문·게시글
+│      → D1 + Drizzle (10GB 한도, sustained write 500~2k/s)
+│
+├─ 5) transactional·serializable·per-entity 격리
+│      재고·예약·턴 게임·채팅방·실시간 협업·rate limit
+│      → Durable Objects (+ WebSocket Hibernation)
+│
+└─ 6) write-heavy(2k+ TPS) + 기존 RDS/Aurora 살리기
+       → Hyperdrive (10장)</code></pre>
+<p><code>toby-shop</code> 시나리오에 대입해 보자. 상품 카탈로그 → R2(이미지) + Cache API(검색 응답 단기 캐시). 사용자 세션 → KV. 주문 도메인 → 5장에서 보류로 분류한 자리, DO + Hyperdrive 후보. 고객지원 채팅 → DO + WebSocket Hibernation. 첨부 파일 → R2. <em>이 6갈래가 자기 시스템 안에 한 줄씩 자리 잡는다.</em></p>
+</section>
+<section id="실습-toby-shop-고객지원-채팅방-한-사이클" class="level3">
+<h3>실습 — <code>toby-shop</code> 고객지원 채팅방 한 사이클</h3>
+<p>이번 챕터의 누적 산출물은 분명하다. <code>toby-shop</code>에 새 Worker 한 개를 분기로 추가한다. 고객지원 채팅방. WebSocket Hibernation으로 연결을 받고, 메시지는 DO storage에 쌓고, 첨부는 R2 presigned URL로 받는다.</p>
+<pre><code>toby-shop/
+├── apps/
+│   ├── api/                  # 6·7장에서 만든 Worker 1
+│   └── support-chat/         # 8장 신규 — Worker 2
+│       ├── src/
+│       │   ├── index.ts
+│       │   ├── chat-room.ts
+│       │   └── presign.ts
+│       └── wrangler.toml
+└── packages/...</code></pre>
+<p>핵심 진입점.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// apps/support-chat/src/index.ts</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Hono } <span class="im">from</span> <span class="st">&#39;hono&#39;</span><span class="op">;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { presignAttachment } <span class="im">from</span> <span class="st">&#39;./presign&#39;</span><span class="op">;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> { ChatRoom } <span class="im">from</span> <span class="st">&#39;./chat-room&#39;</span><span class="op">;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Env <span class="op">=</span> {</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  CHAT<span class="op">:</span> DurableObjectNamespace<span class="op">;</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  ATTACHMENTS<span class="op">:</span> R2Bucket<span class="op">;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  R2_ACCOUNT_ID<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  R2_ACCESS_KEY_ID<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  R2_SECRET_ACCESS_KEY<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> app <span class="op">=</span> <span class="kw">new</span> <span class="fu">Hono</span><span class="op">&lt;</span>{ Bindings<span class="op">:</span> Env }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">// WebSocket — 한 방 한 인스턴스.</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/ws&#39;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> room <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">query</span>(<span class="st">&#39;room&#39;</span>) <span class="op">??</span> <span class="st">&#39;lobby&#39;</span><span class="op">;</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> id <span class="op">=</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CHAT</span><span class="op">.</span><span class="fu">idFromName</span>(<span class="vs">`room:</span><span class="sc">${</span>room<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> stub <span class="op">=</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CHAT</span><span class="op">.</span><span class="fu">get</span>(id)<span class="op">;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> stub<span class="op">.</span><span class="fu">fetch</span>(c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="at">raw</span>)<span class="op">;</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="co">// 첨부 — presigned URL 발급.</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(<span class="st">&#39;/attach&#39;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> room <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">query</span>(<span class="st">&#39;room&#39;</span>) <span class="op">??</span> <span class="st">&#39;lobby&#39;</span><span class="op">;</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> <span class="kw">type</span> <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">query</span>(<span class="st">&#39;type&#39;</span>) <span class="op">??</span> <span class="st">&#39;application/octet-stream&#39;</span><span class="op">;</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { url<span class="op">,</span> key } <span class="op">=</span> <span class="cf">await</span> <span class="fu">presignAttachment</span>(c<span class="op">.</span><span class="at">env</span><span class="op">,</span> room<span class="op">,</span> <span class="kw">type</span>)<span class="op">;</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ url<span class="op">,</span> key })<span class="op">;</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co">// 첨부 다운로드 — Worker가 R2 binding으로 직접 응답.</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&#39;/attach/:key{.+}&#39;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> obj <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">ATTACHMENTS</span><span class="op">.</span><span class="fu">get</span>(c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">param</span>(<span class="st">&#39;key&#39;</span>))<span class="op">;</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (obj <span class="op">===</span> <span class="kw">null</span>) <span class="cf">return</span> c<span class="op">.</span><span class="fu">notFound</span>()<span class="op">;</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> headers <span class="op">=</span> <span class="kw">new</span> <span class="fu">Headers</span>()<span class="op">;</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>  obj<span class="op">.</span><span class="fu">writeHttpMetadata</span>(headers)<span class="op">;</span></span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>  headers<span class="op">.</span><span class="fu">set</span>(<span class="st">&#39;cache-control&#39;</span><span class="op">,</span> <span class="st">&#39;public, max-age=86400, immutable&#39;</span>)<span class="op">;</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(obj<span class="op">.</span><span class="at">body</span><span class="op">,</span> { headers })<span class="op">;</span></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> app<span class="op">;</span></span></code></pre></div>
+<p>이 한 사이클이 동작하면 8장의 누적 결과가 손에 남는다. 6·7장의 사용자 API는 그대로 두고, 옆에 채팅 Worker가 새로 분기로 자리 잡는다. 같은 모노레포·같은 도메인의 다른 path. 두 Worker가 다른 모양의 데이터를 다룬다 — 하나는 D1 + KV의 사용자 도메인, 하나는 DO + R2의 실시간 도메인. <em>5장에서 그렸던 결정 매트릭스가 코드로 닫히는 순간이다.</em></p>
+</section>
+<section id="이-기술이-무너지는-자리-3" class="level3">
+<h3>이 기술이 무너지는 자리</h3>
+<p>광고가 아니라는 약속을 8장에서도 지키자. DO·R2·Cache API 각자가 무너지는 자리를 정직하게 적는다.</p>
+<ul>
+<li><strong>DO의 lock-in 위험.</strong> Workers 코드 자체는 Web standards로 portable하지만 <em>Durable Objects API와 storage·migration 모델은 Cloudflare 고유다.</em> DO 위에 채팅·재고·실시간 협업을 깊게 쌓을수록 다른 클라우드로 옮기기가 어려워진다. 같은 actor 모델을 AWS에서 흉내내려면 ECS + DynamoDB + ElastiCache 조합이 필요한데, <em>코드 모양이 다르다.</em> 13장에서 본격적으로 다루지만, DO 의존이 깊은 워크로드는 그 자체로 vendor lock-in의 깊이가 깊다는 사실을 알고 가자.</li>
+<li><strong>DO의 단일 인스턴스 모델은 처리량의 자연스러운 상한이다.</strong> 한 자원에 초당 1만 write가 들어와야 한다면 단일 DO로는 무리다. 1차 샤딩(<code>{name}-{shardN}</code>)이나 write-heavy는 Hyperdrive 너머의 Postgres로 보내는 분기가 필요하다. <em>모든 strong consistency가 DO에 들어가야 하는 게 아니다.</em></li>
+<li><strong>R2의 enterprise 기능 부재.</strong> Object Lock(WORM), 일부 Lifecycle 동작, S3 Intelligent-Tiering, 일부 Glacier 전환 기능이 부재 또는 제한이다. compliance·archival 요구가 강한 자산은 S3에 남기는 편이 낫다. R2를 <em>primary 미디어·backup·LLM 데이터셋</em>에 쓰고, 강한 immutability가 필요한 부분은 S3와 병행하는 패턴이 가장 안전하다.</li>
+<li><strong>R2 inbound는 AWS egress다.</strong> 처음 옮길 때 한 번 큰 청구서를 받는다. 점진적으로 옮기거나, 옮기는 시점을 회계 분기에 맞춰 두자. <em>모르고 옮기면 깜짝 놀란다.</em></li>
+<li><strong>Cache API는 PoP-local이고 invalidate가 약하다.</strong> 글로벌 일관 캐시가 필요하면 KV로 가고, 세밀한 single-key purge가 필요하면 KV·D1을 쓰는 편이 낫다. Cache API는 <em>짧은 TTL·요청 단위 분기</em>에 빛나는 도구다.</li>
+<li><strong>WebSocket Hibernation의 비용 모델은 “메시지가 적게 오가는 idle 시간이 긴” 워크로드에 최적이다.</strong> 분당 수만 건이 폭주하는 라이브 스트림 채팅에서는 메시지 수 과금이 누적돼 절감 효과가 줄어든다. 트래픽 형상부터 본다.</li>
+<li><strong>DO migrations는 강제다.</strong> 익숙해지면 자연스럽지만, 처음에는 짜증을 부른다. 클래스 이름을 함부로 바꾸지 말고, 새 클래스를 추가할 때마다 새 태그를 붙이는 습관을 들이자.</li>
+</ul>
+<p>이 일곱 줄이 8장의 정직한 마무리다. <em>DO·R2·Cache API 모두 만능이 아니다.</em> 5장의 결정 프레임을 다시 들고 와, 자기 워크로드 위에 한 번 더 올려 보자.</p>
+</section>
+<section id="다음-장-예고" class="level3">
+<h3>다음 장 예고</h3>
+<p>데이터 두 챕터로 백엔드 깊이에 들어왔으니 한 번 호흡을 환기할 차례다. 9장에서는 프론트로 점프한다. Pages가 maintenance 모드가 된 지금, 새 Next.js 앱은 어디에 배포해야 하는가. OpenNext on Cloudflare가 어디까지 production을 견디는가. velopert(veltrends)가 Pages → Vercel로 회귀한 솔직한 사례를 옆에 두고, <em>모든 Next.js 앱이 이전 대상은 아니다</em>라는 정직한 의사결정선을 그려 본다. <code>toby-shop</code>의 상점 프론트(SSR + 이미지 최적화 + ISR 한 페이지)를 Workers Static Assets에 올려 7장 사용자 API와 8장 채팅 Worker 둘 다와 연동되는 그림을 손에 쥐자.</p>
+<p>자, 다음 장에서 만나자.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>

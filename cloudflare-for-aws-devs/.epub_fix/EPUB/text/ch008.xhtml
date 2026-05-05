@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch008.xhtml</title>
+  <style>
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-옮길까-말까-cloudflare로-가야-할-워크로드-판별법" class="level2">
+<h2>5장. 옮길까 말까 — Cloudflare로 가야 할 워크로드 판별법</h2>
+<p>월요일 오전, 팀 회의실에 모여 있다고 해보자. 누군가가 화이트보드 앞에 서서 묻는다. “그래서, 우리 시스템에서 Cloudflare로 옮겨야 할 게 뭐죠?” 4장에서 우리는 AWS의 모든 서비스가 Cloudflare 어느 자리에 어떻게 매핑되는지 카탈로그를 손에 쥐었다. 그런데 그 표를 다 본 직후 가장 먼저 드는 감정은 무엇인가. 시원함이 아니라 막막함이다. 매핑은 알겠는데, 정작 “내 워크로드 중 무엇을” 옮길 것인가는 표가 답해주지 않는다.</p>
+<p>매핑 표는 지도다. 지도는 길을 가리켜 주지만 어디로 갈지를 정해주지는 않는다. 옮겨야 할 워크로드와 옮기면 안 되는 워크로드를 구분하지 못한 채 카탈로그만 보고 의사결정을 시작하면, 6개월 뒤에 우리는 KV에 secondary index를 흉내내려고 코드를 비비 꼬고 있거나, 30초짜리 PDF 생성 batch가 Workers CPU time 한도에 걸려서 매주 슬랙 알림을 받고 있을 것이다. 둘 다 끔찍한 일이다. 옮길 자리와 남길 자리를 구분하는 결정 프레임이 없는 채로 매핑만 들고 뛰어들면 거의 반드시 그렇게 된다.</p>
+<p>이 장에서 손에 쥐고 가야 할 것은 한 가지다. 자기 시스템 위에 들고 가서 “이건 옮긴다, 이건 남긴다, 이건 나중”으로 한 번 분류해 주는 결정 프레임. 이 책 전체의 약속 — <em>Cloudflare를 도입하지 말고, 자기 아키텍처에 올바른 자리를 내주자</em> — 가 가장 무거워지는 챕터다. 14장에서 “어떻게 옮길 것인가”의 시퀀스를 그릴 텐데, 그 8단계 로드맵은 지금 이 챕터에서 만든 결정 워크시트 위에서만 의미가 있다. 5장은 <em>무엇을</em>, 14장은 <em>어떻게</em>. 둘은 짝이다.</p>
+<p>자, 5축 결정 트리부터 살펴보자.</p>
+<section id="축-결정-트리-한-워크로드를-다섯-번-묻는다" class="level3">
+<h3>5축 결정 트리 — 한 워크로드를 다섯 번 묻는다</h3>
+<p>워크로드 하나를 두고 “Cloudflare로 옮길까 말까”를 결정하려면, 다섯 가지 축에서 각각 답을 가져야 한다. 한 축에서 명백한 거부 신호가 나오면 그 워크로드는 거기서 멈춰야 한다. 다섯 축이 모두 초록불일 때만 안전하게 옮길 수 있다.</p>
+<section id="축-1.-요청-패턴-spike-y인가-steady인가-글로벌인가-단일-리전인가" class="level4">
+<h4>축 1. 요청 패턴 — spike-y인가 steady인가, 글로벌인가 단일 리전인가</h4>
+<p>먼저 가장 뚜렷한 축이다. 요청이 어떤 모습으로 들어오는가. 평소엔 잠잠하다가 가끔 폭주하는 spike-y 워크로드인가, 아니면 24시간 거의 일정한 부하의 steady 워크로드인가. 그리고 사용자가 어디에 있는가 — 서울 한 곳에 모여 있는가, 아니면 도쿄·싱가포르·암스테르담·상파울루에 흩어져 있는가.</p>
+<p>spike-y + 글로벌이면 Workers의 가격·콜드스타트 모델이 가장 빛난다. 무료 plan에서도 일 10만 요청까지 받을 수 있고, 5ms 미만 콜드스타트 덕에 갑자기 트래픽이 들어와도 첫 요청자가 기다리지 않는다. 한 청원수 사이트가 무료 Workers 한도 안에서 트래픽 스파이크를 받아낸 한국 커뮤니티 사례를 떠올려도 좋다.</p>
+<p>steady + 단일 리전이면 이야기가 다르다. 사용자가 한국에만 있고 부하가 일정하다면, 가격 모델 측면에서 Cloudflare가 압도적이지 않다. EC2 reserved instance나 Lambda provisioned concurrency가 더 저렴할 수도 있다. 그렇다면 굳이 옮길 이유가 없다. <em>지금 잘 돌고 있는 시스템을 옮길 이유가 없다는 결론도 충분히 정직한 답이다.</em></p>
+</section>
+<section id="축-2.-데이터-일관성-eventually-consistent로-충분한가" class="level4">
+<h4>축 2. 데이터 일관성 — eventually consistent로 충분한가</h4>
+<p>두 번째 축. 이 워크로드의 데이터는 얼마나 강한 일관성을 요구하는가. 세 갈래로 나눠보자.</p>
+<ul>
+<li><strong>eventually consistent로 충분</strong> — 세션 토큰, feature flag, 사용자 설정, 캐시. KV가 빛난다. 60초 정도 늦게 전파돼도 사용자가 눈치채지 못하는 데이터.</li>
+<li><strong>strong consistency 필요</strong> — 사용자 프로필, 주문 내역, 게시물. D1 또는 Hyperdrive 너머의 Postgres가 자리를 잡는다.</li>
+<li><strong>transactional 일관성 필요</strong> — 재고 차감, 좌석 예약, 게임 턴, 채팅방 메시지 순서. Durable Objects의 자리. actor 모델로 한 인스턴스가 직렬화된 처리를 보장.</li>
+</ul>
+<p>여기서 중요한 함정 하나. DynamoDB를 쓰던 워크로드를 한 줄에 KV로 매핑하면 거의 반드시 사고가 난다. DynamoDB에는 secondary index가 있고 GSI로 다른 키 조합으로 조회할 수 있는데, KV는 단일 키 lookup만 된다. 검색·정렬·범위 쿼리가 필요한 순간 KV는 거기서 무너진다. 4장의 매핑 표가 “DynamoDB ↔︎ KV/D1/DO 중 선택”이라고 갈라 놨던 이유가 이것이다. <em>DynamoDB 한 줄 매핑은 거짓말이다.</em> 일관성 축에서 한 번 더 검증해야 한다.</p>
+</section>
+<section id="축-3.-글로벌성-사용자-지리지연-slo데이터-jurisdiction" class="level4">
+<h4>축 3. 글로벌성 — 사용자 지리·지연 SLO·데이터 jurisdiction</h4>
+<p>세 번째 축은 위치의 정치학이다. 사용자가 어디에 있고, 지연 SLO가 얼마이며, 데이터를 어느 관할에 두어야 하는가.</p>
+<p>해외 사용자 비중이 높은데 p95 응답이 800ms를 넘는다면, edge로 옮길 동기가 분명하다. CloudFront + Lambda@Edge 조합이 일부 PoP에서 400~600ms 콜드스타트를 보였다는 Rebal AI의 보고를 떠올려 보면, Workers의 글로벌 균일 5ms 콜드스타트는 명백한 무기다.</p>
+<p>반대로, 한국 데이터 주권을 강하게 요구하는 워크로드 — KISA 가이드를 따라야 하는 금융·의료 데이터 — 라면 Cloudflare의 글로벌 분산 자체가 컴플라이언스 위반이 될 수 있다. EU jurisdiction이나 D1 location hint로 일부 제어가 가능하지만, “한국 데이터는 한국 리전 안에서만”을 법적으로 증명해야 한다면 D1·KV의 글로벌 분산 모델은 맞지 않는다. <em>남기는 게 정답이다.</em></p>
+</section>
+<section id="축-4.-패키지런타임-의존-v8-isolate-안에서-살아남을-수-있는가" class="level4">
+<h4>축 4. 패키지·런타임 의존 — V8 isolate 안에서 살아남을 수 있는가</h4>
+<p>네 번째 축이 가장 기술적이고 가장 거짓말 안 한다. 이 코드가 V8 isolate 안에서 도는가, 도는 척만 하는가. 2장에서 살펴봤듯 Workers는 V8 isolate 위에서 돌고, 그래서 빠르고 그래서 제약된다. 다음 항목 중 하나라도 깊이 의존한다면, 옮기는 건 잠시 미루는 편이 낫다.</p>
+<ul>
+<li>임의 바이너리 실행 (FFmpeg을 직접 spawn해서 영상 처리)</li>
+<li>full Node.js API (특히 fs, child_process, worker_threads)</li>
+<li>OS syscall 의존 (로컬 디스크 캐시, /tmp에 큰 파일 쓰기)</li>
+<li>무거운 JVM 라이브러리 (Spring Boot 전체 컨텍스트, Hibernate JPA, Spring Batch)</li>
+<li>30초+ 장기 동기 batch (Workers CPU time 한도와 별개로 architecturally 잘못된 모양)</li>
+<li>1MB(Free)·10MB(Paid) 스크립트 크기를 넘기는 의존성 (Prisma engine, Sharp, headless Chrome)</li>
+</ul>
+<p>Liftosaur가 Workers를 떠나 Lambda로 회귀한 이유 중 하나가 정확히 이것이었다. 이미지 처리에 필요한 Node 라이브러리가 Workers에서 동작하지 않았고, 1MB 스크립트 한도에 걸려 의존성을 넣을 수가 없었다. Lambda layers로 의존성을 분리할 수 있는 Lambda와는 모델 자체가 다르다. <em>솔직한 사례를 뒤에서 더 자세히 보자.</em></p>
+</section>
+<section id="축-5.-컴플라이언스격리-vpcprivatelink강한-region-lock" class="level4">
+<h4>축 5. 컴플라이언스·격리 — VPC·PrivateLink·강한 region lock</h4>
+<p>마지막 축. 네트워크 격리·컴플라이언스 요구가 얼마나 강한가. 다음과 같은 조건이 있다면 Cloudflare가 답이 아닐 가능성이 높다.</p>
+<ul>
+<li>시스템이 VPC 안에서만 동작해야 하고 외부에 노출 자체가 금지된다.</li>
+<li>AWS PrivateLink로 cross-VPC private endpoint를 사용 중이고, 그게 핵심 보안 모델이다.</li>
+<li>HIPAA·PCI-DSS·KISA 가이드 같은 규제로 단일 region 안에서만 데이터·연산이 일어나야 한다.</li>
+<li>정교한 IAM policy로 리소스별 권한을 행 단위로 제어하고 있고, 이걸 Bindings + Access policy 조합으로 다시 짜는 게 위험 부담이 너무 크다.</li>
+</ul>
+<p>물론 Cloudflare One·Tunnel·Access 스택으로 ZTNA 모델은 다시 짤 수 있다. 11장에서 본격적으로 다룬다. 다만 <em>완전 격리된 사설망 위에서만 도는 시스템</em>을 굳이 Cloudflare로 끌어내야 할 이유는 보통 없다. 11장 cloudflared로 일부만 외부 접근 가능하게 만드는 패턴 정도면 충분하다.</p>
+<p>자, 5축이 끝났다. 다섯 축에서 모두 초록불이 켜진 워크로드가 옮길 만한 후보다. 한 축이라도 빨간불이면 멈춰서 한 번 더 생각하자.</p>
+</section>
+</section>
+<section id="절대-옮기면-안-되는-워크로드" class="level3">
+<h3>절대 옮기면 안 되는 워크로드</h3>
+<p>5축으로 충분히 거를 수 있지만, 명시적으로 못 박아 두는 편이 낫다. 다음 워크로드는 2026년 5월 시점 Cloudflare 플랫폼으로 옮기지 말자. 옮기는 순간 거의 반드시 후회한다.</p>
+<p><strong>1. 대용량 GPU 추론 워크로드.</strong> Workers AI에 올라와 있는 모델(Llama 3.1, Stable Diffusion XL 등) 외에는 GPU 추론을 직접 돌릴 수 없다. fine-tuned 모델·custom model을 GPU로 돌려야 한다면 Bedrock·SageMaker·자체 EC2 G/P 인스턴스가 자리를 지킨다.</p>
+<p><strong>2. JVM 무거운 라이브러리 의존 코드.</strong> Spring Boot 전체 컨텍스트를 띄워야 하는 모놀리스, Hibernate + JPA + Spring Batch가 핵심인 도메인 코드는 옮기지 말자. Spring Boot 4 + GraalVM native image + Workers Containers 조합이 미래에 가능해질지 모르지만, 2026년 5월 기준 실무 사례가 미디엄 글 한 편 수준이다. 책 집필 시점에는 <em>권장 패턴이라고 단언하기 어렵다.</em></p>
+<p><strong>3. 강한 region lock 워크로드.</strong> 한국 데이터는 한국에만, 유럽 데이터는 유럽에만 — 법적·정책적으로 강제되는 시스템. D1 location hint가 일부 도움을 주지만, 글로벌 PoP에 코드가 동시에 떠 있는 모델 자체가 region lock 가정과 충돌한다.</p>
+<p><strong>4. OS syscall에 깊이 의존하는 워크로드.</strong> FFmpeg·ImageMagick·headless Chrome을 직접 호출하는 미디어 처리, /tmp에 임시 파일을 쓰면서 stream 처리하는 batch, 로컬 SQLite를 디스크에 두고 쓰는 코드. Workers 안에서는 이 가정이 모두 깨진다.</p>
+<p><strong>5. 30초+ 장기 동기 batch.</strong> 보고서 생성, 대용량 ETL, 전체 데이터 reprocess. Workers의 CPU time 한도(기본 30초, plan에 따라 더 유연)와 별개로, <em>architecturally</em> 잘못된 자리다. 이런 작업은 ECS/Fargate batch task나 Step Functions·Workflows의 step으로 쪼개야 한다.</p>
+<p><strong>6. 복잡한 PrivateLink·VPC peering 위주 워크로드.</strong> AWS 내부 사설망 안에서 마이크로서비스끼리 PrivateLink로 통신하는 구조. cross-VPC 격리·service mesh가 핵심 보안 모델이라면, 그 자리를 Cloudflare가 부드럽게 차지하지 못한다.</p>
+<p>이 여섯 가지를 만난다면 <em>옮기지 말자.</em> 14장에서 다시 강조하지만, 책의 핵심 약속은 “올바른 자리를 내준다”이지 “전부 옮긴다”가 아니다. 옮기지 않는 결정도 정직한 결정이다.</p>
+</section>
+<section id="자가-진단-체크리스트" class="level3">
+<h3>자가 진단 체크리스트</h3>
+<p>5축 결정 트리를 받았으니, 이제 자기 시스템에 직접 들고 가서 점수를 매겨보자. 각 항목에 Yes/No로 답한다. Yes 하나당 점수를 더하거나 빼면, “Move now / Move later / Don’t move” 세 갈래 결과가 나온다.</p>
+<p>다음은 18개 항목 — 5축을 자기 워크로드 위에 풀어 놓은 형태다.</p>
+<p><strong>요청 패턴 (3문항, 각 +2점)</strong> 1. 현재 Lambda 평균 콜드스타트가 200ms 이상인가? 2. 해외 사용자(아시아·미주·유럽)가 전체 트래픽의 30% 이상인가? 3. 일일 트래픽이 spike-y한 편인가 (peak/avg 비율 5배 이상)?</p>
+<p><strong>비용 (3문항, 각 +2점)</strong> 4. egress 비용이 월 청구의 30% 이상인가? 5. CloudFront + Lambda@Edge에서 PoP 캐시 hit율이 50% 미만인가? 6. CloudWatch + X-Ray 비용이 월 $500을 넘는가?</p>
+<p><strong>일관성 (3문항)</strong> 7. 이 워크로드의 핵심 데이터에 secondary index 또는 range query가 필요한가? (Yes면 -3점, KV는 답이 아니므로) 8. 트랜잭션 격리 수준이 serializable이어야 하는 시나리오가 있는가? (Yes면 +1점, DO 후보) 9. 사용자 세션·feature flag·설정값처럼 eventually consistent로 충분한 데이터가 있는가? (Yes면 +1점, KV 후보)</p>
+<p><strong>런타임 의존 (4문항)</strong> 10. 핵심 코드가 임의 바이너리(FFmpeg·ImageMagick 등)를 spawn하는가? (Yes면 -3점) 11. Node.js의 fs·child_process·worker_threads에 깊이 의존하는가? (Yes면 -3점) 12. JVM 위 Spring Boot 전체 컨텍스트가 한 함수 단위로 떠야 하는가? (Yes면 -3점) 13. 의존성 패키지 합산 크기가 10MB를 넘는가? (Yes면 -2점)</p>
+<p><strong>컴플라이언스·격리 (3문항)</strong> 14. KISA 가이드·HIPAA·PCI 같은 규제로 데이터 region이 강제되는가? (Yes면 -3점) 15. AWS PrivateLink·VPC peering이 핵심 보안 모델인가? (Yes면 -2점) 16. IAM policy로 리소스별 권한을 정교하게 관리하고 있고, 그게 핵심 운영 모델인가? (Yes면 -1점)</p>
+<p><strong>운영 부담 (2문항)</strong> 17. SAM/CDK·CloudFormation 운영에 매주 1시간 이상 쓰고 있는가? (Yes면 +1점) 18. DDoS·WAF 청구서 폭탄을 한 번이라도 경험했거나 두려워하는가? (Yes면 +1점)</p>
+<p>총점을 계산해보자.</p>
+<ul>
+<li><strong>+10점 이상</strong> → Move now. 5축 다 통과한 셈, 옮길 동기와 적합도 모두 높다.</li>
+<li><strong>+3 ~ +9점</strong> → Move later. 옮길 만한 자리지만, 보강이 필요한 항목(예: 일부 의존성 분리)이 있다. 14장 8단계 시퀀스 중 risk-low 단계부터 점진적으로.</li>
+<li><strong>-3 ~ +2점</strong> → 보류. 현재 시스템과 Cloudflare 적합도 사이가 모호하다. 한 워크로드를 더 잘게 쪼개서 다시 점수 매겨보자. 일부만 옮길 수 있을지도 모른다.</li>
+<li><strong>-3점 이하</strong> → Don’t move. 위에서 본 “절대 옮기면 안 되는 워크로드”에 한 발 걸친 상태. 무리해서 옮기면 6개월 뒤 회귀 사례가 된다.</li>
+</ul>
+<p>이 체크리스트는 부록 C의 비용 시뮬레이션과 짝이다. 점수가 +10이 나왔어도 비용 시뮬레이션에서 절감액이 미미하면 시급도가 낮은 것이고, 반대로 점수가 +5밖에 안 나왔어도 egress가 월 청구의 절반을 차지하는 R2 후보 버킷이 있다면 그것 한 항목만 분리해서 먼저 옮길 수 있다.</p>
+</section>
+<section id="패턴-워크로드-결정-매트릭스" class="level3">
+<h3>9패턴 워크로드 결정 매트릭스</h3>
+<p>체크리스트로 한 워크로드를 점수 내봤다면, 이번엔 워크로드 <em>유형</em>별로 미리 정해진 권장 행동을 매트릭스로 보자. 자기 시스템 안에 다음 9패턴이 어떻게 분포돼 있는지 확인하면, 어디부터 손댈지 한눈에 정리된다.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>패턴</th>
+<th>권장 행동</th>
+<th>자리 잡는 Cloudflare 제품</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>정적 자산 (CSS·JS·이미지)</strong></td>
+<td>Move now</td>
+<td>R2 + Cloudflare CDN, 또는 Workers Static Assets</td>
+</tr>
+<tr>
+<td><strong>API gateway 앞단</strong></td>
+<td>Move now</td>
+<td>Workers Routes + Hono (4·6장)</td>
+</tr>
+<tr>
+<td><strong>read-heavy 캐시 / 세션</strong></td>
+<td>Move now</td>
+<td>KV (7장 본격)</td>
+</tr>
+<tr>
+<td><strong>사용자 facing CRUD API</strong></td>
+<td>Move later</td>
+<td>Workers + D1/Drizzle 또는 Hyperdrive (7·10장)</td>
+</tr>
+<tr>
+<td><strong>write-heavy DB (2k+ TPS)</strong></td>
+<td>Don’t move</td>
+<td>RDS·Aurora 유지 + Hyperdrive 앞단 (10장)</td>
+</tr>
+<tr>
+<td><strong>long-running orchestration</strong></td>
+<td>Move now (조각 단위)</td>
+<td>Workflows로 step 분리 (12장)</td>
+</tr>
+<tr>
+<td><strong>WebSocket 채팅·실시간 협업</strong></td>
+<td>Move now</td>
+<td>Durable Objects + WebSocket Hibernation (8장)</td>
+</tr>
+<tr>
+<td><strong>미디어 storage (egress 큰 버킷)</strong></td>
+<td>Move now</td>
+<td>R2 (egress free, 8장)</td>
+</tr>
+<tr>
+<td><strong>인증 게이트웨이 / 어드민 노출</strong></td>
+<td>Move now</td>
+<td>Cloudflare Access + Tunnel (11장)</td>
+</tr>
+</tbody>
+</table>
+<p>이 표는 본문 14장 8단계 시퀀스의 압축판이기도 하다. 위에서 아래로 읽으면, <em>risk-low → risk-mid</em> 순서다. 정적 자산·API 앞단·세션 KV는 거의 무위험으로 옮길 수 있고, 사용자 CRUD는 D1/Hyperdrive 선택 결단이 필요하며, write-heavy DB는 옮기지 말고 Hyperdrive 앞에만 두자.</p>
+<p>한 가지 주의. 매트릭스는 <em>기본값</em>이지 <em>법칙</em>이 아니다. 자기 시스템의 비즈니스 제약 — 예를 들어 “어드민은 한국에서만 접근”이나 “결제는 PG사 지정 region 통해서만” — 이 우선한다. 표는 기본값을 빨리 채우는 도구로만 쓰자.</p>
+</section>
+<section id="의사결정-워크시트-toby-shop을-예로" class="level3">
+<h3>의사결정 워크시트 — toby-shop을 예로</h3>
+<p>이제 종이를 한 장 꺼내 보자. 이 책의 누적 실습 프로젝트 <code>toby-shop</code>(작은 e-commerce SaaS)에 결정 워크시트를 적용해 보자. 부록 C의 빈 양식을 자기 시스템에 옮기기 전에, <code>toby-shop</code>을 가지고 한 번 호흡을 맞춰 보는 것이다.</p>
+<p><code>toby-shop</code>의 가상 컴포넌트 8개를 가져와 보자.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>컴포넌트</th>
+<th>5축 요약</th>
+<th>점수</th>
+<th>결정</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>상품 카탈로그 정적 페이지 (이미지·CSS·JS)</td>
+<td>spike-y, 글로벌, eventually consistent OK, 의존성 가벼움</td>
+<td>+9</td>
+<td><strong>Move now</strong> → Workers Static Assets + R2</td>
+</tr>
+<tr>
+<td>2</td>
+<td>상품 검색 API (read-heavy, 캐시 가능)</td>
+<td>spike-y, 글로벌, eventually OK, secondary index 불필요</td>
+<td>+8</td>
+<td><strong>Move now</strong> → Workers + KV 캐시</td>
+</tr>
+<tr>
+<td>3</td>
+<td>사용자 세션 (로그인 토큰 저장)</td>
+<td>per-key 1 write/s 충분, 글로벌 분산 OK</td>
+<td>+7</td>
+<td><strong>Move now</strong> → KV</td>
+</tr>
+<tr>
+<td>4</td>
+<td>사용자 프로필·주소 CRUD</td>
+<td>strong consistency, SQL 쿼리 필요</td>
+<td>+4</td>
+<td><strong>Move later</strong> → D1 + Drizzle 또는 Hyperdrive</td>
+</tr>
+<tr>
+<td>5</td>
+<td>주문 처리 (재고 차감, 결제 연동)</td>
+<td>transactional, 분산 lock 필요, write-heavy 가능</td>
+<td>-1</td>
+<td><strong>보류</strong> → DO + Hyperdrive 검토</td>
+</tr>
+<tr>
+<td>6</td>
+<td>결제 후 영수증 발송 (orchestration)</td>
+<td>step 단위 분리 가능, 외부 API 대기 큼</td>
+<td>+6</td>
+<td><strong>Move now</strong> → Workflows</td>
+</tr>
+<tr>
+<td>7</td>
+<td>고객지원 채팅 (WebSocket)</td>
+<td>실시간 + 강한 일관성 + per-room 격리</td>
+<td>+8</td>
+<td><strong>Move now</strong> → Durable Objects</td>
+</tr>
+<tr>
+<td>8</td>
+<td>월간 매출 보고서 batch (1시간+)</td>
+<td>30초+ 장기 동기, JVM 라이브러리 의존</td>
+<td>-5</td>
+<td><strong>Don’t move</strong> → ECS/Fargate 유지</td>
+</tr>
+</tbody>
+</table>
+<p>8개 중 5개가 Move now, 1개가 Move later, 1개가 보류, 1개가 Don’t move. 이 분포가 현실적이다. <em>모두 옮기지도 않고, 아무것도 안 옮기지도 않는다.</em> 하이브리드가 최종 형태일 가능성이 가장 높다는 14장의 메시지를 미리 만나는 셈이다.</p>
+<p>자기 시스템에 적용할 때는 이렇게 해보자. 8~12개 핵심 컴포넌트를 골라 표 한 장에 채워 넣는다. 점수는 위 자가 진단 체크리스트로 매긴다. 결정란에 Move now / later / 보류 / Don’t move를 적는다. <em>이 한 장이 14장 마이그레이션 로드맵의 베이스가 된다.</em> 이 워크시트 없이 14장으로 넘어가면 어디부터 손댈지 알 수 없게 된다.</p>
+<p>부록 C에 빈 양식과 “내 워크로드 비용 추정” 칸이 있다. 결정 워크시트와 비용 시뮬레이션 두 장을 같이 채우면, 시급도와 적합도를 동시에 본 그림이 된다. 적합도는 높지만 절감액이 적은 워크로드는 낮은 우선순위. 적합도와 절감액 둘 다 높은 워크로드부터 14장 1단계로 옮긴다.</p>
+</section>
+<section id="양-끝의-사례-baselime와-liftosaur" class="level3">
+<h3>양 끝의 사례 — Baselime와 Liftosaur</h3>
+<p>결정 프레임을 손에 쥐었으니, 결정의 양쪽 끝에서 어떤 일이 벌어지는지 두 사례를 마주해 보자. <em>광고가 아니라는 약속</em>을 위해 둘 다 정직하게 들여다본다.</p>
+<section id="baselime-5축-다-초록불이었던-사례" class="level4">
+<h4>Baselime — 5축 다 초록불이었던 사례</h4>
+<p>Baselime는 observability 도구를 만드는 작은 팀이었다. 3명·3개월 미만으로 AWS Lambda + ECS 스택을 Workers로 풀 마이그레이션했고, 정규 가격 적용 시 일 비용이 $790에서 $25로 떨어졌다 — 95% 절감. AWS Lambda 비용만 따로 보면 -85%였다.</p>
+<p>왜 잘 풀렸을까. Baselime의 워크로드를 5축에 넣어 보면 답이 보인다.</p>
+<ul>
+<li>요청 패턴 — 글로벌 사용자, spike-y 트래픽 (체크).</li>
+<li>일관성 — observability 데이터는 eventually consistent로 대부분 충분 (체크).</li>
+<li>글로벌성 — 사용자 분포가 넓고 지연에 민감 (체크).</li>
+<li>런타임 — Node 위에서 도는 stateless API. JVM·OS syscall 없음 (체크).</li>
+<li>컴플라이언스 — VPC 격리 강제 없음, region lock 없음 (체크).</li>
+</ul>
+<p>다섯 축이 모두 초록불이었다. <em>옮기지 않는 게 더 이상한 시스템</em>이었던 셈이다.</p>
+</section>
+<section id="liftosaur-5축에서-빨간불이-두-개-켜진-사례" class="level4">
+<h4>Liftosaur — 5축에서 빨간불이 두 개 켜진 사례</h4>
+<p>반대편에 Liftosaur가 있다. 운동 트래킹 앱을 만드는 1인 개발자가 처음에는 Workers + KV 위에 시스템을 올렸다가, 결국 Lambda + DynamoDB로 회귀한 사례다. 회귀 사유를 5축에 매핑해 보자.</p>
+<ul>
+<li>일관성 — secondary index가 필요했다. KV는 단일 키 lookup만 된다. <em>빨간불.</em></li>
+<li>런타임 — 이미지 처리에 필요한 Node 라이브러리가 Workers에서 동작 안 했다. 1MB 스크립트 한도(Liftosaur가 옮긴 시점 기준)에 걸려 의존성을 넣을 수가 없었다. <em>빨간불.</em></li>
+</ul>
+<p>5축에서 빨간불이 두 개 켜진 워크로드를 끝까지 옮기려고 하면 코드가 비비 꼬인다. Liftosaur의 회귀는 실패가 아니다 — <em>정직한 후퇴</em>다. 5축으로 미리 점수를 매겼다면 처음부터 KV가 답이 아니라는 걸 알았을 것이다. KV 대신 D1로 갔거나, 아니면 처음부터 옮기지 않았거나. 둘 다 합리적이다.</p>
+<p>이 두 사례는 결정 프레임의 양쪽 끝을 보여준다. <em>옮길 만한 워크로드는 5축이 다 초록불이고, 옮기면 안 되는 워크로드는 한두 축이 빨간불이다.</em> 이 단순한 진실을 무시하면 둘 중 하나가 된다 — Baselime의 95% 절감을 놓치거나, Liftosaur의 6개월 회귀 비용을 떠안거나.</p>
+</section>
+</section>
+<section id="결정-프레임의-권장형-적용-지금-당장이-아니라" class="level3">
+<h3>결정 프레임의 권장형 적용 — “지금 당장이 아니라”</h3>
+<p>자, 이 모든 점수와 매트릭스를 손에 쥐었다고 해도 한 가지를 잊지 말자. <em>결정 프레임은 지시가 아니라 권유다.</em> 점수가 +10점이라고 해서 다음 주에 옮기지 않으면 안 되는 게 아니다.</p>
+<p>오히려 추천하는 흐름은 이렇다. 결정 워크시트로 한 번 분류한다. Move now 항목 중 가장 risk-low한 한 개를 골라 14장 1단계로 옮긴다. 한 달 운영해 본다. 비용·p95·error rate가 예상대로 움직였다면 다음 항목으로. 그렇지 않으면 멈춰서 5축을 다시 점검한다.</p>
+<p>너무 빨리 옮기는 것보다 천천히 옮기는 편이 낫다. <em>Cloudflare를 도입하는 게 목표가 아니라, 자기 아키텍처에 올바른 자리를 내주는 게 목표다.</em> 한 번에 5개 컴포넌트를 옮기는 팀과, 6개월에 걸쳐 한 개씩 옮기는 팀이 있다면, 후자가 거의 항상 더 안정적인 운영을 만든다. Strangler Fig 패턴의 본질은 “옛 나무를 베지 않고 새 나무가 옛 나무를 감싸 자라게 한다”이다. 14장에서 8단계로 풀어낼 그 패턴의 베이스가 5장의 결정 워크시트다.</p>
+<p>다섯 축, 18문항 자가 진단, 9패턴 매트릭스, 결정 워크시트 한 장. 이 네 도구를 들고 자기 시스템 위에 한 번 올려 보자. 한 시간이면 충분하다. 그 한 장이 6장부터 12장까지의 본격 기술 챕터를 <em>내 시스템에 붙여서 읽게</em> 만들어 줄 것이다.</p>
+</section>
+<section id="이-결정-프레임이-무너지는-자리" class="level3">
+<h3>이 결정 프레임이 무너지는 자리</h3>
+<p>이 장의 마지막은 정직한 한계로 닫자. 5축 결정 트리는 만능이 아니다. 다음 자리에서는 무너지거나 거짓 안심을 줄 수 있다.</p>
+<ul>
+<li>비즈니스 제약이 기술 점수보다 우선할 때. 점수가 +12점이어도 “어드민은 한국 EC2에서만 도는 게 정책”이면 옮기지 않는 게 맞다. 5축은 기술 적합도이지 정책 결정이 아니다.</li>
+<li>트래픽 형상이 6개월 후에 크게 바뀔 가능성이 있을 때. 지금은 단일 region steady지만 곧 글로벌 spike-y가 된다면, 점수가 낮아도 미리 옮길 만한 후보일 수 있다. 미래를 점수에 반영하지 못한다.</li>
+<li>“보류” 결과가 나온 워크로드는 결정 프레임이 답을 회피하는 자리다. 더 잘게 쪼개서 다시 점수 내거나, 5축 외의 추가 정보(예: 팀 역량·운영 경험)를 손에 쥐고 결정해야 한다.</li>
+<li>점수가 +5점인 워크로드 두 개를 묶어 한 번에 옮기는 게 점수가 +10점인 워크로드 하나를 옮기는 것보다 위험할 수 있다. 점수는 워크로드 <em>각각</em>에 대한 신호이지 묶음 마이그레이션 위험을 반영하지 않는다.</li>
+<li>2025년 outage 같은 단일 벤더 의존 위험은 점수에 거의 반영 안 된다. 13장에서 본격적으로 다루지만, 점수가 +12점이어도 “이 워크로드까지 Cloudflare에 두면 critical path가 단일 벤더에 너무 쏠린다”는 운영적 판단은 별도로 해야 한다.</li>
+</ul>
+<p>다음 장에서는 결정 워크시트에서 “Move now”로 표시된 항목들을 본격적으로 옮기기 시작한다. Spring 멘탈을 Hono로 다시 그리는 챕터, Workers 본격 사용법을 살펴보자.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>

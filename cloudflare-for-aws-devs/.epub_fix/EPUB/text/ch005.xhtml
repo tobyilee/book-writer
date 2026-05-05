@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch005.xhtml</title>
+  <style>
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-멘탈-모델을-다시-그리자-v8-isolate가-바꾸는-가정" class="level2">
+<h2>2장. 멘탈 모델을 다시 그리자 — V8 Isolate가 바꾸는 가정</h2>
+<p>Lambda 함수를 Java로 짠 적이 있는 우리는 어느 월요일 아침의 풍경을 잘 안다. 사용자가 처음 호출한 함수가 응답까지 3초 가까이 걸린다. CloudWatch 로그를 열어 보면 <code>INIT_DURATION: 2400 ms</code>라는 줄이 박혀 있다. JVM이 깨어나서 클래스를 로드하고 Spring 컨텍스트를 짜는 데만 2초가 넘게 갔다는 뜻이다. 두 번째 호출부터는 200ms로 떨어진다. 이른바 콜드스타트다. SnapStart를 켜고, Provisioned Concurrency를 사두고, GraalVM Native Image까지 만져본 사람이라면 이 풍경이 더 친숙할 것이다. 콜드스타트와의 싸움은 지난 10년간 서버리스 개발자의 숙제였다.</p>
+<p>자, 그런데 누군가 우리에게 와서 이렇게 말한다고 해보자. “Workers는 콜드스타트가 5ms 미만이다.” 처음 들으면 마케팅 카피처럼 들린다. JVM 워밍업도 없고, 컨테이너 부팅도 없고, 그냥 5ms? 어떻게 그게 가능할까? 그리고 더 중요한 질문, <strong>그 대가로 우리는 무엇을 포기해야 할까?</strong> 공짜로 받는 성능은 거의 없다. 우리가 익혀온 가정 중 어떤 것을 흔들어야 그 5ms가 손에 들어오는지, 함께 들여다보자.</p>
+<p>이 장은 의도된 혼란의 자리다. 1장에서 “또 하나의 클라우드가 아니다”라는 말을 들었다면, 2장은 그 말이 정확히 무엇을 뜻하는지 멘탈 모델 단위로 풀어내는 곳이다. V8 isolate, 사라진 리전, Bindings, Compatibility Date 그리고 “I/O 대기는 과금되지 않는다”는 가격 모델 — 이 다섯 기둥을 세우고 나면 3장의 첫 배포가 손에 잡힌다.</p>
+<section id="v8-isolate-같은-서버리스라는-단어-아래의-다른-행성" class="level3">
+<h3>V8 Isolate — 같은 “서버리스”라는 단어 아래의 다른 행성</h3>
+<p>먼저 Lambda가 어떻게 도는지 한 줄로 다시 정리해보자. AWS는 함수마다 Firecracker라는 microVM을 띄운다. microVM은 KVM 위에 올린 가벼운 가상머신인데, 가볍다고 해도 OS 커널·파일시스템·네트워크 스택 같은 것들이 들어 있다. 그 위에서 Node나 JVM 같은 런타임이 켜지고, 그 안에 우리 함수 코드가 로드된다. 그러니까 한 요청을 처리하기 위해 우리는 사실상 작은 운영체제 한 대를 부팅하고 있는 셈이다. Firecracker가 부팅 자체는 100ms 안에 끝낸다고는 해도, 그 위에 올라가는 JVM이 켜지고 Spring 컨텍스트가 만들어지는 데 또 2초가 더 걸린다. 콜드스타트의 비용은 거기서 나온다.</p>
+<p>Workers는 이 모델을 통째로 갈아엎는다. 핵심은 <strong>V8 isolate</strong>라는 개념이다. V8은 우리가 잘 아는 그 V8 — Chrome 브라우저 안에서 자바스크립트를 돌리는 엔진이다. 한 V8 프로세스 안에는 여러 개의 isolate를 동시에 띄울 수 있다. isolate 하나하나는 자기만의 힙과 GC를 가지지만, OS 프로세스를 새로 띄우는 게 아니라 같은 프로세스 안에 격리된 실행 컨텍스트로 존재한다. 브라우저로 비유하면, 같은 Chrome 안에서 여러 탭이 각자 격리되어 도는 것과 비슷하다. 새 탭을 여는 데 새 OS를 부팅할 필요가 없는 것과 같은 이치다.</p>
+<p>그래서 새 isolate를 만드는 비용이 microVM 부팅에 비해 비교가 안 되게 싸다. 5ms 미만이라는 숫자가 거기서 나온다. 더 인상적인 점이 있는데, <strong>isolate는 첫 요청이 들어오기 전까지 만들어지지도 않는다.</strong> 사용자가 도쿄에서 우리 Worker를 처음 호출하면, 그 순간 도쿄 PoP에 isolate가 만들어진다. 같은 PoP에 두 번째 요청이 들어오면 같은 isolate가 재사용된다. 트래픽이 없으면 isolate는 자연스럽게 사라진다. Lambda의 컨테이너 풀처럼 따로 워밍업을 신경 쓸 필요가 없다.</p>
+<p>여기서 자연스럽게 던져야 할 질문이 있다. <strong>그렇다면 그 대가는 무엇인가?</strong> 공짜는 없다고 했다. 가장 큰 대가는 <em>임의 바이너리·full Node API·OS syscall이 안 된다</em>는 점이다. V8은 자바스크립트(와 WebAssembly) 엔진이지 OS가 아니다. 그래서 FFmpeg를 직접 호출하고 싶다면 막힌다. Sharp 같은 native binding은 그대로 쓸 수 없다. 멀티스레딩? 안 된다. JVM을 통째로 올리고 싶다? 당연히 안 된다. 우리가 Spring 위에서 당연하게 누리던 라이브러리 생태계의 절반은 이 자리에서 닫힌다. 처음에는 끔찍한 일처럼 느껴진다. 평생 써온 도구함의 절반을 놓고 가야 하니까.</p>
+<p>그런데 한 발짝 떨어져 보면 그림이 다르다. Workers의 자리는 <strong>API 게이트웨이·인증·라우팅·캐시·외부 API 프록시·간단한 데이터 변환</strong> 같은 워크로드다. 이런 곳에서는 FFmpeg도 JVM도 필요 없다. 필요한 것은 짧은 응답시간과 글로벌 분산이고, 그건 V8 isolate 모델이 가장 잘 해주는 일이다. 무거운 워크로드 — 미디어 변환, 거대 배치, GPU 추론 — 는 ECS나 Bedrock에 그대로 두면 된다. 도구함의 절반을 놓고 가는 게 아니라, 같은 도구함을 워크로드별로 두 군데에 나눠 두는 셈이다. 5장에서 이 결정의 프레임을 본격적으로 다룬다. 지금은 “isolate에 맞는 일과 맞지 않는 일이 있다”는 감각만 가져가자.</p>
+<section id="spectre-방어와-멈춘-시계" class="level4">
+<h4>Spectre 방어와 멈춘 시계</h4>
+<p>V8 isolate에는 또 한 가지 미묘한 제약이 있다. 같은 isolate 안에 우리 코드가 다른 사람의 코드와 함께 사는 모델이라서, 이론적으로 Spectre 같은 side channel 공격이 가능해진다. 캐시·브랜치 예측 같은 CPU 마이크로아키텍처를 통해 같은 프로세스 안의 다른 메모리를 추론해내는 공격이다. Cloudflare는 여기에 대해 여러 겹의 방어를 깔아두었다.</p>
+<p>가장 눈에 띄는 방어가 <strong>시간 측정 차단</strong>이다. 보통 자바스크립트에서 <code>Date.now()</code>나 <code>performance.now()</code>를 부르면 마이크로초 단위까지 시간이 흐른다. Spectre 공격은 그 미세한 시간 차이를 측정해 캐시 hit/miss를 추론한다. 그래서 Workers 안에서는 <strong><code>Date.now()</code>가 스크립트 실행 중에 사실상 고정된 값을 반환한다.</strong> 정확히 말하면 마지막 I/O가 일어난 시점의 시간을 반환한다. 처음 이 사실을 알게 되면 찜찜하다. “벤치마크는 어떻게 돌리지?”, “지연 시간은 어떻게 측정하지?” 하는 질문이 자연스럽게 따라붙는다.</p>
+<p>답은 단순하다. <em>벤치마크는 Worker 안이 아니라 바깥에서 측정한다.</em> Cloudflare 대시보드의 Workers Analytics, <code>wrangler tail</code>로 들어오는 로그, 외부 APM(Sentry, Baselime, Datadog)으로 보낸 trace 이벤트가 실제 측정 지점이다. Worker 코드 안에서 ms 단위의 지연을 재서 의사결정에 쓰던 패턴이 있다면 다시 짜는 편이 낫다. 다행히 그런 패턴은 흔하지 않다.</p>
+<p>또 하나의 방어는 <strong>멀티스레딩 차단</strong>이다. SharedArrayBuffer를 써서 정밀한 타이머를 만드는 우회로가 막혀 있다. 한 isolate 안에서 우리 코드는 사실상 단일 스레드로 돈다. CPU bound 작업을 병렬로 돌리고 싶다면 Workflows로 나누거나, 여러 Worker로 나누는 게 자연스러운 길이다.</p>
+<p>그리고 한 가지 더, V8 보안 패치를 Cloudflare는 Chrome stable보다 먼저 production에 푼다. 새 CVE가 떴을 때 Chrome 사용자보다 Workers 사용자가 더 빨리 보호받는다는 뜻이다. 빠른 보안 대응이라는 점에서는 분명한 장점이다. 다만 양면이 있다. Chrome stable에서 검증되기 전의 패치가 production에 들어간다는 점은 일부 엔지니어 사이에서 양가적으로 평가된다. 빠른 패치인가, 검증 안 된 패치인가. 정답은 없고, <em>Cloudflare는 빠른 보안 쪽을 택했다</em>는 사실만 알아두면 된다.</p>
+<blockquote>
+<p><strong>무너지는 자리 — V8 Isolate가 안 맞는 자리</strong> JVM 전체를 올리고 싶을 때, 임의 바이너리(FFmpeg, ImageMagick CLI)를 직접 호출해야 할 때, OS syscall에 의존하는 라이브러리(예: 로컬 파일 캐시·shared memory·POSIX 시그널)를 그대로 옮기려 할 때, 멀티스레딩으로 CPU를 갈아 넣어야 할 때 — 이런 워크로드는 isolate 모델에 맞지 않는다. 옮기지 말자. ECS·Fargate·Bedrock에 남기는 편이 정직하다.</p>
+</blockquote>
+</section>
+</section>
+<section id="사라진-리전-들어선-좌표계" class="level3">
+<h3>사라진 리전, 들어선 좌표계</h3>
+<p>다음 가정을 흔들 차례다. AWS에서 새 프로젝트를 시작할 때 우리가 거의 무의식적으로 가장 먼저 하는 일이 있다. <strong>리전을 고른다.</strong> us-east-1로 갈지, ap-northeast-2로 갈지, 아니면 둘 다 쓸지. 그 결정 위에 VPC를 그리고, 서브넷을 자르고, Security Group을 짠다. 데이터도 그 리전에 산다. RDS는 그 리전의 인스턴스고, DynamoDB는 그 리전의 테이블이고, S3 버킷은 그 리전의 storage class다. 글로벌하게 만들고 싶다면 CloudFront를 앞에 깔거나 DynamoDB Global Table을 켜거나 S3 Cross-Region Replication을 건다. 어쨌든 출발점은 “어떤 리전에 살 것인가”의 결정이다.</p>
+<p>Workers에는 이 결정 자체가 없다. 우리가 <code>wrangler deploy</code>를 한 번 누르면 코드는 330개 넘는 PoP에 동시에 배포된다. 도쿄 사용자가 부르면 도쿄에서, 프랑크푸르트 사용자가 부르면 프랑크푸르트에서 응답이 떨어진다. Worker 코드 안에서 <code>region</code> 같은 변수는 등장하지 않는다. AWS SDK 클라이언트를 만들 때 거의 모든 생성자에 들어가던 <code>region</code> 파라미터가, KV·R2·D1·DO 호출에서는 사라져 있다. 우리는 그저 <code>env.MY_KV.get(...)</code>이라고 쓴다. 데이터가 어디 있는지는 런타임이 라우팅한다.</p>
+<p>처음에는 이게 편안하지 않다. 10년 동안 “리전을 정하고 시작하라”고 배운 사람한테 “리전이 없습니다”는 메시지는 어딘가 불안하다. <em>그럼 데이터 주권은 어떻게 챙기지? GDPR 같은 규제는?</em> 자연스러운 의문이다. 답은, 리전이 사라진 자리에 다른 좌표계가 들어섰다는 것이다. 셋만 기억해두자.</p>
+<p><strong>첫째, PoP다.</strong> PoP(Point of Presence)는 Cloudflare가 전 세계에 깔아둔 데이터센터 한 곳을 가리킨다. 코드 입장에서 PoP는 신경 쓰는 단위가 아니다. 어느 PoP에 도는지는 사용자에게 가장 가까운 곳을 런타임이 알아서 정한다. 그저 “내 코드는 모든 PoP에 산다”고 알아두면 된다.</p>
+<p><strong>둘째, Jurisdiction이다.</strong> GDPR을 비롯한 데이터 주권 규제 때문에, “이 데이터는 EU 안에서만 처리되어야 한다” 같은 요구가 있을 수 있다. Cloudflare에서는 D1·DO 같은 stateful 자원을 만들 때 <code>jurisdiction: "eu"</code> 같은 옵션으로 그 자원이 사는 영역을 EU 또는 UK로 묶을 수 있다. 한국·일본 같은 단일국 jurisdiction은 아직 별도로 제공되지는 않지만, jurisdiction이라는 추상이 리전의 자리를 일부 대체한다고 보면 된다.</p>
+<p><strong>셋째, location hint다.</strong> D1과 Durable Objects를 만들 때 “이 데이터의 첫 위치를 어디로 잡을지” 힌트를 줄 수 있다. 예를 들어 한국 사용자 위주의 워크로드라면 D1을 <code>apac</code> 힌트로 만들고, DO 인스턴스를 만들 때 <code>locationHint: "apac"</code>을 준다. 어디까지나 힌트라서 Cloudflare가 적절히 조정하지만, “사용자가 가장 많은 곳에 데이터를 가까이 두고 싶다”는 의지를 표현하는 도구다.</p>
+<p>리전이 사라진 자리에 PoP·Jurisdiction·location hint가 들어섰다. 같은 좌표계가 아니라 <em>다른</em> 좌표계다. 1:1로 옮길 수 있는 것이 아니라 멘탈 자체를 새로 짜야 한다. 처음에는 번거롭게 느껴지지만, 한 번 익숙해지면 “리전마다 인프라를 복제한다”는 부담이 사라진 자리가 꽤 가볍다.</p>
+</section>
+<section id="bindings-iam-role과-sdk-client를-한-추상으로" class="level3">
+<h3>Bindings — IAM Role과 SDK Client를 한 추상으로</h3>
+<p>이제 좀 다른 질문으로 옮겨가보자. AWS에서 Lambda가 S3 버킷을 읽으려면 무엇이 필요한가? 적어도 두 가지가 필요하다. <strong>하나는 IAM role</strong>이다. 그 Lambda 실행 역할에 <code>s3:GetObject</code> 권한이 붙어 있어야 한다. <strong>다른 하나는 SDK client</strong>다. 함수 코드 안에서 <code>new S3Client({ region: "..." })</code>처럼 클라이언트를 만들고 거기에 자격 증명이 흘러들어가야 한다. 이 둘이 따로 노는 점은 AWS를 오래 써본 사람이라면 익숙하다. IAM 정책은 콘솔이나 IaC에서 짜고, 클라이언트는 코드에서 만들고, 둘이 맞물려야 한다.</p>
+<p>Cloudflare는 이 둘을 <strong>Bindings</strong>라는 한 추상으로 묶는다. <code>wrangler.jsonc</code>에 이렇게 적는다고 해보자.</p>
+<pre class="jsonc"><code>{
+  &quot;name&quot;: &quot;toby-shop-api&quot;,
+  &quot;main&quot;: &quot;src/index.ts&quot;,
+  &quot;compatibility_date&quot;: &quot;2026-05-01&quot;,
+  &quot;kv_namespaces&quot;: [
+    { &quot;binding&quot;: &quot;SESSIONS&quot;, &quot;id&quot;: &quot;abc123...&quot; }
+  ],
+  &quot;r2_buckets&quot;: [
+    { &quot;binding&quot;: &quot;ATTACHMENTS&quot;, &quot;bucket_name&quot;: &quot;toby-shop-files&quot; }
+  ],
+  &quot;d1_databases&quot;: [
+    { &quot;binding&quot;: &quot;DB&quot;, &quot;database_name&quot;: &quot;toby-shop&quot;, &quot;database_id&quot;: &quot;...&quot; }
+  ]
+}</code></pre>
+<p>이 한 덩어리가 의미하는 바를 풀어보자. <code>SESSIONS</code>라는 이름의 KV namespace가 있고, <code>ATTACHMENTS</code>라는 이름의 R2 bucket이 있고, <code>DB</code>라는 이름의 D1 database가 있다. 그런데 <em>어디에 권한 정책이 있나?</em> 없다. 아니, 정확히 말하면 <strong>이 선언 자체가 권한 정책</strong>이다. wrangler.jsonc에 binding을 적는다는 행위는 “이 Worker가 이 자원에 접근할 수 있다”고 선언하는 것과 같다. IAM의 별도 정책 문서가 없다.</p>
+<p>코드에서는 이 binding이 그대로 함수 인자로 흘러들어온다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">fetch</span>(request<span class="op">:</span> Request<span class="op">,</span> env<span class="op">:</span> Env<span class="op">,</span> ctx<span class="op">:</span> ExecutionContext) {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">// env.SESSIONS는 KV namespace 핸들</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> sessionId <span class="op">=</span> <span class="fu">getCookie</span>(request<span class="op">,</span> <span class="st">&quot;sid&quot;</span>)<span class="op">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> user <span class="op">=</span> <span class="cf">await</span> env<span class="op">.</span><span class="at">SESSIONS</span><span class="op">.</span><span class="fu">get</span>(sessionId<span class="op">,</span> <span class="st">&quot;json&quot;</span>)<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// env.DB는 D1 database 핸들</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> profile <span class="op">=</span> <span class="cf">await</span> env<span class="op">.</span><span class="at">DB</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;SELECT * FROM profiles WHERE user_id = ?&quot;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">bind</span>(user<span class="op">.</span><span class="at">id</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">first</span>()<span class="op">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Response<span class="op">.</span><span class="fu">json</span>(profile)<span class="op">;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<p><code>env.SESSIONS</code>도, <code>env.DB</code>도 클라이언트를 직접 만들지 않았다. 자격 증명을 코드에 박지도 않았다. 그저 binding 이름을 통해 핸들이 함수 인자로 들어와 있다. <strong>이게 IAM role과 SDK client 두 역할이 한 추상으로 합쳐졌다는 뜻이다.</strong></p>
+<p>Spring 개발자라면 이 모양이 어딘가 익숙할 것이다. <code>@Autowired</code>로 의존성을 주입받는 그 모양이다. Spring에서 <code>UserRepository</code>를 컨트롤러 안에 주입할 때, 우리는 그 객체를 <code>new</code>로 만들지도 않고 데이터베이스 자격 증명을 코드에 넣지도 않는다. 컨테이너가 만들어서 넣어준다. Workers의 Bindings는 비슷한 사고방식의 더 가벼운 버전이다. <em>런타임이 의존성을 주입해주는 모델</em>이라고 보면 멘탈 매핑이 자연스럽다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Spring — 의존성 주입</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">@RestController</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UserController <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">final</span> UserRepository repo<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">UserController</span><span class="op">(</span>UserRepository repo<span class="op">)</span> <span class="op">{</span> <span class="kw">this</span><span class="op">.</span><span class="fu">repo</span> <span class="op">=</span> repo<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ...</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Workers — Bindings</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">async</span> <span class="kw">function</span> <span class="fu">fetch</span>(req<span class="op">:</span> Request<span class="op">,</span> env<span class="op">:</span> Env) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">// env.DB가 사실상 주입된 의존성이다</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> repo <span class="op">=</span> <span class="fu">createUserRepo</span>(env<span class="op">.</span><span class="at">DB</span>)<span class="op">;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>차이는 있다. Spring은 컴파일 타임에 의존 그래프를 짜고, Workers는 런타임에 환경 객체로 받는다. Spring은 임의 클래스를 빈으로 등록할 수 있고, Workers는 Cloudflare가 정의한 자원만 binding으로 잡을 수 있다. 그래도 “사용 측은 만들지 않고 받는다”는 본질이 같다는 점이 핵심이다. 처음에 Workers를 보고 “DI가 없네, 어떻게 테스트하지?” 하고 난감해하는 분이 있다면, 이 매핑을 떠올려보자.</p>
+<p>테스트는 어떻게 하나? 좋은 질문이다. Spring에서는 모킹된 빈을 컨테이너에 넣었다. Workers에서는 <code>getBindingsProxy()</code>라는 헬퍼나 <code>@cloudflare/vitest-pool-workers</code>라는 도구로 같은 일을 한다. 테스트 코드에서 가짜 KV·D1·R2 핸들을 만들고, fetch 함수에 env 객체로 넣어 호출하는 식이다. 본격적인 코드 예시는 6장에서 다룬다. 지금은 “Bindings는 DI고, 모킹할 수 있다”는 사실만 알아두자.</p>
+<p>Bindings의 또 한 가지 좋은 점은 <strong>타입 안전성</strong>이다. <code>wrangler types</code> 명령을 한 번 돌리면 <code>Env</code> 인터페이스가 자동 생성된다. wrangler.jsonc에 <code>SESSIONS</code>라는 KV가 있다면 <code>Env.SESSIONS: KVNamespace</code> 타입이 만들어진다. 오타를 내거나 없는 binding을 쓰면 컴파일 단계에서 잡힌다. AWS SDK의 string 기반 ARN이나 환경변수 폭주에 비하면 훨씬 깔끔하다. 익숙해지면 돌아가기 어렵다.</p>
+<blockquote>
+<p><strong>무너지는 자리 — Bindings의 한계</strong> Bindings는 깔끔하지만 IAM의 정교한 정책 언어 — 조건부 접근, resource-level 권한, 시간대별 정책, MFA 강제 같은 — 와는 표현력이 다르다. “이 Worker는 이 KV의 read만 가능하고 write는 불가” 같은 fine-grained 정책을 binding 자체에 표현할 직접적 방법이 없다. 그런 정책이 필요하면 Worker를 둘로 나누거나, 코드 레벨에서 권한 체크를 직접 하거나, Cloudflare Access와 WAF 규칙을 조합하는 우회로를 잡아야 한다. 11장에서 더 자세히 다룬다.</p>
+</blockquote>
+</section>
+<section id="compatibility-date-시간이-박혀-있는-런타임" class="level3">
+<h3>Compatibility Date — 시간이 박혀 있는 런타임</h3>
+<p>다음 기둥이다. AWS에서 Lambda 함수를 만들 때 우리는 런타임을 고른다. <code>nodejs20.x</code>, <code>java17</code>, <code>python3.12</code>. 시간이 지나면 AWS가 새 런타임을 내고, 옛 런타임의 EOL 날짜를 공지한다. Lambda 콘솔이나 IaC에서 우리가 직접 새 런타임으로 마이그레이션해줘야 한다. 안 그러면 어느 날 콘솔에 빨간 경고가 뜨고, 결국 강제로 마이그레이션 당한다.</p>
+<p>Workers는 좀 다르다. 가장 헷갈리는 단어 중 하나가 <code>compatibility_date</code>다. wrangler.jsonc 위에 보면 <code>"compatibility_date": "2026-05-01"</code> 같은 줄이 들어 있다. 처음 보면 “이건 언제 만들어진 Worker라는 표시인가?” 싶다. 절반은 맞고 절반은 아니다.</p>
+<p>정확하게 말하면, <strong>이 날짜는 우리 Worker가 어느 시점의 런타임 동작을 따라갈지 못 박는 표시다.</strong> Cloudflare는 workerd라는 런타임을 매주처럼 업데이트한다. 새 표준 API가 추가되고, 옛 API의 동작이 다듬어지고, 가끔은 미묘한 동작 변경도 있다. 만약 모든 Worker가 항상 최신 런타임 동작을 따라간다면, 우리가 6개월 전에 짠 Worker가 어느 날 갑자기 다른 동작을 보일 수 있다. 끔찍한 일이다.</p>
+<p><code>compatibility_date</code>는 그래서 일종의 시간 잠금 장치다. <code>2026-05-01</code>로 박아두면, 그 시점 기준의 런타임 동작이 우리 Worker에 적용된다. 시간이 흘러 Cloudflare가 어떤 동작을 바꿔도 우리 Worker는 옛 동작을 그대로 받는다. <em>우리가 직접 날짜를 올리기 전까지는.</em> AWS Lambda의 강제 EOL과 비교하면 마음이 편안해지는 모델이다. 능동적으로 올리지 않으면 옛날 그대로다.</p>
+<p>물론 영원히 안 올릴 수는 없다. 보안 패치는 날짜와 무관하게 적용되고, 너무 오래된 동작은 어느 시점에 sunset된다. 그래도 Lambda처럼 “3개월 안에 마이그레이션 안 하면 함수가 안 돕니다” 같은 강압은 없다. 우리가 분기에 한 번 정도 검토해서 올리는 패턴이 자연스럽다.</p>
+<p><code>compatibility_flags</code>라는 짝궁 옵션도 있다. 특정 동작 하나만 켜고 끄고 싶을 때 쓴다. 예를 들어 “Node.js 호환 레이어 켜기” 같은 플래그를 개별로 활성화할 수 있다. 굳이 compatibility_date를 통째로 올리지 않고도 새 동작 하나만 시험해볼 수 있는 길이다.</p>
+<pre class="jsonc"><code>{
+  &quot;compatibility_date&quot;: &quot;2026-05-01&quot;,
+  &quot;compatibility_flags&quot;: [&quot;nodejs_compat&quot;]
+}</code></pre>
+<p>Spring 개발자라면 어떻게 비유할까. Spring Boot의 버전 선택과 비슷하지만 결이 다르다. Spring Boot는 보통 한 버전을 고르고, 마이너 버전을 올릴 때 마이그레이션 가이드를 본다. Workers는 <em>런타임은 항상 최신</em>인데, 우리 코드에 <strong>“이 시점의 동작을 봐달라”</strong> 는 라벨을 붙이는 모양이다. 라벨을 올리는 것도 우리고, 라벨을 안 올려서 옛 동작을 받는 것도 우리다. 통제권이 우리 쪽에 있다.</p>
+<p>새 Worker를 만들 때 한 가지만 기억해두자. <strong><code>pnpm create cloudflare</code>로 프로젝트를 만들면 그 시점의 최신 날짜로 자동 채워진다.</strong> 우리가 신경 쓸 일은 분기마다 한 번씩 “지금 날짜로 올려도 되나” 점검하는 정도다. 변경사항은 Cloudflare 공식 문서의 “Compatibility Dates” 페이지에 깔끔하게 정리돼 있다. 부록 E에 추적 가이드를 두었다.</p>
+</section>
+<section id="io-대기는-과금되지-않는다-가격이-멘탈을-다시-그린다" class="level3">
+<h3>“I/O 대기는 과금되지 않는다” — 가격이 멘탈을 다시 그린다</h3>
+<p>지금까지가 런타임 모델이었다면, 이제 그 위에 얹힌 가격 모델을 보자. 이 한 줄이 우리의 멘탈 모델을 어디까지 흔드는지 살펴보면 흥미롭다.</p>
+<p>먼저 Lambda의 모델이다. Lambda는 두 가지로 과금한다. 하나는 요청 수, 다른 하나는 <strong>메모리 × 실행 시간</strong>이다. 1024MB 메모리 함수가 3초 동안 돌면 3 GB-s가 과금된다. 외부 API를 호출하고 5초 동안 응답을 기다린다고 해도, 그 5초 동안 Lambda는 메모리를 잡고 있고 <em>과금 시계는 그대로 돌아간다.</em> 이걸 알게 된 뒤로 많은 사람이 “Lambda 안에서는 외부 API 응답을 오래 기다리지 마라”는 운영 수칙을 갖게 됐다. 길게 기다려야 하는 작업은 Step Functions로 빼서 비동기로 만들고, Step Functions는 또 state transition 단위로 과금된다.</p>
+<p>Workers Standard는 다르다. <strong>CPU time × 요청 수</strong>로 과금한다. 외부 API를 호출하고 5초를 기다리는 동안, 그 5초는 <em>과금되지 않는다.</em> CPU가 돌고 있는 시간만 잡는다. 외부 API 응답이 도착해 다시 우리 코드가 실행되는 그 짧은 순간만 비용이다. 이 한 줄이 멘탈 모델 전체를 흔든다.</p>
+<p>상상해보자. 우리가 LLM 응답을 5초 동안 기다리는 워크로드를 운영한다고 해보자. Lambda 위에서는 5초 × 메모리만큼 비용이 흐른다. Workers 위에서는 우리 코드가 실제로 도는 몇십 ms 동안만 비용이 잡힌다. 같은 양의 일에 비용 차이가 한 자릿수가 아니라 두 자릿수까지 벌어질 수 있다. AI 게이트웨이, 외부 API 프록시, 워크플로 오케스트레이션 — 이런 I/O 대기 위주 워크로드는 Workers의 가격 모델 위에서 자연스럽게 살이 붙는다.</p>
+<p>그렇다면 어떤 워크로드가 어디에 자연스러운가? 한 줄로 정리하면 <strong>“I/O가 많고 CPU가 적은 일은 Workers, CPU를 많이 쓰는 무거운 일은 Lambda나 ECS”</strong> 다. 외부 API 통합, 라우팅, 인증 검증, 캐시 hit 응답, 가벼운 데이터 변환 — Workers의 영역이다. 무거운 데이터 처리, 이미지 변환, 큰 SQL 분석 쿼리 — 다른 곳에 두는 편이 낫다.</p>
+<p>이 가격 모델이 가져오는 부수 효과가 또 있다. <strong>Workflows라는 durable execution 엔진이 Step Functions와 본질적으로 다른 비용 모양을 갖는다.</strong> Step Functions는 state transition 단위로 과금되기 때문에 long-poll이나 사용자 승인 같은 외부 대기가 비용에 그대로 잡힌다. Workflows는 코드가 <code>step.sleep(...)</code>이나 <code>step.waitForEvent(...)</code>로 며칠을 자더라도 그 동안 비용이 흐르지 않는다. 우리가 Spring <code>@Async</code>로 짜오던 비동기 패턴, Step Functions로 짜오던 multi-step 워크플로 — 이런 영역의 비용 곡선이 다시 그려진다. 자세한 코드는 12장에서 본격적으로 살펴보자.</p>
+<p>여기서도 정직해야 한다. <strong>무료가 아니라는 점이다.</strong> I/O 대기 시간은 과금되지 않지만, 요청 수와 CPU time은 과금된다. 요청이 매우 많은 워크로드(초당 수만 건)에서는 결국 비용이 누적된다. 그리고 Workers Paid 플랜은 월 $5짜리 기본료가 있다. 작은 사이드 프로젝트에 Free 플랜으로 충분한 경우가 많지만, production은 Paid가 권장된다. 비용 시뮬레이션은 부록 C에 워크시트로 두었다.</p>
+</section>
+<section id="spring-개발자의-다섯-가지-멘탈-어떻게-다시-그릴까" class="level3">
+<h3>Spring 개발자의 다섯 가지 멘탈 — 어떻게 다시 그릴까</h3>
+<p>V8 isolate, 사라진 리전, Bindings, Compatibility Date, I/O 과금. 네 기둥에 가격 모델까지 얹었다. 이 새 좌표계 위에서 Spring 개발자가 익숙하게 누리던 다섯 가지 멘탈 — 요청-응답, 미들웨어, DI, 트랜잭션, <code>@Scheduled</code> — 가 어떻게 다시 그려질지 미리 그림만 그려두자. 본격적인 코드는 6장과 12장에서 쓴다.</p>
+<p><strong>첫째, 요청-응답이다.</strong> Spring에서는 <code>@RestController</code>와 <code>@GetMapping</code>이 우리의 진입점이었다. Workers는 더 단순하다. <code>fetch(request, env, ctx)</code> 함수 하나가 전부다. request 객체는 Web standards의 그 Request이고, response도 Web standards의 그 Response다. 가벼운 라우팅이 필요하면 Hono를 얹는다. Hono는 Express에 가까운 라우팅·미들웨어 모델을 가져오기 때문에, Express를 써본 사람한테는 즉각 친숙하고, Spring만 써온 사람한테도 30분이면 적응된다.</p>
+<p><strong>둘째, 미들웨어다.</strong> Spring의 <code>SecurityFilterChain</code>, <code>Interceptor</code>, <code>Filter</code> — 이 자리는 Hono의 <code>app.use()</code> 체인이 정확히 채운다. 인증·rate limit·캐시·로깅을 미들웨어 체인으로 엮는 모델이 같다. 다른 점은 Hono의 미들웨어가 함수 한 개로 표현되어 가벼운다는 점, 그리고 V8 isolate 위에서 도니까 시작 비용이 거의 없다는 점이다.</p>
+<p><strong>셋째, DI다.</strong> 앞 절에서 봤듯이 Bindings가 Spring의 <code>@Autowired</code> 자리에 들어선다. 차이는 컨테이너가 우리가 정의한 임의 클래스를 빈으로 등록해주지는 않는다는 점이다. 그래서 Repository 같은 도메인 객체는 함수형으로 짜거나 작은 클래스로 직접 만들어 인자로 넘기는 패턴이 많다. 처음에는 “Spring 컨테이너가 그립다”는 마음이 들 수 있는데, 막상 짜보면 의외로 가볍고 명료해진다.</p>
+<p><strong>넷째, 트랜잭션이다.</strong> 이 자리는 Spring 개발자가 가장 헷갈려하는 곳이다. <code>@Transactional</code>을 메소드에 붙이면 트랜잭션이 자동 propagation되던 마법은 Workers 안에 없다. D1은 statement 또는 batch 단위 트랜잭션을 지원하지만 분산 propagation이 없고, Durable Objects는 그 storage 안에서 강한 일관성을 보장한다. “트랜잭션 코디네이터가 필요하다”고 느끼면 보통 Durable Objects를 그 자리에 둔다. 사용자별 카운터, 재고, 예약 — 이런 워크로드가 그렇다. 자세한 멘탈 매핑은 7·8장에서 본격적으로 다룬다.</p>
+<p><strong>다섯째, <code>@Scheduled</code>다.</strong> Spring Batch, <code>@Scheduled</code>로 짜오던 정기 작업은 Workers에서 <strong>Cron Triggers</strong>가 맡는다. wrangler.jsonc에 cron 표현식 한 줄을 적으면, 그 시간마다 우리 Worker의 <code>scheduled</code> 핸들러가 호출된다. 무거운 배치는 ECS에 그대로 두고, 매시 정각의 health check나 매일 새벽의 보고서 발송 같은 가벼운 정기 작업이 자연스러운 자리다. 12장에서 본격적으로 짜본다.</p>
+<p>다섯 가지 멘탈을 한 페이지 표로 정리하면 이렇게 된다.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Spring 멘탈</th>
+<th>Workers의 자리</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@RestController</code> + <code>@GetMapping</code></td>
+<td><code>fetch(request, env, ctx)</code> + Hono 라우팅</td>
+</tr>
+<tr>
+<td><code>SecurityFilterChain</code> / <code>Interceptor</code></td>
+<td>Hono <code>app.use()</code> 미들웨어 체인</td>
+</tr>
+<tr>
+<td><code>@Autowired</code> / DI 컨테이너</td>
+<td>Bindings (env 객체) + 함수형 또는 작은 팩토리</td>
+</tr>
+<tr>
+<td><code>@Transactional</code> 자동 propagation</td>
+<td>D1 statement·batch 또는 Durable Objects (per-entity)</td>
+</tr>
+<tr>
+<td><code>@Scheduled</code> / Spring Batch (가벼운 부분)</td>
+<td>Cron Triggers + Workflows</td>
+</tr>
+</tbody>
+</table>
+<p>이 표는 한 페이지 요약이다. 본격적인 코드는 6장(Hono·미들웨어·DI), 7·8장(데이터·트랜잭션), 12장(Workflows·Cron)에서 쓴다.</p>
+</section>
+<section id="무너지는-자리-v8-isolate-모델이-정직하게-안-되는-것들" class="level3">
+<h3>무너지는 자리 — V8 Isolate 모델이 정직하게 안 되는 것들</h3>
+<p>이 장의 마지막 박스다. 이 책의 모든 기술 챕터 끝에는 “무너지는 자리” 박스를 둔다. 광고가 아님을 가장 단순하게 보여주는 약속이다. V8 isolate 모델이 정직하게 안 되는 자리를 한 번에 모아보자.</p>
+<ul>
+<li><strong>임의 바이너리 실행 불가.</strong> FFmpeg을 직접 부르고 싶은가? 안 된다. 미디어 변환은 Cloudflare Images나 별도 ECS·Lambda 워커에 맡기자.</li>
+<li><strong>full Node API의 일부 부재.</strong> <code>nodejs_compat</code> 플래그로 상당 부분 채워졌지만, <code>child_process</code>·<code>cluster</code>·일부 native fs API는 여전히 안 된다. Sharp 같은 native binding은 그대로 못 쓴다.</li>
+<li><strong>OS syscall 불가.</strong> POSIX 시그널, raw socket, shared memory — 다 막혀 있다. 이런 게 필요한 워크로드는 isolate에 맞지 않는다.</li>
+<li><strong>멀티스레딩 불가.</strong> SharedArrayBuffer로 정밀 타이머 만드는 패턴이 막혀 있고, Worker 내부에서 CPU 병렬 처리가 안 된다. 병렬이 필요하면 Workflows로 step을 나누거나 여러 Worker로 fan-out하자.</li>
+<li><strong>스크립트 크기 한도.</strong> Free 플랜 1MiB, Paid 10MiB. Spring Boot fat jar 같은 거대한 의존성 덩어리는 들어갈 자리가 없다. 큰 의존성을 줄이거나 핵심만 옮기는 편이 낫다.</li>
+<li><strong><code>Date.now()</code>가 사실상 멈춰 있다.</strong> Spectre 방어 정책이다. 코드 안에서 정밀 타이밍을 재서 의사결정에 쓰는 패턴은 다시 짜야 한다.</li>
+</ul>
+<p>이 한계를 받아들일 수 있는 워크로드와 그렇지 않은 워크로드를 구분하는 게 5장 결정 프레임의 출발선이다. 지금은 한계 자체를 정직하게 알고 가자.</p>
+</section>
+<section id="마무리-1" class="level3">
+<h3>마무리</h3>
+<p>자, 정리해보자. 우리는 V8 isolate라는 더 가벼운 격리 모델을 살펴봤고, 그 대가로 무엇을 포기해야 하는지 짚었다. 리전이 사라진 자리에 PoP·Jurisdiction·location hint라는 다른 좌표계가 들어섰다. Bindings는 IAM role과 SDK client 두 역할을 한 추상으로 묶었고, Spring의 <code>@Autowired</code>와 사고방식이 가깝다. Compatibility Date는 런타임 안정성을 우리 손으로 잡는 시간 잠금 장치고, “I/O 대기는 과금되지 않는다”는 가격 모델은 우리가 어떤 워크로드를 어디에 둘지의 결정을 다시 그린다. Spring 개발자의 다섯 가지 멘탈 — 요청-응답, 미들웨어, DI, 트랜잭션, <code>@Scheduled</code> — 는 사라지는 게 아니라 다른 자리에 다시 그려진다.</p>
+<p>기억해두자. <strong>Workers는 더 가벼운 Lambda가 아니라, 가정이 다른 런타임이다.</strong> 컨테이너가 isolate로 바뀌고, 리전이 PoP로 바뀌고, IAM이 Bindings로 바뀌고, 메모리·시간 과금이 CPU 시간 과금으로 바뀐다. 한 자리만 다르면 비교가 가능한데, 네 자리가 동시에 다르니 멘탈 모델을 통째로 다시 그릴 필요가 있다. 불편하지만 정직한 진단이다.</p>
+<p>다음 장에서는 이 새 좌표계 위에서 우리 손으로 첫 Worker를 띄워보자. Mac에서 Wrangler를 깔고, 5분 안에 Hello World가 글로벌 PoP에 배포되어 도쿄·LA·런던에서 같은 응답이 즉시 떨어지는 광경을 직접 본다. 머리의 혼란이 손끝의 성취로 진정되는 자리다. 함께 넘어가보자.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>

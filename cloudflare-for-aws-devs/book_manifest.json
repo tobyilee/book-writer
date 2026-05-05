@@ -1,0 +1,37 @@
+{
+  "title": "AWS 개발자를 위한 Cloudflare 본격 활용 가이드",
+  "subtitle": "Workers·D1·R2부터 OpenNext·AI Gateway까지, 멘탈 모델을 다시 그리는 길잡이",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-05",
+  "version": "1.0.0",
+  "identifier": "urn:uuid:cloudflare-for-aws-devs-1.0.0",
+  "description": "AWS·Spring·Lambda에 익숙한 백엔드 개발자가 Cloudflare를 자기 시스템에 정직하게 들이는 길을 안내한다. Workers·D1·R2·Durable Objects·Hyperdrive·Workers AI·OpenNext까지 14개 장에 걸쳐 멘탈 모델을 다시 그리고, 5축 결정 트리와 Strangler Fig 8단계로 옮길 자리와 남길 자리를 가른다. 광고가 아닌 결정의 정직함을 약속하는 책.",
+  "cover_image": "cover.png",
+  "manuscript": "04_manuscript.md",
+  "slug": "cloudflare-for-aws-devs",
+  "chapters": [
+    {"number": 1, "title": "왜 또 하나의 클라우드가 아닌가 — Edge-first의 시대"},
+    {"number": 2, "title": "멘탈 모델을 다시 그리자 — V8 Isolate가 바꾸는 가정"},
+    {"number": 3, "title": "첫 Worker를 띄우자 — Mac에서 5분 만에 글로벌 배포"},
+    {"number": 4, "title": "AWS ↔ Cloudflare 매핑 카탈로그 — 1:1 표가 거짓말이 되는 지점들"},
+    {"number": 5, "title": "옮길까 말까 — Cloudflare로 가야 할 워크로드 판별법"},
+    {"number": 6, "title": "Workers 본격 사용법 — Spring 멘탈을 Hono로 다시 그리자"},
+    {"number": 7, "title": "데이터 1 — KV와 D1, 워크로드 패턴으로 골라 쓰기"},
+    {"number": 8, "title": "데이터 2 — Durable Objects와 R2, 그리고 Cache API"},
+    {"number": 9, "title": "Next.js on Cloudflare — Workers Static Assets·OpenNext의 현실"},
+    {"number": 10, "title": "Hyperdrive로 RDS를 그대로 살려두기 — 가장 risk-low한 첫 발걸음"},
+    {"number": 11, "title": "보안과 Zero Trust — Access·Tunnel·WAF·Turnstile·Auth.js"},
+    {"number": 12, "title": "AI·Workflows·Queues — Step Functions·SQS·@Scheduled 너머"},
+    {"number": 13, "title": "운영과 정직한 한계 — 비용·관측·outage·lock-in"},
+    {"number": 14, "title": "마이그레이션 전략 — Strangler Fig 8단계로 어떻게 옮기는가"}
+  ],
+  "appendices": [
+    {"id": "A", "title": "Wrangler CLI 치트시트"},
+    {"id": "B", "title": "진단 카드"},
+    {"id": "C", "title": "비용 시뮬레이터 워크시트"},
+    {"id": "D", "title": "Python Workers 노트"},
+    {"id": "E", "title": "AWS ↔ Cloudflare 빠른 참조"},
+    {"id": "F", "title": "트러블슈팅 + 2025 outage 타임라인"}
+  ]
+}

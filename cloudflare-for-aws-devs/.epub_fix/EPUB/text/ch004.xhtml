@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch004.xhtml</title>
+  <style>
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-왜-또-하나의-클라우드가-아닌가-edge-first의-시대" class="level2">
+<h2>1장. 왜 또 하나의 클라우드가 아닌가 — Edge-first의 시대</h2>
+<p>월요일 아침, 도쿄에 있는 사용자가 우리 API를 부르면 280ms가 돌아온다. 캘리포니아 본사 사무실에서는 60ms다. 같은 코드, 같은 데이터인데 5배 가까이 차이가 난다. CloudFront를 앞에 깔아도 첫 요청의 지연은 거의 줄지 않는다. 왜 그럴까?</p>
+<p>이 책을 펼친 우리는 이미 답의 절반을 알고 있다. 코드가 us-east-1에 있기 때문이다. TLS 핸드셰이크와 DB 연결을 합치면 태평양을 건너는 라운드트립만 일고여덟 번이다. 그렇다면 코드를 도쿄에 두면 어떨까? 그게 그렇게 단순할 리 없다. 도쿄에 EC2를 한 대 더 띄우면 데이터는 어디서 오나, 세션은 어디서 공유하나, 비용은 두 배가 되지 않나. 시드니, 프랑크푸르트, 상파울루까지 사용자가 늘어나면 또 어떻게 할 것인가. 우리가 지난 10년 동안 익혀온 멘탈 모델 안에서는 모든 답이 또 다른 운영 부담으로 돌아온다. 리전을 더 늘리고, VPC를 더 그리고, 데이터 동기화를 더 짜야 한다.</p>
+<p>Cloudflare는 이 질문을 다른 자리에서 다시 묻는다. “코드가 모든 곳에 있다면 어떨까?” 처음 들으면 마케팅 카피처럼 들린다. 하지만 그게 진짜로 가능하다면, 우리가 지난 10년 동안 짊어온 가정 — 리전을 고른다, VPC를 그린다, ALB 뒤에 Auto Scaling Group을 세운다 — 의 절반이 흔들린다. 함께 살펴보자. 이 책의 첫 페이지가 우리에게 약속하는 것이 바로 그것이다.</p>
+<section id="cloudflare는-더-싼-lambda다라는-첫-인상" class="level3">
+<h3>“Cloudflare는 더 싼 Lambda다”라는 첫 인상</h3>
+<p>AWS를 오래 써온 개발자가 Cloudflare 문서를 처음 펼치면 가장 먼저 떠올리는 한 줄이 있다. “그러니까, 더 싼 Lambda네.” Workers는 코드를 돌리니까 Lambda 같고, R2는 객체를 저장하니까 S3 같고, D1은 SQL을 받으니까 RDS 같다는 식이다. 표를 한 장 그리면 깔끔하게 정리된다. 그렇게 1:1로 매핑해 놓고 비용 계산기를 돌려보면 결론은 늘 비슷하다. “어, 정말 싸네. 그런데 우리 시스템을 진짜로 옮기면 깨질 것 같은데.”</p>
+<p>이 1:1 매핑이 바로 함정이다. 함정인 이유는 가격이 틀려서가 아니라, <strong>두 플랫폼이 서로 다른 가정 위에 서 있기 때문</strong>이다. AWS는 “리전 안에서 모든 것이 끝난다”는 가정 위에 쌓아 올렸다. 한 리전을 고르고, 그 안에 VPC를 그리고, 서브넷을 자른다. Lambda는 그 리전의 컨테이너를 띄워 함수를 돌리고, DynamoDB는 그 리전의 테이블에 쓰고, S3는 그 리전의 버킷에 올린다. 글로벌하게 만들고 싶으면 CloudFront를 앞에 두거나 Global Table을 켜면 된다. 그러나 본질은 “어떤 리전에 살 것인가”의 결정이 가장 먼저 온다.</p>
+<p>Cloudflare는 그 가정을 출발선부터 다르게 잡는다. <strong>코드는 모든 PoP에 동시에 배포된다.</strong> 사용자가 도쿄에 있든 상파울루에 있든 가장 가까운 데이터센터에서 같은 코드가 응답한다. 리전은 고르는 게 아니라 사라진 자리다. 데이터의 위치는 리전이 아니라 jurisdiction(EU·UK 같은 법적 단위) 또는 location hint(D1·DO에서)로 표현한다. 코드와 데이터의 위치가 분리되고, 둘 다 사용자의 위치에 따라 동적으로 라우팅된다. 멘탈 모델 자체가 다르다.</p>
+<p>그래서 1:1 매핑은 표면만 닮은 도구를 짝지어 놓고 안심하게 만든다. Lambda↔︎Workers는 둘 다 함수형 서버리스라서 옆에 두면 비슷해 보인다. 하지만 Lambda는 컨테이너(Firecracker microVM)를 띄우는 모델이고, Workers는 V8 isolate라는 더 가벼운 격리 위에서 돈다. 콜드스타트가 5ms 미만으로 떨어지는 대신 임의 바이너리·full Node API·OS syscall은 포기한다. 같은 “서버리스”라는 단어 아래에 다른 행성이 있다. 그 차이를 모르고 옮기면, Spring Boot 위에 올린 거대한 의존성 덩어리를 그대로 들고 가서 1MB 한도(또는 Paid 10MB)에 부딪혀 황당해진다. 끔찍한 일이다.</p>
+<p>DynamoDB↔︎KV는 더 위험한 매핑이다. 둘 다 key-value니까 같다고 치면, 어느 날 production에서 secondary index로 쿼리하던 코드가 통째로 안 도는 광경을 보게 된다. KV는 secondary index가 없다. 범위 쿼리도 없다. eventually consistent라서 쓰고 나서 60초까지 다른 PoP에서는 옛 값이 보일 수 있다. Liftosaur라는 서비스가 Workers + KV로 시작했다가 DynamoDB로 회귀한 사례가 있는데, 가장 큰 이유 중 하나가 바로 이 KV의 한계였다. 1:1 매핑 표만 보고 옮긴 사람들의 공통된 후일담이다.</p>
+<p>그렇다면 어떻게 해야 할까? 답은 단순하다. 매핑 표를 버리는 게 아니라, <strong>매핑이 거짓말을 하는 경계선을 미리 알고 보는 것</strong>이다. Lambda↔︎Workers는 “둘 다 서버리스”가 아니라 “둘 다 사용자 코드를 실행하지만, 컨테이너냐 isolate냐의 격리 모델이 다르다”로 읽어야 한다. DynamoDB는 KV로 매핑되는 게 아니라, <strong>사용 패턴별로</strong> KV·D1·Durable Objects 셋 중 하나로 갈라진다. read-heavy 세션·플래그라면 KV, 관계형 SQL이라면 D1, 강한 일관성·per-entity 상태라면 DO다. 하나의 익숙한 이름이 셋으로 갈라진다는 사실이 처음에는 번거롭게 느껴진다. 하지만 그게 정확한 그림이다.</p>
+<p>그래서 이 책의 첫 약속은 이것이다. <strong>Cloudflare를 “또 하나의 클라우드”로 보지 말자.</strong> 그러면 가격 비교만 하다가 본질을 놓친다. 대신 “AWS와 가정이 다른 edge-first 플랫폼”으로 보자. 그 자리에서 보면, 어떤 워크로드는 옮기는 게 합리적이고 어떤 워크로드는 옮기지 않는 게 합리적이라는 결정이 또렷해진다.</p>
+</section>
+<section id="edge-first가-정확히-무엇을-뜻하는가" class="level3">
+<h3>Edge-first가 정확히 무엇을 뜻하는가</h3>
+<p>“edge-first”라는 단어는 Cloudflare 블로그·문서에 거의 모든 페이지에 나오는 표현이다. 그런데 정확히 뭘 의미하는 걸까? 한 번 짚고 가자.</p>
+<p>AWS의 멘탈에서 “edge”는 부속물이다. 사용자에게 가까운 곳에 캐시 한 겹을 더 두는 것이 CloudFront다. 코드를 약간 돌리고 싶으면 CloudFront Functions나 Lambda@Edge를 얹는다. 본체는 여전히 리전 안에 있다. EC2도, RDS도, DynamoDB도, ALB도 모두 한 리전에 있고, edge는 그 앞에 깔린 얇은 레이어다. 사용자에게 빠르게 보이고 싶을 때 옵션으로 켜는 기능에 가깝다.</p>
+<p>Cloudflare는 거꾸로다. <strong>edge가 본체이고, origin이 옵션이다.</strong> 우리가 작성한 Worker 코드는 처음부터 330개 넘는 PoP에 동시 배포된다. 도쿄 사용자가 부르면 도쿄에서, 프랑크푸르트 사용자가 부르면 프랑크푸르트에서 응답한다. 어느 PoP에 살까를 정하는 일이 없다. 모든 PoP에 산다. 그게 edge-first의 첫 번째 의미다.</p>
+<p>두 번째 의미는 더 미묘하다. 같은 코드가 모든 곳에 있다면, 그 코드 안에서 “리전”이라는 단어는 더 이상 변수가 아니다. AWS에서는 거의 모든 SDK 클라이언트 생성자에 region 파라미터가 들어간다. Workers에서 KV·R2·D1·DO를 호출할 때는 그런 게 없다. 우리는 그저 <code>env.MY_KV.get(...)</code>이라고 쓴다. 어디 있는 데이터인지는 런타임이 라우팅한다. 리전이 사라진 자리에 PoP·Bindings·Compatibility Date가 들어선다. 이 세 단어가 Cloudflare의 새로운 좌표계다.</p>
+<p>세 번째, 그리고 가장 강력한 의미는 가격 모델이다. Lambda는 메모리·실행 시간(GB-s) × 요청 수로 과금한다. 외부 API를 호출하고 응답을 기다리는 동안에도 메모리는 lock되고 비용은 흐른다. Workers Standard는 다르다. <strong>CPU time × 요청 수</strong>로 과금한다. 외부 API·DB 응답을 기다리는 시간은 과금되지 않는다. AI 호출처럼 LLM 응답을 5초씩 기다리는 워크로드라면, 같은 양의 일에 비용 차이가 한 자릿수가 아니라 두 자릿수까지 벌어진다. 이건 단순한 가격표 차이가 아니라 “어떤 워크로드가 자연스럽게 흘러가는가”가 다르다는 뜻이다. 워크플로 오케스트레이션, AI 게이트웨이, 외부 API 프록시 같은 I/O 대기 위주 워크로드는 Workers 가격 모델 위에서 살이 붙는다.</p>
+<p>자, 이쯤에서 한 번 멈춰보자. 여기까지 읽고 “그래서 AWS 버리라는 거야?”라는 의문이 들었다면, 그건 자연스러운 반응이다. 하지만 이 책의 답은 정반대다. <strong>AWS를 버리지 말자.</strong> 우리가 10년 가까이 쌓아 올린 시스템은 그 자리에서 충분히 잘 돌아간다. RDS의 강한 일관성, Step Functions의 풍부한 통합, ECS의 거대한 컨테이너 워크로드 — 이런 자리는 그대로 두는 편이 낫다. Cloudflare는 그 옆에 자기 자리를 가지고 들어와야 한다. 어디에 들어와야 하는가가 이 책 전체의 질문이다.</p>
+</section>
+<section id="두-번의-outage가-가르쳐준-것" class="level3">
+<h3>두 번의 outage가 가르쳐준 것</h3>
+<p>2025년 11월 18일, 그리고 같은 해 12월 5일. Cloudflare는 두 차례의 큰 글로벌 장애를 겪었다. 11월 18일의 사건은 특히 인상적이었는데, Bot Management 설정 파일이 ClickHouse 권한 변경 때문에 두 배 크기가 되어 proxy가 panic을 일으켰다. Workers KV, Turnstile, Dashboard까지 줄줄이 영향을 받았고 11:20부터 17:06 UTC까지 부분 또는 전체 장애가 이어졌다. Hacker News에서는 한동안 토론이 끊이지 않았다.</p>
+<p>이 사건들을 어떻게 받아들여야 할까. 한쪽에서는 “단일 벤더에 너무 많은 트래픽이 집중되어 있다”고 경고한다. 다른 쪽에서는 “AWS도 us-east-1 장애가 나면 인터넷 절반이 멈춘다”고 반박한다. 둘 다 일리 있다. 어느 한쪽 말이 정답은 아니다.</p>
+<p>이 책이 제안하는 자세는 조금 다르다. <strong>“Cloudflare를 쓸까 말까”가 아니라 “어디까지 의존할까”의 질문으로 옮기자.</strong> 단일 벤더에 모든 critical path를 거는 일은 어떤 벤더라도 위험하다. 그게 Cloudflare든, AWS든, GCP든. 그래서 우리가 던져야 할 질문은 다음과 같다.</p>
+<p>DNS는 Cloudflare로 가더라도 secondary DNS를 다른 곳에 두면 어떨까. 핵심 데이터는 R2에 두더라도 AWS S3에 백업 sink를 하나 더 운영하면 어떨까. 결제 같은 critical path는 Workers와 Lambda 두 군데에 동시에 두고 dual-running하면 어떨까. Rebal AI라는 회사가 정확히 이 패턴을 운영하고 있다. 비용이 두 배 들지만 한쪽이 죽어도 서비스가 멈추지 않는다.</p>
+<p>여기서 우리는 정직해야 한다. Cloudflare 블로그를 읽으면 자주 “single vendor lock-in은 없다”는 말이 나온다. Workers 코드 자체는 Web standards 기반이라 이론적으로는 portable하다. 하지만 Bindings, Durable Objects, D1, KV의 API는 Cloudflare 고유다. 옮기려면 추상화 레이어를 한 겹 두거나 코드를 다시 짜야 한다. <strong>feature-level lock-in은 명백히 존재한다.</strong> 이걸 인정하지 않고 “Cloudflare는 lock-in이 없습니다”라고 말하는 책이 있다면, 그건 광고지 책이 아니다.</p>
+<p>이 책은 광고가 아니다. 13장에서 outage 케이스를 더 깊이 다루고, 부록 F에 두 번의 사건의 상세 타임라인을 정리해두었다. 도입을 권유하면서 위험을 숨기지 않는다는 약속을 지키기 위해서다.</p>
+</section>
+<section id="세-가지-명시적-약속-그리고-그-한계" class="level3">
+<h3>세 가지 명시적 약속, 그리고 그 한계</h3>
+<p>마케팅 카피를 걷어내고 보면, Cloudflare가 AWS 개발자에게 명시적으로 약속하는 것이 셋 있다. 이 셋을 머릿속에 박아두는 것만으로도 결정의 90%가 또렷해진다. 함께 살펴보자.</p>
+<p><strong>첫째, egress가 무료다.</strong> R2의 객체 다운로드, Workers의 응답 트래픽, 모두 outbound 비용을 받지 않는다. S3 Standard에서 30TB를 한 달 동안 다운로드하면 약 $2,700이 나온다. 같은 양을 R2에서 받으면 storage 비용 외에는 0이다. 미디어, 백업, AI 모델 가중치, 로그 export처럼 outbound가 큰 워크로드일수록 절감 폭이 커진다. Baselime이라는 회사는 AWS에서 Cloudflare로 옮긴 뒤 일 $790짜리 비용이 $25로 떨어졌다고 공식 블로그에 썼다. 95% 절감이다.</p>
+<p>여기서 정직해야 할 한계가 있다. egress가 무료지만 <strong>Class A operations(쓰기·list)와 Class B operations(읽기)는 과금</strong>된다. 요청 수가 매우 많은 워크로드(예: 작은 객체를 초당 수천 번 읽는 패턴)에서는 결국 비용이 누적된다. 그리고 AWS에서 R2로 한 번 큰 데이터를 옮길 때, 그 inbound는 AWS의 egress로 잡힌다. 마이그레이션 첫 달 청구서가 깜짝 놀랄 만큼 클 수 있다. 옮길 가치가 있어도, 옮기는 그 한 번의 비용은 잊지 말자.</p>
+<p><strong>둘째, 콜드스타트가 5ms 미만이다.</strong> Lambda는 함수마다 컨테이너(Firecracker microVM)를 띄운다. JVM이 무거우면 첫 호출에 수 초가 걸리기도 한다. Java/Spring 위에서 Lambda를 돌려본 사람이라면 이 고통을 안다. SnapStart, Provisioned Concurrency, GraalVM Native — 콜드스타트를 줄이려는 온갖 우회 기법들이 그래서 생겼다. Workers는 V8 isolate 위에서 돌기 때문에 그런 우회가 필요 없다. isolate는 OS 프로세스가 아니라 한 V8 안의 격리된 실행 컨텍스트다. 새 isolate를 만드는 데 5ms가 채 걸리지 않는다.</p>
+<p>이것의 대가는 분명하다. <strong>임의 바이너리·full Node API·OS syscall이 안 된다.</strong> FFmpeg를 직접 호출하고 싶다? 안 된다. Sharp 같은 native binding은 그대로 못 쓴다(Cloudflare Images로 우회). JVM 전체를 올리고 싶다? 당연히 안 된다. 멀티스레딩? 안 된다. <code>Date.now()</code>는 스크립트 실행 중에 고정값을 반환한다(Spectre 방어 정책의 일부). 이 제약을 받아들일 수 있는 워크로드와 그렇지 않은 워크로드의 경계선을 구분하는 게 결정의 출발점이다.</p>
+<p><strong>셋째, DDoS 방어와 SSL이 기본 포함이다.</strong> Cloudflare는 도메인을 한 번 옮기면 무료 플랜에서도 무제한 대역폭, DDoS 방어, SSL 인증서, WAF의 일부, Bot Management의 일부가 그냥 따라온다. 한국 개발자 커뮤니티에서 자주 회자되는 “DDoS 청구서 폭탄” 같은 걱정이 없다. AWS Shield Standard도 기본이긴 하지만, 트래픽이 폭주하는 동안 그 트래픽이 그대로 EC2·Lambda·CloudFront 비용으로 잡힌다. Cloudflare에서는 그 트래픽이 origin에 닿기 전에 흡수된다.</p>
+<p>여기에도 한계는 있다. WAF의 enterprise rule, Bot Management의 모든 기능, API Shield 같은 것은 유료다. 작은 서비스라면 무료 플랜만으로 충분하지만, 큰 서비스가 되면 결국 Pro·Business·Enterprise 플랜의 가격을 봐야 한다. 그래도 같은 보호 수준을 AWS WAF + Shield Advanced + 자체 운영으로 짜는 비용보다는 저렴한 경우가 많다.</p>
+<p>이 셋을 한 줄씩 머릿속에 두고 가자. egress 무료, 콜드스타트 5ms 미만, 보호 기본 포함. 결정의 첫 단추다.</p>
+</section>
+<section id="이-책이-다루지-않는-것" class="level3">
+<h3>이 책이 다루지 않는 것</h3>
+<p>기술서를 펼치면 다 다룬다고 약속하는 책일수록 막상 필요한 부분에서 입을 다문다. 그래서 이 책은 처음부터 <strong>다루지 않는 것</strong>을 분명히 밝히는 편이 낫다.</p>
+<p>먼저, <strong>GPU 추론</strong>이다. Cloudflare Workers AI가 자체 GPU 인프라 위에서 LLM·임베딩·이미지 모델을 돌리지만, 카탈로그에 없는 모델을 직접 GPU에서 돌리는 영역은 이 책의 범위 밖이다. 그런 워크로드는 ECS/Fargate + EC2 GPU 또는 Bedrock에 남기는 편이 낫다. 이 책에서는 12장에서 Workers AI와 AI Gateway를 다룰 때 “어떤 워크로드를 Workers AI로, 어떤 워크로드를 Bedrock에 남길지”의 의사결정선만 그린다.</p>
+<p>다음, <strong>Spring Batch와 같은 거대 배치</strong>다. JPA로 관계 그래프를 깊게 타고 트랜잭션 안에서 수만 row를 돌리는 워크로드는 Workers의 CPU time 한도와 isolate 모델에 자연스럽게 맞지 않는다. 이런 워크로드는 ECS에 남기는 게 맞다. 5장의 결정 프레임에서 “절대 옮기면 안 되는 워크로드”로 다시 등장한다.</p>
+<p><strong>복잡한 PrivateLink·VPC peering 위주 아키텍처</strong>도 이 책의 범위 밖이다. Cloudflare Tunnel + Cloudflare One으로 대체할 수 있는 시나리오는 11장에서 다루지만, 수십 개의 VPC가 PrivateLink로 얽혀 있는 enterprise 토폴로지는 단순히 이전 대상이 아니다. 그런 환경에서는 Cloudflare가 사용자 facing 경로(API, CDN, 인증)에만 들어오고, 사설망 자체는 AWS에 남는 하이브리드가 자연스럽다.</p>
+<p>마지막으로 <strong>Python Workers</strong>다. 2024년부터 베타로 제공되고 있고 점점 안정화되고 있지만, 2026년 5월 시점의 production 권장 패스는 여전히 TypeScript/JavaScript다. 부록 D에 한 페이지짜리 안내를 두긴 했지만, 본문은 TS Workers 중심이다. Python으로 데이터 파이프라인을 운영하는 분들에게는 미안한 일이지만, 책 한 권의 깊이를 유지하기 위한 선택이다.</p>
+<p>이 네 가지를 의도적으로 제외한 자리에 우리가 다루는 것은 분명하다. <strong>AWS Spring/Node 백엔드를 운영하는 개발자가, 자기 시스템에 Cloudflare를 어디까지 어떻게 끼워 넣을지 결정하고 실행하는 데 필요한 모든 것.</strong> 그게 이 책의 약속이다.</p>
+</section>
+<section id="이-책을-펼친-우리는-누구인가" class="level3">
+<h3>이 책을 펼친 우리는 누구인가</h3>
+<p>이 책의 첫 페이지를 펼친 사람은 대체로 다음 셋 중 하나다.</p>
+<p>하나는 <strong>해외 사용자 지연으로 고민하는 개발자</strong>다. us-east-1에 핵심 시스템을 두고 운영하는데, 한국·일본·유럽 사용자가 늘어나면서 p95 응답시간 SLO를 못 맞추기 시작한다. CloudFront를 깔아도 동적 API의 첫 요청은 여전히 길다. 리전을 늘리면 데이터 동기화·운영 부담이 함께 늘어난다. 이런 자리에서 Cloudflare의 edge-first 모델이 가장 또렷한 답이 된다.</p>
+<p>둘은 <strong>egress 비용으로 고민하는 개발자</strong>다. S3에서 미디어를 직접 서빙하거나, 백업을 다른 클라우드로 보내거나, AI 학습 데이터를 자주 다운로드하는 워크로드. 매달 청구서를 받아 보면 트래픽 비용이 슬금슬금 올라가는데 줄일 길이 없다. R2의 egress free가 정확히 이 자리에 들어온다. 옮기는 첫 달의 inbound 청구서를 감수할 의지만 있으면, 그 다음부터는 압도적이다.</p>
+<p>셋은 <strong>운영 부담을 줄이고 싶은 개발자</strong>다. ALB, Auto Scaling Group, RDS Multi-AZ, ElastiCache, 이 모두를 운영하는 부담이 점점 무거워진다. 새 기능을 짜는 시간보다 운영을 챙기는 시간이 늘어나면 어딘가가 잘못된 신호다. Workers에 옮길 수 있는 부분은 옮기고, 옮길 수 없는 부분은 RDS를 그대로 두되 Hyperdrive로 edge에서 살리는 하이브리드 패턴을 그릴 수 있다. 운영 면적이 줄어든다.</p>
+<p>이 셋 중 하나라도 우리 이야기처럼 들렸다면, 이 책은 우리에게 쓰여졌다. 단, 한 가지 전제가 있다. <strong>AWS와 Spring/Node 백엔드 경력</strong>이다. 이 책은 클라우드 입문서가 아니다. Lambda를 짜본 적 있고, DynamoDB와 RDS의 차이를 안다는 정도의 바닥은 깔려 있다고 본다. JS/TS는 기초만 있어도 따라올 수 있도록 단계별 설명을 두었지만, 백엔드 경험 자체는 전제다.</p>
+<p>반대로 이 책이 우리를 위한 책이 아닌 경우도 있다. Cloudflare를 처음 듣는 사람, 서버리스가 처음인 사람, 자바스크립트 자체가 낯선 사람은 이 책 전에 더 가벼운 입문서를 거치는 편이 낫다. AWS를 거의 안 써본 사람도 마찬가지다. 이 책의 모든 챕터는 “AWS의 그것”과 “Cloudflare의 그것”을 비교하면서 진행되기 때문이다. 비교 대상이 비어 있으면 챕터의 절반이 허공에서 들린다.</p>
+</section>
+<section id="책의-나침반-14장의-지도" class="level3">
+<h3>책의 나침반 — 14장의 지도</h3>
+<p>이 책은 한 직선이 아니라 활처럼 휘는 곡선을 그린다. 호기심에서 시작해, 멘탈 모델의 혼란을 한 번 거치고, 첫 성공의 안도감을 잡고, 지도를 펼쳐 보고, 결정의 도구를 손에 쥔 다음, 본격적으로 데이터·프론트·보안·AI·운영의 깊이로 들어간다. 마지막에는 “내 시스템을 어떻게 옮길 것인가”의 답을 자기 손으로 그릴 수 있게 된다.</p>
+<p>지금 1장에서 우리는 호기심의 자리에 있다. “또 하나의 클라우드가 아니라면 무엇인가?” 다음 장은 그 답의 핵심으로 들어간다. <strong>V8 isolate가 무엇이고, 리전이 사라진 자리에 무엇이 들어서며, Bindings와 Compatibility Date가 왜 새로운 좌표계인가.</strong> Lambda 컨테이너 모델로 Workers를 이해하려는 시도가 깨지는 자리다. 의도된 혼란이 한 번 지나간다.</p>
+<p>3장에서는 손끝의 성취가 머리의 혼란을 진정시킨다. Mac에서 Wrangler를 깔고, 5분 안에 Hello World를 글로벌 PoP에 배포해본다. 도쿄·LA·런던에서 같은 응답이 즉시 떨어지는 광경을 직접 본 뒤에는 멘탈 모델이 달라진다.</p>
+<p>4장은 지도다. AWS의 익숙한 이름들 — Lambda, S3, DynamoDB, CloudFront, Step Functions, Bedrock — 이 Cloudflare의 어느 자리에 어떻게 자리 잡는지 카탈로그를 펼친다. 동시에 1:1 매핑이 깨지는 다섯 가지 패턴을 분명히 표시해 둔다. 5장에서는 그 매핑 위에서 “그래서 내 워크로드 중 무엇을 옮길 것인가”의 결정 프레임을 손에 쥔다.</p>
+<p>6장부터 12장은 본격적인 실무 영역이다. Hono로 라우팅·미들웨어·DI를 다시 그리고(6장), KV·D1·DO·R2를 워크로드 패턴별로 골라 쓰고(7·8장), Next.js를 OpenNext로 옮기고(9장), Hyperdrive로 RDS를 그대로 살리고(10장), Cloudflare Access·Tunnel로 보안을 다시 짜고(11장), Workflows·Queues·Cron·AI Gateway·Workers AI로 비동기·AI 영역을 채운다(12장). 각 챕터는 누적 실습 프로젝트 <code>toby-shop</code> 위에서 한 겹씩 쌓인다. 깃 브랜치로 체크포인트가 남기 때문에 어디서든 다시 뛰어들 수 있다.</p>
+<p>13장은 정직한 위험이다. 비용 모델의 함정, observability 공백, 2025년 outage의 교훈, vendor lock-in. 이 책이 광고가 아님을 가장 분명히 드러내는 챕터다. 14장은 결단이다. 5장에서 “무엇을 옮길 것인가”를 결정했다면, 14장은 “어떻게 옮길 것인가”의 8단계 시퀀스다. Strangler Fig 패턴으로, 아무것도 부수지 않고 점진적으로 옮기는 길.</p>
+<p>마지막 페이지를 덮을 때쯤이면 우리는 한 가지 답을 손에 쥐고 있을 것이다. <strong>내 시스템에 Cloudflare가 어디까지 들어와도 좋은가.</strong> 그 답을 자기 손으로 쓰기 위한 도구 일습이 이 책이다.</p>
+</section>
+<section id="누적-실습-프로젝트-toby-shop-한-줄-소개" class="level3">
+<h3>누적 실습 프로젝트 — <code>toby-shop</code> 한 줄 소개</h3>
+<p>기술서가 추상적인 개념만 늘어놓으면 책장을 덮을 때쯤 머릿속에 남는 게 별로 없다. 그래서 이 책은 한 도메인의 작은 e-commerce SaaS — <code>toby-shop</code> — 을 누적 실습 프로젝트로 두었다. 3장에서 빈 Worker로 시작해 6장에서 Hono 라우팅·인증·KV 세션이 붙고, 7장에서 D1 + Drizzle로 사용자 프로필이 생기고, 8장에서 고객지원 채팅방(Durable Objects + WebSocket)이 분기되고, 9장에서 Next.js 상점 프론트가 추가되고, 10장에서 RDS + Hyperdrive로 주문 도메인이 살아나고, 11장에서 소셜 로그인과 어드민 보안이 더해지고, 12장에서 결제 후 영수증 Workflow와 RAG 챗봇이 얹힌다. 13장에서 Logpush + 외부 APM이 운영 레이어로 깔린다.</p>
+<p>각 챕터 끝에는 깃 브랜치(<code>ch3-hello</code>, <code>ch6-data</code> 같은) 체크포인트가 있다. 처음부터 따라올 수도 있고, 7장이나 9장 같은 특정 챕터부터 뛰어들 수도 있다. 누적되는 곳은 누적되고, 분기되는 곳은 분기된다. 분기된 워크북(1·2·4·5·14장의 결정 워크시트)은 자기 시스템에 그대로 적용해볼 수 있는 형태로 만들어두었다.</p>
+</section>
+<section id="무너지는-자리-1장이-약속하지-못하는-것" class="level3">
+<h3>무너지는 자리 — 1장이 약속하지 못하는 것</h3>
+<p>이 책의 모든 기술 챕터 끝에는 “무너지는 자리” 박스를 둔다. 1장에도 둔다. 광고로 보이지 않게 하는 가장 단순한 약속이다.</p>
+<p>이 1장의 한계는 분명하다. 첫째, <strong>Cloudflare는 빠르게 변한다.</strong> 2026년 5월 시점의 사실들이 책이 출간된 뒤 6개월 안에 일부 바뀔 수 있다. Workers Containers의 인스턴스 한도, OpenNext 어댑터의 호환성, Vinext의 안정화 정도, Vectorize의 hybrid search 지원 — 이런 영역은 분기마다 공식 페이지를 다시 봐야 한다. 부록 E에 추적 가이드를 두었으니 참고하자.</p>
+<p>둘째, <strong>이 책은 enterprise PrivateLink·HIPAA·KISA 강한 region lock 같은 영역을 다루지 않는다.</strong> 그런 환경에서 Cloudflare가 들어올 자리는 매우 좁아진다. 사용자 facing 경로 일부와 DDoS 보호 정도가 현실적인 한계일 수 있다. 그 영역의 더 깊은 답은 이 책이 줄 수 있는 것 너머에 있다.</p>
+<p>셋째, <strong>2025년 outage는 다시 일어날 수 있다.</strong> Cloudflare의 엔지니어링 신뢰도와 별개로, 단일 벤더에 critical path를 거는 일은 본질적으로 위험을 동반한다. 13장에서 회피 전략을 다루지만, 그 회피 전략을 모두 갖추는 데도 비용과 운영 부담이 따른다. 한 줄로 정리하면, “Cloudflare를 도입한다”가 아니라 “Cloudflare에 자기 시스템의 일부 자리를 내준다”는 자세가 정직하다.</p>
+</section>
+<section id="마무리" class="level3">
+<h3>마무리</h3>
+<p>다음 장에서는 Lambda 컨테이너 모델로 Workers를 이해하려는 시도가 깨지는 자리를 살펴보자. V8 isolate가 정확히 무엇이고, 콜드스타트 5ms 미만의 대가로 무엇을 포기하는지, 리전이 사라진 자리에 PoP·Bindings·Compatibility Date가 어떻게 들어서는지. 우리가 익혀온 가정 중 일부를 한 번 흔들어볼 차례다. 잠시 불편하겠지만, 그 흔들림이 지나가야 3장의 첫 배포가 손에 잡힌다.</p>
+<p>기억해두자. <strong>Cloudflare는 또 하나의 클라우드가 아니다. 가정이 다른 edge-first 플랫폼이다.</strong> 이 한 줄이 책 전체를 통과하는 나침반이다.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch002.xhtml</title>
+  <style>
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="서문" class="level2">
+<h2>서문</h2>
+<p>AWS에 익숙한 우리가 처음 Cloudflare 문서를 펼치면 묘한 위화감이 든다. 단어는 익숙하다. 서버리스, 함수, 객체 저장소, 데이터베이스, CDN. 그런데 표면 한 겹 아래로 내려가면 가정이 통째로 다른 풍경이 펼쳐진다. 리전이 없고, 컨테이너가 없고, 콜드스타트가 5ms 미만이고, S3 호환인데 egress가 무료라고 한다. “이거, 정말 production에서 굴러가는 게 맞나?” 한 번쯤 의심해 봤을 것이다. 그렇다고 외면하기에는 옆자리 동료가 슬랙에 OpenNext 후기를 자꾸 던지고, Hacker News 상단에는 Workers 이름이 자주 박힌다. 쳐다는 봐야겠는데, 어디서부터 봐야 할지 손에 잡히지 않는다.</p>
+<p>이 책은 그 자리에 손을 내미는 책이다. <em>Cloudflare를 도입하자</em>고 권하는 책이 아니라, <em>자기 시스템에 Cloudflare가 들어올 자리가 있는지를 정직하게 결정하도록 돕는</em> 책이다. 두 자세는 다르다. 도입이라는 단어에는 새 제품을 안에 들이는 그림이 박혀 있다. 자리를 내준다는 단어에는 우리 아키텍처에 어울리는 한 자리에 한 손님이 들어오는 그림이 박혀 있다. 첫 번째는 광고고, 두 번째는 약속이다. 우리는 14장 내내 두 번째 자세를 흔들리지 않게 잡고 갈 것이다.</p>
+<p>흐름은 단순하다. <strong>왜</strong> Cloudflare가 또 하나의 클라우드가 아닌지로 시작해(1장), 익숙한 멘탈 모델을 어디서 흔들어야 하는지를 짚고(2장), Mac에서 5분 만에 첫 Worker를 글로벌 PoP에 올린다(3장). 그러고 나서 AWS와 Cloudflare를 매핑하는 카탈로그를 펼치되 그 표가 거짓말이 되는 다섯 자리를 미리 표시해 두고(4장), “내 워크로드 중 무엇을 옮길 것인가”의 결정 도구를 손에 쥔다(5장). 6장부터 12장까지가 본격 실무다. Hono로 백엔드 골격을 다시 그리고, KV·D1·Durable Objects·R2로 데이터 자리를 채우고, OpenNext로 Next.js를 올리고, Hyperdrive로 RDS를 살려둔 채 컴퓨트만 글로벌로 흩뿌리고, Zero Trust로 보안 모델을 다시 그리고, Workflows·Queues·AI Gateway로 비동기·LLM 영역을 메운다. 그리고 13장에서 <em>운영과 정직한 한계</em>를 정면으로 마주하고, 14장에서 Strangler Fig 8단계로 모든 것을 시퀀스로 묶는다.</p>
+<p>책 전체에 누적 실습 프로젝트 하나가 깔린다. <strong><code>toby-shop</code>이다.</strong> 3장에서 한 줄짜리 Hello Worker로 시작해, 6장에서 Hono 라우팅·인증·미들웨어가 붙고, 7장에서 D1·KV로 사용자·세션이 들어오고, 8장에서 Durable Objects로 채팅방과 재고 동시성이 들어오고, 9장에서 Next.js 상점 프론트가 얹히고, 10장에서 Aurora Postgres가 Hyperdrive로 연결되고, 11장에서 어드민이 Access·Tunnel로 보호되고, 12장에서 결제 후 영수증 Workflow와 RAG 챗봇까지 자란다. 한 권을 다 읽고 나면, 손에 한 사이클이 굴러가는 작은 시스템이 남는다.</p>
+<p>이 책이 약속하지 않는 것도 분명히 적어 두자. <strong>이 책은 광고서가 아니다.</strong> 모든 챕터에 <em>무너지는 자리</em> 박스가 들어 있다. Workers의 CPU time 한도가 어디서 발에 걸리는지, KV의 60초 전파 지연이 어디서 회귀가 되는지, Durable Objects가 어디까지 깊은 lock-in인지, 2025년 11/18·12/5 outage가 어떤 교훈을 남겼는지를 정직하게 짚는다. 광고는 다른 책이 하면 된다. 우리가 여기서 약속하는 것은 결정의 정직함뿐이다.</p>
+<p>대상 독자는 <em>Spring·Java·Lambda·Step Functions·DynamoDB·CloudFront에 익숙한 백엔드 개발자</em>다. JavaScript/TypeScript에 알레르기가 없되 능숙하지 않아도 좋다. AWS 운영을 5년 이상 해봤고, 한 번쯤 “이거 다른 길도 있지 않나” 의심해 본 사람을 위한 책이다. 한 챕터에 한 시간씩, 14주를 들이면 손끝의 감각으로 자기 답을 손에 쥐게 된다. 처음부터 차례대로 읽는 것을 권하지만, 4장 매핑 카탈로그와 5장 결정 프레임은 어느 단계에서든 다시 펼쳐 볼 수 있는 빠른 참조용으로도 잘 작동한다. 부록 A부터 F까지는 책을 덮은 다음에도 계속 손에 들고 다닐 만한 한 장짜리 도구들이다.</p>
+<p>이 책의 시간 도장은 2026년 5월이다. Cloudflare는 빠르게 변하는 영역이라, 어떤 페이지의 가격표나 베타 상태는 우리가 책장을 펼치는 그 순간에는 이미 다음 단계로 넘어가 있을 수 있다. 그래도 <em>멘탈 모델</em>은 잘 변하지 않는다. 우리가 잡으려는 것은 가격표가 아니라 가정이다. 가정이 손에 잡히면, 가격표가 바뀌어도 결정이 흔들리지 않는다.</p>
+<p>자, 함께 시작해 보자. 첫 장을 펼치면 도쿄에서 280ms가 돌아오는 월요일 아침의 풍경부터 만난다.</p>
+<hr />
+</section>
+</body>
+</html>

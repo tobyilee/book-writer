@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch013.xhtml</title>
+  <style>
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-hyperdrive로-rds를-그대로-살려두기-가장-risk-low한-첫-발걸음" class="level2">
+<h2>10장. Hyperdrive로 RDS를 그대로 살려두기 — 가장 risk-low한 첫 발걸음</h2>
+<p>회사에 이런 RDS 한 대가 있다고 해보자. Aurora Postgres, 도쿄 리전, 안에는 5년 치 주문 데이터가 들어 있다. 마이그레이션도 한두 번 했고, 인덱스는 손때가 묻을 대로 묻었으며, 야심한 새벽에 한 번씩 backup snapshot을 떠두는 쿠론 잡까지 정성스럽게 굴러간다. 누구도 이 DB를 옮기자고 말하지 않는다. 옮기자고 말하는 사람이 있다면, 옮기는 작업의 무게를 모르거나 모른 척하는 쪽이다.</p>
+<p>그런데 이 위에 얹힌 Spring Boot API의 해외 사용자들이 점점 불편을 호소한다. 동남아·남미·유럽 어디에서 들어와도 응답이 답답하게 느껴진다. p95가 800ms를 넘는다. CloudFront만으로는 동적 API의 지연이 풀리지 않는다. 그럼 Lambda@Edge로? 그쪽은 콜드스타트가 더 끔찍하다는 보고가 도쿄 외 리전에서 올라온다. 그렇다면 어떻게 해야 할까.</p>
+<p>DB는 그대로 둔다. 그건 협상 불가다. 옮길 것은 컴퓨트 한 겹뿐이다. RDS는 도쿄에 그대로 있는 채로, 사용자에게 가까운 PoP에서 도는 코드가 RDS를 빠르게 부를 수만 있으면 된다. 이 한 줄짜리 요구가 지금부터 풀어볼 문제다. 그리고 그 답이 Hyperdrive다.</p>
+<section id="번의-round-trip이-글로벌에서-어떻게-누적되는가" class="level3">
+<h3>7번의 round-trip이 글로벌에서 어떻게 누적되는가</h3>
+<p>먼저 왜 이 문제가 어려운지부터 짚고 가자. Workers에서 RDS로 곧장 TCP 연결을 여는 그림을 떠올려 보자. 사실 이 그림 자체가 처음부터 막힌다. Workers는 V8 isolate 위에서 도는 런타임이고, 임의 TCP socket을 여는 자유는 제한돼 있다. 그러면 우리가 알던 <code>pg</code>나 <code>mysql2</code> 라이브러리는 어떻게 도는가? Cloudflare는 Workers 안에서 외부 DB로의 TCP 연결을 자체 게이트웨이를 거쳐 흘려보낸다. 즉 Workers 코드는 표준 라이브러리를 쓰는 것처럼 보이지만, 실제로는 Cloudflare 인프라 한 겹을 거쳐 DB에 닿는다.</p>
+<p>여기까지는 그래도 풀리는 그림이다. 진짜 문제는 그다음부터다. Postgres 한 번 부르려면 무엇이 일어나는지 따져보자.</p>
+<ul>
+<li>TCP handshake — 1 round-trip</li>
+<li>TLS handshake — 3 round-trip</li>
+<li>DB authentication (SCRAM-SHA-256 같은 방식) — 3 round-trip</li>
+</ul>
+<p>다 합치면 7번이다. 한 번의 SQL 쿼리를 던지기 위해 미리 7번의 왕복을 해야 한다. 같은 리전이라면 이 비용이 작다. PoP와 RDS가 옆방에 있으면 7번을 다 합쳐도 수 ms 안쪽이다.</p>
+<p>그렇다면 글로벌에서는 어떨까. 상파울루 PoP에서 도쿄 RDS까지 한 번 왕복이 250ms라고 해보자. 7번이면 1.75초다. 이걸 매 요청마다 쌓는다. 사용자가 페이지 하나를 띄우는 동안 API가 세 번 호출된다면, 5초가 그냥 핸드셰이크에 사라진다. 실제 SQL이 도는 시간은 그 안에 묻혀 보이지도 않는다. 끔찍한 일이다.</p>
+<p>그렇다면 어떻게 해야 할까. 답은 이미 RDS Proxy나 PgBouncer 같은 도구가 알려준 적이 있다. <strong>연결을 미리 맺어두고, 풀로 묶고, 요청이 오면 풀에서 하나 꺼내준다.</strong> 다만 그 풀이 글로벌에 깔려 있어야 한다. 상파울루 사용자는 상파울루 근처 풀에서 꺼내고, 시드니 사용자는 시드니 근처 풀에서 꺼내야 한다. 그게 Hyperdrive다.</p>
+</section>
+<section id="hyperdrive는-db가-아니다-이름의-함정부터-풀자" class="level3">
+<h3>Hyperdrive는 DB가 아니다 — 이름의 함정부터 풀자</h3>
+<p>처음 Hyperdrive라는 이름을 들으면 새로운 DB 제품처럼 들린다. D1 옆에 또 하나 있는 데이터베이스인가 하는 의심이 든다. 그렇지 않다. Hyperdrive는 DB가 아니라 <strong>글로벌 connection pool + 쿼리 캐시</strong>다. DB는 여전히 우리가 가진 RDS·Aurora·Neon·Supabase 그대로다.</p>
+<p>기억해두자. Hyperdrive는 우리 RDS 앞에 글로벌하게 깔려 있는 한 겹의 도우미다. 이 한 겹이 무엇을 해주는가.</p>
+<p>첫째, 7번의 round-trip을 흡수한다. Hyperdrive는 우리 DB와 미리 연결을 맺어두고 풀에 쥐고 있다. Worker가 SQL을 던지면, Hyperdrive는 풀에서 이미 인증이 끝난 연결 하나를 꺼내 그걸로 쿼리를 보낸다. Worker 입장에서는 핸드셰이크가 사실상 0번이 된 셈이다.</p>
+<p>둘째, 쿼리 결과를 일정 조건에서 캐시한다. SELECT 쿼리, 같은 SQL · 같은 파라미터 · TTL 안쪽이라면 같은 결과를 PoP 가까이에서 돌려준다. CDN이 정적 자산을 캐시하는 모델을 SQL 응답에 적용한 것이다. 단 이 캐시는 강한 일관성이 필요한 쿼리에는 위험하다 — 그래서 끄거나, TTL을 짧게 두거나, 캐시 안 할 쿼리를 따로 표시하는 식으로 조절해야 한다.</p>
+<p>셋째, <strong>transaction mode</strong>로 동작한다. 한 트랜잭션 동안에는 단일 연결을 점유했다가, COMMIT 또는 ROLLBACK이 끝나면 풀로 반환한다. 이 동작이 무엇을 의미하는지가 뒤에서 한 번 더 등장한다. 일단 머리에 새겨두자 — Hyperdrive는 트랜잭션 단위로 연결을 빌려주고 거두어들인다.</p>
+<p>이걸 Spring 개발자의 익숙한 그림으로 바꾸면 한 페이지로 정리된다.</p>
+<section id="jdbc-hikaricp-hyperdrive-spring-개발자의-다리" class="level4">
+<h4>JDBC HikariCP ↔︎ Hyperdrive — Spring 개발자의 다리</h4>
+<p>Spring Boot 위에서 JDBC를 써본 사람이라면 HikariCP를 모를 수 없다. <code>application.yml</code> 어딘가에 <code>maximum-pool-size: 20</code> 같은 한 줄이 박혀 있고, 트랜잭션이 시작되면 풀에서 connection을 빌려와 <code>@Transactional</code> 메서드 끝까지 가지고 있다가 COMMIT 후 풀로 반환한다. 한 JVM 안에 풀이 하나 있고, 그 풀이 RDS와 미리 연결을 맺어둔 형태다.</p>
+<p>Hyperdrive는 이 모델을 <strong>글로벌</strong>로 확장한 것이다. 한 JVM이 아니라 Cloudflare PoP들이 함께 풀을 운영한다. Worker가 트랜잭션을 시작하면, 가까운 PoP의 Hyperdrive가 미리 맺어둔 연결 하나를 빌려준다. 트랜잭션이 끝나면 다시 풀로 돌아간다. JDBC URL이 바뀐 셈이다 — <code>jdbc:postgresql://aurora.aws...</code>가 <code>postgresql://hyperdrive.cloudflare...</code>로 옮겨갔을 뿐, 그 너머의 DB는 그대로다.</p>
+<p>다른 점도 있다. HikariCP는 한 JVM 안의 풀이라 JVM이 죽으면 풀도 같이 사라진다. Hyperdrive의 풀은 우리 코드가 아닌 Cloudflare 쪽에서 관리한다. 그래서 Worker 한 인스턴스가 죽고 살고는 풀과 무관하다. 이 구조는 우리가 Worker를 글로벌에 흩뿌려도 DB의 max_connections를 폭파시키지 않게 막아준다. JVM 100개를 띄우면 connection 2,000개가 RDS로 향하지만, Worker isolate 100,000개가 떠도 RDS로 가는 실제 연결은 Hyperdrive 풀 크기에 묶인다. 이건 작은 차이가 아니다 — RDS 운영자에게 가장 끔찍한 그림(connection storm)이 자연스럽게 차단되는 셈이다.</p>
+<p>물론 다른 점도 있다. <code>@Transactional(propagation = REQUIRES_NEW)</code> 같은 정교한 propagation 모델은 Hyperdrive에 등가물이 없다. 트랜잭션 경계는 우리가 SQL 레벨에서 BEGIN·COMMIT으로 직접 그어야 한다. Drizzle이나 Kysely 같은 라이브러리가 그 경계를 함수로 감싸 비슷한 DX를 주긴 하지만, Spring의 AOP 마법은 없다. 기억해두자 — 트랜잭션 경계는 명시적이다.</p>
+</section>
+</section>
+<section id="가장-risk-low한-첫-발걸음" class="level3">
+<h3>가장 risk-low한 첫 발걸음</h3>
+<p>이 책 14장에서 다룰 마이그레이션 8단계 중, 컴퓨트를 옮기는 단계가 사실은 가장 까다롭다. 코드의 런타임이 바뀌는 일이라 호환성 문제가 깊은 자리에서 튀어나온다. 그런데 Hyperdrive는 그 여정을 한 단계 가볍게 만든다. 어떻게? <strong>데이터는 그대로 두고, 컴퓨트만 가져오기 때문이다.</strong></p>
+<p>이 그림이 왜 안전한지 따져보자.</p>
+<p>먼저 데이터가 움직이지 않는다. 옮기지 않은 데이터는 깨질 일이 없다. RDS의 백업·복제·모니터링·DBA 운영 절차가 그대로 돈다. 사고가 나도 기존 절차로 복구된다. 옮기는 일에 비하면 위험이 한 자릿수 낮다.</p>
+<p>다음으로 롤백이 단순하다. Hyperdrive 바인딩을 통한 호출이 마음에 안 들면, Worker의 connection string을 RDS 직접 호출로 바꾸기만 하면 된다. 데이터는 한 번도 움직이지 않았다. RDS는 여전히 거기에 있다. 롤백이 “DNS 한 번 바꾸기” 수준의 무게다.</p>
+<p>또 하나, 실측 효과가 빠르게 나온다. 7번의 round-trip이 흡수되는 구조이기 때문에, 해외 사용자의 p95 응답시간이 거의 즉시 줄어든다. 도쿄 RDS · 상파울루 사용자 시나리오에서 글자 그대로 800ms대 응답이 200~300ms대로 떨어지는 사례가 보고된다 (정확한 절감폭은 워크로드와 PoP 위치에 따라 다르므로 직접 측정해 보는 편이 낫다). 비용 측면에서도, 2025년 가격 정책 변경 이후 무료 plan에서도 Hyperdrive를 쓸 수 있게 됐다. 도입 비용이 사실상 0이다.</p>
+<p>이 셋을 함께 보면, Hyperdrive 도입은 점진 마이그레이션의 <strong>첫 발걸음</strong>으로 가장 잘 어울린다. 위험은 낮고, 효과는 빠르고, 롤백은 쉽다. 이 책이 권하는 하이브리드 패턴 — DB는 AWS, 컴퓨트는 Cloudflare — 의 핵심 도구가 바로 이것이다.</p>
+</section>
+<section id="손으로-한-번-붙여보자-aurora-postgres-hyperdrive" class="level3">
+<h3>손으로 한 번 붙여보자 — Aurora Postgres + Hyperdrive</h3>
+<p>말로만 풀면 멀리 있는 이야기처럼 들린다. 손가락을 한 번 움직여 보자. 가상의 시나리오를 가정한다.</p>
+<p>상황 — <code>toby-shop</code>이라는 e-commerce SaaS가 있다. 주문 도메인은 Aurora Postgres에 들어 있다. 우리는 이 RDS를 그대로 두고, Workers에서 주문을 조회하는 API 한 개만 edge에서 빠르게 띄우고 싶다.</p>
+<section id="단계-rds-쪽-준비" class="level4">
+<h4>0단계 — RDS 쪽 준비</h4>
+<p>먼저 점검할 것이 두 가지 있다.</p>
+<p>첫째, RDS가 Cloudflare에서 닿을 수 있어야 한다. 가장 단순한 방법은 publicly accessible 옵션을 켜고 Security Group의 inbound 5432를 Cloudflare egress IP 범위에서 허용하는 것이다. 정확한 IP 목록은 Cloudflare 공식 문서에 정리돼 있다 — 그대로 복사해 SG에 넣자. 이 방식이 찜찜하다면 두 번째 방법이 있다 — Cloudflare Tunnel(<code>cloudflared</code>)을 EC2 한 대에 띄워 RDS로 가는 길을 outbound-only로 여는 것이다. 11장에서 이 패턴을 본격 다룬다. 일단 지금은 publicly accessible + IP 화이트리스트로 진행하자.</p>
+<p>둘째, SSL 연결이다. RDS는 기본적으로 SSL을 요구한다. Hyperdrive 설정에서 SSL 모드를 켜주면 된다. 인증서까지 검증하고 싶다면 RDS의 CA 번들을 Hyperdrive에 등록할 수 있다 (운영 환경에서는 검증하는 편이 낫다).</p>
+</section>
+<section id="단계-hyperdrive-만들기" class="level4">
+<h4>1단계 — Hyperdrive 만들기</h4>
+<p><code>wrangler</code> 한 줄이면 된다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">wrangler</span> hyperdrive create toby-shop-orders <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--connection-string</span><span class="op">=</span><span class="st">&quot;postgresql://USER:PASS@orders.cluster-xxx.ap-northeast-1.rds.amazonaws.com:5432/orders?sslmode=require&quot;</span></span></code></pre></div>
+<p>응답으로 Hyperdrive 인스턴스의 ID가 나온다. 이 ID를 <code>wrangler.toml</code>(또는 <code>wrangler.jsonc</code>)에 바인딩으로 적어준다.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-orders-api&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="dt">main</span> <span class="op">=</span> <span class="st">&quot;src/index.ts&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dt">compatibility_date</span> <span class="op">=</span> <span class="st">&quot;2026-04-01&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[[hyperdrive]]</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;ORDERS_DB&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dt">id</span> <span class="op">=</span> <span class="st">&quot;your-hyperdrive-id-here&quot;</span></span></code></pre></div>
+<p>이 한 줄이 끝이다. 이제 Worker 코드 안에서 <code>env.ORDERS_DB.connectionString</code> 같은 형태로 connection string이 주입된다. Spring 개발자의 머릿속으로 옮겨 말하면 — <code>application.yml</code>에 <code>spring.datasource.url</code>을 적은 것과 같다. 다른 점은, 이 connection string이 RDS로 직접 가지 않고 Hyperdrive를 거쳐 RDS로 흐른다는 것뿐이다.</p>
+<p>기억해두자 — connection string에는 production credential이 들어 있다. <code>wrangler secret</code>으로 관리하거나, Hyperdrive 자체가 제공하는 credential 보호 모드를 쓰는 편이 낫다. 평문으로 <code>wrangler.toml</code>에 박는 일은 끔찍한 일이다.</p>
+</section>
+<section id="단계-hono-postgres-js로-코드-짜기" class="level4">
+<h4>2단계 — Hono + postgres-js로 코드 짜기</h4>
+<p>Workers에서 Postgres를 부를 때 가장 무난한 라이브러리가 <code>postgres</code>(postgres-js)다. Drizzle을 같이 쓰면 타입 안전성까지 챙긴다. 코드는 이렇다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Hono } <span class="im">from</span> <span class="st">&quot;hono&quot;</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> postgres <span class="im">from</span> <span class="st">&quot;postgres&quot;</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { drizzle } <span class="im">from</span> <span class="st">&quot;drizzle-orm/postgres-js&quot;</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { orders } <span class="im">from</span> <span class="st">&quot;./schema&quot;</span><span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Bindings <span class="op">=</span> {</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  ORDERS_DB<span class="op">:</span> Hyperdrive<span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> app <span class="op">=</span> <span class="kw">new</span> <span class="fu">Hono</span><span class="op">&lt;</span>{ Bindings<span class="op">:</span> Bindings }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/orders/:id&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sql <span class="op">=</span> <span class="fu">postgres</span>(c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">ORDERS_DB</span><span class="op">.</span><span class="at">connectionString</span><span class="op">,</span> {</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    max<span class="op">:</span> <span class="dv">5</span><span class="op">,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    fetch_types<span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> db <span class="op">=</span> <span class="fu">drizzle</span>(sql)<span class="op">;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> id <span class="op">=</span> <span class="bu">Number</span>(c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">param</span>(<span class="st">&quot;id&quot;</span>))<span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> db</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">select</span>()</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">from</span>(orders)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">where</span>(orders<span class="op">.</span><span class="at">id</span><span class="op">.</span><span class="fu">eq</span>(id))</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">limit</span>(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  c<span class="op">.</span><span class="at">executionCtx</span><span class="op">.</span><span class="fu">waitUntil</span>(sql<span class="op">.</span><span class="fu">end</span>())<span class="op">;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (result<span class="op">.</span><span class="at">length</span> <span class="op">===</span> <span class="dv">0</span>) <span class="cf">return</span> c<span class="op">.</span><span class="fu">notFound</span>()<span class="op">;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>(result[<span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> app<span class="op">;</span></span></code></pre></div>
+<p>코드 한 줄씩 살펴보자.</p>
+<p><code>postgres(c.env.ORDERS_DB.connectionString, ...)</code> — Hyperdrive의 connection string을 그대로 postgres-js에 넘긴다. 라이브러리 입장에서는 그냥 Postgres 한 대다. Hyperdrive를 쓰는지 RDS를 직접 쓰는지 코드는 알지 못한다. 이게 좋은 신호다 — 표준 인터페이스 뒤에 Hyperdrive가 숨어 있어 lock-in이 얇다.</p>
+<p><code>max: 5</code> — postgres-js가 한 isolate 안에서 들고 있는 connection 수의 상한이다. Hyperdrive 너머의 풀과 별개다. Workers 한 isolate는 짧게 살았다 죽기 때문에, 내부 풀을 크게 들고 있을 이유가 없다.</p>
+<p><code>c.executionCtx.waitUntil(sql.end())</code> — Worker는 응답을 보낸 뒤에도 ctx 안에서 비동기 정리 작업을 끝낼 수 있다. connection 정리를 응답 이후로 미루면 사용자 응답 시간이 영향을 받지 않는다. JVM 세계에는 없는 멘탈 모델이라 처음 보면 낯설지만, 익숙해지면 무척 쓸모 있다.</p>
+<p>이제 <code>wrangler dev --remote</code>로 한 번 돌려보자. 첫 요청은 Hyperdrive 풀을 채우는 비용이 살짝 보이지만, 두 번째 요청부터는 응답이 즉각 돌아온다. <code>wrangler tail</code>로 로그를 보면 SQL 한 번에 ms 단위 응답이 박히는 걸 볼 수 있다.</p>
+</section>
+<section id="단계-drizzle-마이그레이션을-어떻게-굴릴까" class="level4">
+<h4>3단계 — Drizzle 마이그레이션을 어떻게 굴릴까</h4>
+<p>여기서 한 가지 결정이 필요하다. Drizzle 스키마와 마이그레이션을 어디서 굴릴 것인가? 두 가지 패턴이 있다.</p>
+<p>첫째, 마이그레이션은 기존 Spring Boot/Flyway/Liquibase에서 그대로 굴리고, Drizzle은 읽기·타입 정의 용도로만 쓰는 패턴. 이게 가장 안전하다. 마이그레이션의 책임자가 한 곳이라 충돌이 없다.</p>
+<p>둘째, Drizzle Kit으로 마이그레이션을 직접 굴리는 패턴. 새로 만든 도메인 또는 작은 서비스에서 쓸 만하다. 다만 기존 Flyway 이력과 충돌할 수 있으므로, 두 도구가 같은 테이블에 손대지 않도록 영역을 갈라두자.</p>
+<p>권장은 첫 번째다. 기존 마이그레이션 파이프라인은 그대로 두고, Workers는 읽기·쓰기를 표준 SQL로 한다. 왜? 마이그레이션은 옮기지 않을 때 가장 안전하니까. 컴퓨트 한 겹만 이동시키는 게 우리의 약속이었음을 다시 떠올리자.</p>
+</section>
+</section>
+<section id="호환성-한-번-더-어디까지가-기존-그대로인가" class="level3">
+<h3>호환성 한 번 더 — 어디까지가 기존 그대로인가</h3>
+<p>Hyperdrive가 표준 Postgres·MySQL을 그대로 흘려보낸다고 해도, 모든 동작이 1:1로 같지는 않다. 이 자리는 정직하게 짚고 넘어가야 한다. 광고서가 아니라 실무 가이드를 읽고 있다는 약속이니까.</p>
+<p><strong>Postgres 호환성</strong> — postgres-js, node-postgres(pg), Drizzle, Kysely 모두 잘 돈다. Aurora·RDS·Neon·Supabase 어디든 endpoint만 Hyperdrive로 바꾸면 된다. 이게 책 전체에서 가장 매끄러운 호환성 사례 중 하나다.</p>
+<p><strong>MySQL 호환성</strong> — <code>mysql2</code>가 표준 선택이다. PlanetScale은 자체 HTTP 프로토콜을 쓰는 별개 옵션이라 Hyperdrive와는 결이 다르다. PlanetScale 자체는 그 자체로 글로벌 가속이 있으므로 Hyperdrive 앞에 굳이 두지 않아도 된다.</p>
+<p><strong>prepared statement</strong> — 여기는 주의가 필요하다. Hyperdrive의 transaction mode 풀에서는 connection이 트랜잭션 단위로 회수되기 때문에, 한 connection에 prepared statement를 캐시해 두는 전통적 패턴이 그대로 작동하지 않을 수 있다. 라이브러리에 따라 매 트랜잭션마다 prepared statement를 다시 등록하거나, <code>prepare: false</code> 같은 옵션을 명시해야 한다. 처음 도입할 때 이 한 가지 때문에 지연이 미묘하게 들쭉날쭉하면 prepare 동작부터 의심하자.</p>
+<p><strong>LISTEN/NOTIFY · long-running cursor</strong> — Postgres의 LISTEN/NOTIFY 같은 영속 연결 기반 기능은 transaction-scoped 풀과 어울리지 않는다. 이런 워크로드는 별도 채널(예: 전용 worker가 직접 RDS에 붙어 NOTIFY를 듣고, Cloudflare Queue로 흘려보내는 식)로 분리하는 편이 낫다. 마찬가지로 거대한 결과셋을 cursor로 스트리밍하는 패턴도 풀 모델과 충돌한다. 짧고 여러 번이 Hyperdrive의 sweet spot이다.</p>
+<p><strong>Connection limit</strong> — RDS에 max_connections라는 한도가 있다는 사실을 다시 떠올리자. Hyperdrive 풀 크기는 우리가 정할 수 있고, 그 풀이 RDS로 향하는 실제 연결 수의 상한을 결정한다. RDS 인스턴스가 db.t3.medium처럼 작다면 max_connections가 100 안쪽이다. Hyperdrive 풀 크기를 그 안에서 잡아야 한다. 같은 RDS를 다른 서비스(Spring Boot, EC2 batch 등)와 공유하고 있다면, 각자의 풀 크기를 합쳐서 RDS의 max_connections를 넘지 않도록 운영팀과 미리 합의하자.</p>
+<p><strong>쓰기 일관성</strong> — 가장 중요한 한 줄이다. <strong>쓰기 일관성을 보장하는 책임은 여전히 DB에 있다.</strong> Hyperdrive는 connection 가속기이지 데이터 일관성 보장 레이어가 아니다. SERIALIZABLE 트랜잭션이 필요하면 SQL에 그렇게 쓰자. SELECT … FOR UPDATE가 필요하면 그렇게 쓰자. Hyperdrive가 무언가를 자동으로 더 강하게 만들거나 약하게 만들지 않는다.</p>
+</section>
+<section id="쿼리-캐시는-양날의-검이다" class="level3">
+<h3>쿼리 캐시는 양날의 검이다</h3>
+<p>Hyperdrive의 쿼리 캐시 이야기로 잠시 돌아가자. 같은 SELECT가 짧은 시간 안에 반복되면, Hyperdrive는 두 번째부터 PoP 가까이에서 캐시된 결과를 돌려준다. 응답이 ms 단위로 떨어진다. 이건 매력적인 그림이다.</p>
+<p>그런데 이 캐시는 우리가 평소 머릿속에 그리는 “DB가 항상 가장 최신”이라는 가정을 살짝 흔든다. 데이터가 방금 INSERT됐는데 다른 PoP에서 SELECT하면 잠깐 옛 결과가 보일 수 있다. TTL이 짧아도 0은 아니다.</p>
+<p>그렇다면 어떻게 해야 할까? 두 갈래로 정리하자.</p>
+<p>첫째, <strong>읽기 일관성이 강해야 하는 쿼리는 캐시를 끈다.</strong> Hyperdrive 설정에서 쿼리 캐시 자체를 비활성화하거나, 라이브러리 레벨에서 cache hint를 disable한다. 결제 직후 잔액 조회, 권한 체크 같은 자리가 여기 해당한다.</p>
+<p>둘째, <strong>읽기 일관성이 느슨해도 괜찮은 쿼리는 캐시를 켠다.</strong> 카탈로그 목록, 인기 상품 톱10, 카테고리 트리 같은 자리. 이쪽은 1초 정도 옛 결과여도 사용자는 알아채지 못한다. 캐시 hit이 되는 쿼리에서 Hyperdrive의 진가가 가장 잘 드러난다.</p>
+<p>이 결정을 SQL 한 줄 단위로 내려야 한다는 점이 처음에는 번거롭게 느껴진다. 그러나 다시 생각해보면, CDN 캐시 정책을 URL 단위로 내리는 일과 비슷하다. 정적 자산은 1년 캐시, API 응답은 0초 캐시, 카탈로그는 1분 캐시. 그 멘탈을 SQL에도 옮겨오면 된다. 익숙해지면 자연스럽다.</p>
+</section>
+<section id="aurorasupabaseneonplanetscale-어디든-붙는다" class="level3">
+<h3>Aurora·Supabase·Neon·PlanetScale — 어디든 붙는다</h3>
+<p>Hyperdrive의 사용처가 RDS만이 아니라는 점도 짚어두자. 표준 Postgres·MySQL을 노출하는 모든 서비스가 후보다.</p>
+<p><strong>Aurora Postgres / Aurora MySQL</strong> — RDS와 같은 방식으로 붙는다. Aurora의 read replica를 별도 endpoint로 둔다면, write용 Hyperdrive와 read용 Hyperdrive를 따로 만들어 코드에서 분기할 수도 있다.</p>
+<p><strong>Supabase</strong> — Supabase는 사실상 매니지드 Postgres + Auth + Storage 묶음이다. Postgres 부분은 Hyperdrive와 완벽히 어울린다. Workers + Hyperdrive + Supabase Postgres 조합은 풀스택 SaaS의 가장 가벼운 시작점 중 하나다.</p>
+<p><strong>Neon</strong> — serverless Postgres. scale-to-zero가 기본이라 hobby·MVP에 잘 맞는다. Neon + Hyperdrive 조합은 글로벌 분산 + 비용 절감 두 마리 토끼를 얻는 자리다. 다만 Neon 자체가 콜드스타트가 있다는 점은 기억해두자 — 첫 쿼리는 살짝 느릴 수 있다.</p>
+<p><strong>PlanetScale</strong> — 앞서 짚었듯, PlanetScale은 자체 HTTP 프로토콜을 통해 직접 edge에서 호출하는 경로가 따로 있다. Hyperdrive 없이도 글로벌 가속이 들어 있는 셈이다. 굳이 Hyperdrive를 거칠 이유가 적다.</p>
+<p>이쯤에서 한 가지 분명히 해두자. <strong>D1 vs Hyperdrive는 경쟁 관계가 아니다.</strong> D1은 새 SQL DB를 Cloudflare 안에 두는 선택이고, Hyperdrive는 기존 Postgres·MySQL을 그대로 쓰는 선택이다. 새 프로젝트, 워크로드가 SQLite로 충분하고 Workers 안에 닫혀 있다면 D1이 좋은 선택이다. 기존 RDS·Aurora가 있고 그걸 옮길 의도가 없다면 Hyperdrive다. 둘 중 하나가 우월한 게 아니라, 결정의 입력이 다르다.</p>
+</section>
+<section id="점진-이전의-첫-걸음으로-무엇을-옮기고-무엇을-남길까" class="level3">
+<h3>점진 이전의 첫 걸음으로 — 무엇을 옮기고 무엇을 남길까</h3>
+<p>이 챕터의 그림 하나를 다시 그려보자. 아래는 가장 현실적인 하이브리드 패턴이다.</p>
+<pre><code>[해외 사용자] → [Cloudflare PoP의 Workers] → [Hyperdrive] → [도쿄 Aurora]
+                                              ↓
+                                       (글로벌 connection pool)
+                                              ↓
+                              [기존 Spring Boot ECS도 같은 Aurora를 본다]</code></pre>
+<p>이 그림에서 무엇이 안 움직였는지 보자. Aurora가 안 움직였다. Spring Boot ECS가 안 움직였다. 마이그레이션·백업·DBA 절차가 안 움직였다. 움직인 것은 단 하나 — Workers라는 컴퓨트 한 겹이 글로벌 PoP에 새로 깔렸다는 점뿐이다.</p>
+<p>이 한 겹의 이득이 충분히 크다면, 계속 이 그림으로 머물러도 된다. 굳이 다 옮길 필요가 없다. 14장에서 다시 강조하지만, 하이브리드는 임시 상태가 아니다. 많은 회사에서 하이브리드가 <strong>최종 형태</strong>다.</p>
+<p>어디서 다음 걸음을 내딛을지는 사용 패턴이 결정한다. KV로 옮길 만한 세션 데이터가 있는가? R2로 옮길 만한 큰 미디어 자산이 있는가? Workflows로 옮길 만한 Step Functions orchestration이 있는가? 이 결정들은 5장에서 그렸던 결정 매트릭스를 다시 펼쳐 보면 된다. Hyperdrive는 그 매트릭스에서 “옮기지 않는다”라는 칸을 두려움 없이 선택하게 해주는 도구다.</p>
+</section>
+<section id="무너지는-자리-hyperdrive가-못-풀어주는-것" class="level3">
+<h3>무너지는 자리 — Hyperdrive가 못 풀어주는 것</h3>
+<p>이 책이 광고서가 아닌 이상, 이 도구가 어디서 무너지는지도 함께 짚어야 한다.</p>
+<ul>
+<li><strong>쓰기 일관성</strong>은 여전히 DB의 책임이다. Hyperdrive는 SELECT를 빠르게 해주지만, 동시 쓰기의 충돌을 자동으로 풀어주지는 않는다. SERIALIZABLE이 필요하면 명시적으로 쓰자.</li>
+<li><strong>prepared statement·LISTEN/NOTIFY·long cursor</strong> 같은 connection-bound 기능은 transaction-mode 풀과 어울리지 않는다. 매번 다시 prepare하거나, 별도 채널로 분리해야 한다.</li>
+<li><strong>DB 자체의 max_connections</strong>가 풀 크기의 상한이다. RDS 인스턴스가 작으면 풀도 작게 잡아야 하고, 같은 DB를 공유하는 다른 서비스와 합산해서 한도를 넘지 않게 운영팀과 합의해야 한다.</li>
+<li><strong>쿼리 캐시는 양날의 검</strong>이다. 한쪽 페이지의 응답을 ms 단위로 떨어뜨리지만, 잘못 켜면 stale 데이터가 사용자 눈에 들어온다. SQL 한 줄 단위로 캐시 정책을 내릴 각오가 필요하다.</li>
+<li><strong>VPC 깊이 격리</strong>가 필요한 환경에는 publicly accessible RDS가 부담스러울 수 있다. 그런 경우엔 Cloudflare Tunnel을 써서 사설망 안쪽에서 outbound-only로 RDS를 노출하는 패턴을 쓰는 편이 낫다 — 이게 다음 장의 주제와 자연스럽게 맞물린다.</li>
+</ul>
+</section>
+<section id="마무리-4" class="level3">
+<h3>마무리</h3>
+<p>Hyperdrive를 손에 넣은 우리에게는 한 가지 새로운 선택지가 생겼다. <strong>데이터를 옮기지 않고도 컴퓨트만 글로벌로 흩뿌릴 수 있다.</strong> 이 한 줄짜리 가능성이 점진 마이그레이션 전체의 무게를 한 자릿수 가볍게 만든다. 7번의 round-trip이 흡수되고, 트랜잭션 모델은 익숙한 그대로 유지되며, 롤백은 connection string 한 줄 바꾸는 일이다.</p>
+<p>물론 모든 자리가 매끄럽지는 않다. prepared statement, LISTEN/NOTIFY, 쓰기 일관성, max_connections 같은 DB 운영의 익숙한 함정들은 그대로 따라온다. 그래서 Hyperdrive는 기존 RDS·Aurora·Postgres를 잘 알고 있는 팀에게 가장 잘 어울린다. 모르고 도입하는 도구가 아니라, 알고 도입을 늦췄던 팀이 손쉽게 한 걸음을 내딛을 때 쓰는 도구다.</p>
+<p>다음 장에서는 RDS를 publicly accessible로 두기가 찜찜한 자리에서 무엇을 할지를 살펴보자. Cloudflare Tunnel과 Access·WAF·Turnstile이 어떻게 묶여 “VPC 없는 세계의 보안 모델”을 만드는지가 다음 페이지에서 펼쳐진다.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>

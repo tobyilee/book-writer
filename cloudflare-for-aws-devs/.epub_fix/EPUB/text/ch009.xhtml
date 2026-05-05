@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch009.xhtml</title>
+  <style>
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-workers-본격-사용법-spring-멘탈을-hono로-다시-그리자" class="level2">
+<h2>6장. Workers 본격 사용법 — Spring 멘탈을 Hono로 다시 그리자</h2>
+<p>처음 Worker를 띄운 다음 날 아침을 떠올려 보자. 3장에서 <code>wrangler deploy</code> 한 번에 글로벌 PoP에 코드가 깔리는 순간을 손끝으로 느꼈고, 5장에서 자기 시스템 컴포넌트 8개를 결정 워크시트에 채워 “이건 Move now”라고 표시했다. 그래서 다음 한 시간 안에 그 첫 컴포넌트를 옮기려고 IDE를 연다. 그런데 빈 화면 앞에 앉으면 이상한 일이 생긴다. <em>분명 익숙한 자리인데 손이 어디로 가야 할지 모르겠다.</em></p>
+<p><code>@RestController</code>는 어디에 적나. <code>@Component</code>로 주입하던 <code>UserService</code>는 어디에 둬야 하나. <code>SecurityFilterChain</code>을 매개로 인증·인가를 한 줄에 그리던 그 익숙한 빈 등록은 누가 대신 해주나. 5축 결정 트리는 손에 쥐었는데, 정작 한 라우트에 인증·로깅·에러 처리·DB 조회를 어떻게 늘어놓을지 빈 <code>index.ts</code> 한 장이 답을 안 해준다.</p>
+<p>이 장에서 손에 쥐고 가야 할 건 그 빈 화면을 채우는 다섯 도구다. 라우팅, 미들웨어, 의존성 주입, 시크릿·환경 분리, 테스트. Spring 개발자가 이미 갖고 있는 다섯 도구를 Workers + Hono 환경에서 <em>어떤 모양으로 다시 그릴지</em> 한 번에 풀어 보자. 단, 한 가지 약속을 먼저 하자 — Spring을 잊으라고 하지 않는다. <em>익숙한 자리에 다른 도구를 끼워 맞춰 보는 것뿐</em>이다. JPA의 <code>@Transactional</code>이 KV·D1·DO에서 어떻게 다시 짜이는지는 7장으로 미루고, 여기서는 한 Worker 안의 골격을 끝까지 깔아 보자.</p>
+<p>자, 첫 도구부터 살펴보자.</p>
+<section id="fetchrequest-env-ctx-workers의-본질-진입점" class="level3">
+<h3>fetch(request, env, ctx) — Workers의 본질 진입점</h3>
+<p>Workers 코드의 진짜 출발점은 한 함수다. <code>export default { fetch(request, env, ctx) { ... } }</code>. 이게 전부다. <code>request</code>는 표준 Web <code>Request</code>, <code>env</code>는 <code>wrangler.toml</code>이 주입한 바인딩 객체, <code>ctx</code>는 <code>ctx.waitUntil()</code>로 응답 후 작업을 등록할 수 있는 컨텍스트다. Spring Boot가 <code>DispatcherServlet</code>을 띄우고 그 위에 <code>@RestController</code>를 얹는 것과 비교하면, <em>Workers는 컨테이너 자체가 없다</em>. 컨테이너 없이 한 함수가 요청을 받아 응답을 만든다. 이게 5ms 콜드스타트의 비밀이다. 띄울 게 없으니 띄우는 시간도 없다.</p>
+<p>이 본질을 잊지 말자. 이 책 내내 Hono를 쓸 텐데, Hono는 <code>fetch(request, env, ctx)</code> 위에 라우팅·미들웨어 한 겹을 얹은 <em>얇은 라이브러리</em>일 뿐이다. Spring처럼 풀스택 프레임워크가 아니다. 모든 게 결국 <code>fetch</code> 한 함수로 수렴한다는 사실을 기억해두자. 이상한 동작을 디버깅할 때 이 본질로 한 번 내려가 보면 보통 답이 나온다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 가장 본질적인 형태</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> <span class="fu">fetch</span>(request<span class="op">:</span> Request<span class="op">,</span> env<span class="op">:</span> Env<span class="op">,</span> ctx<span class="op">:</span> ExecutionContext)<span class="op">:</span> <span class="bu">Promise</span><span class="op">&lt;</span>Response<span class="op">&gt;</span> {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">new</span> <span class="fu">Response</span>(<span class="st">&quot;hello edge&quot;</span>)<span class="op">;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<p>이 위에 라우팅을 얹으면 우리가 손에 익은 모양이 나타난다. 그게 Hono다.</p>
+</section>
+<section id="hono-express에-가까운-라우팅-dsl" class="level3">
+<h3>Hono — Express에 가까운 라우팅 DSL</h3>
+<p>Hono는 일본 개발자 Yusuke Wada가 만든 작은 웹 프레임워크다. Cloudflare Workers·Bun·Deno·Node 어디서든 도는데, 출발점이 Workers였던 만큼 V8 isolate 환경에서 가장 자연스럽다. Express를 써본 사람이라면 30초 만에 손에 붙는다. 5장 결정 워크시트의 2번 항목 <em>상품 검색 API</em> 를 한번 옮겨보자.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// apps/api/src/index.ts</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Hono } <span class="im">from</span> <span class="st">&quot;hono&quot;</span><span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Bindings <span class="op">=</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  CACHE<span class="op">:</span> KVNamespace<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  DB<span class="op">:</span> D1Database<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  JWT_SECRET<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> app <span class="op">=</span> <span class="kw">new</span> <span class="fu">Hono</span><span class="op">&lt;</span>{ Bindings<span class="op">:</span> Bindings }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/&quot;</span><span class="op">,</span> (c) <span class="kw">=&gt;</span> c<span class="op">.</span><span class="fu">text</span>(<span class="st">&quot;toby-shop API&quot;</span>))<span class="op">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/products/:id&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> id <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">param</span>(<span class="st">&quot;id&quot;</span>)<span class="op">;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 캐시 먼저</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> cached <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CACHE</span><span class="op">.</span><span class="fu">get</span>(<span class="vs">`product:</span><span class="sc">${</span>id<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="st">&quot;json&quot;</span>)<span class="op">;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (cached) <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>(cached)<span class="op">;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 캐시 미스 → D1</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> row <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">DB</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;SELECT * FROM products WHERE id = ?&quot;</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">bind</span>(id)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">first</span>()<span class="op">;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>row) <span class="cf">return</span> c<span class="op">.</span><span class="fu">notFound</span>()<span class="op">;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  c<span class="op">.</span><span class="at">executionCtx</span><span class="op">.</span><span class="fu">waitUntil</span>(</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">CACHE</span><span class="op">.</span><span class="fu">put</span>(<span class="vs">`product:</span><span class="sc">${</span>id<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(row)<span class="op">,</span> { expirationTtl<span class="op">:</span> <span class="dv">300</span> })</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>(row)<span class="op">;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> app<span class="op">;</span></span></code></pre></div>
+<p>아주 짧지만 이 안에 6개의 작은 결정이 들어 있다. <code>Hono&lt;{ Bindings }&gt;</code>로 타입 파라미터를 넘기면 <code>c.env.CACHE</code> 같은 접근에 자동완성이 붙는다. <code>c.req.param("id")</code>는 path param. <code>c.env.CACHE.get(...)</code>은 KV 호출. <code>c.executionCtx.waitUntil(...)</code>은 응답을 보낸 뒤 백그라운드로 캐시 쓰기를 마무리하라는 약속 — Lambda의 <code>context.callbackWaitsForEmptyEventLoop = false</code>와 비슷한 의도다. 이 한 화면이 <em>Hono의 거의 전부</em>다.</p>
+<p>Spring MVC와 한 화면씩 마주 놓아 보자.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Spring Boot — 같은 기능</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">@RestController</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">@RequestMapping</span><span class="op">(</span><span class="st">&quot;/products&quot;</span><span class="op">)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ProductController <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">final</span> ProductRepository repo<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">private</span> <span class="dt">final</span> CacheManager cache<span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ProductController</span><span class="op">(</span>ProductRepository repo<span class="op">,</span> CacheManager cache<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">repo</span> <span class="op">=</span> repo<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span><span class="fu">cache</span> <span class="op">=</span> cache<span class="op">;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">@GetMapping</span><span class="op">(</span><span class="st">&quot;/{id}&quot;</span><span class="op">)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Cacheable</span><span class="op">(</span>value <span class="op">=</span> <span class="st">&quot;products&quot;</span><span class="op">,</span> key <span class="op">=</span> <span class="st">&quot;#id&quot;</span><span class="op">)</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> Product <span class="fu">get</span><span class="op">(</span><span class="at">@PathVariable</span> <span class="bu">Long</span> id<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> repo<span class="op">.</span><span class="fu">findById</span><span class="op">(</span>id<span class="op">).</span><span class="fu">orElseThrow</span><span class="op">();</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>같은 일을 Spring은 두 어노테이션(<code>@GetMapping</code>, <code>@Cacheable</code>)으로, Hono는 미들웨어 체인이나 명시적 KV 호출로 표현한다. 문법의 우열은 아니다. 다만 Hono 쪽은 <em>마법이 적다.</em> <code>@Cacheable</code>이 어떻게 동작하는지 디버깅하려면 Spring AOP·CGLIB·Caffeine을 쪼개야 하지만, Hono의 <code>c.env.CACHE.get</code>은 호출 한 줄이라 추적할 게 없다. Spring 개발자에겐 이게 처음엔 <em>허전하게</em> 느껴지고, 한 달쯤 지나면 <em>솔직하게</em> 느껴진다. 마법이 줄어든 만큼 책임이 늘어난 것 — 그 트레이드오프를 이 장 끝까지 같이 받아들이자.</p>
+<section id="타입-안전한-path-query-body" class="level4">
+<h4>타입 안전한 path / query / body</h4>
+<p>Hono의 좋은 자리 하나는 validator다. <code>@hono/zod-validator</code>를 얹으면 query·body가 컴파일 타임에 잡힌다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { z } <span class="im">from</span> <span class="st">&quot;zod&quot;</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { zValidator } <span class="im">from</span> <span class="st">&quot;@hono/zod-validator&quot;</span><span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">post</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;/products&quot;</span><span class="op">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">zValidator</span>(<span class="st">&quot;json&quot;</span><span class="op">,</span> z<span class="op">.</span><span class="fu">object</span>({</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    name<span class="op">:</span> z<span class="op">.</span><span class="fu">string</span>()<span class="op">.</span><span class="fu">min</span>(<span class="dv">1</span>)<span class="op">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    price<span class="op">:</span> z<span class="op">.</span><span class="fu">number</span>()<span class="op">.</span><span class="fu">int</span>()<span class="op">.</span><span class="fu">nonnegative</span>()<span class="op">,</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  }))<span class="op">,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> body <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">valid</span>(<span class="st">&quot;json&quot;</span>)<span class="op">;</span> <span class="co">// 타입이 좁혀진 채로</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">DB</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;INSERT INTO products (name, price) VALUES (?, ?)&quot;</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">bind</span>(body<span class="op">.</span><span class="at">name</span><span class="op">,</span> body<span class="op">.</span><span class="at">price</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">run</span>()<span class="op">;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ id<span class="op">:</span> result<span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">last_row_id</span> }<span class="op">,</span> <span class="dv">201</span>)<span class="op">;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code></pre></div>
+<p>Spring의 <code>@RequestBody @Valid CreateProductDto dto</code> + <code>@NotBlank</code> 어노테이션 묶음과 같은 자리다. Hono의 zValidator 쪽이 <em>코드로 명시적</em>인 게 다르다. 어떤 검증이 어떤 라우트에 어떻게 붙었는지 그 자리에 다 적혀 있다. Spring처럼 어노테이션이 자동으로 해석되는 마법은 없지만, 그 자리에 적혀 있다는 명시성이 운영에서 의외로 큰 장점이 된다. <em>어디서 무엇이 검증되는지 한 화면에서 보인다.</em></p>
+</section>
+</section>
+<section id="미들웨어-체인-securityfilterchain을-다시-그리자" class="level3">
+<h3>미들웨어 체인 — SecurityFilterChain을 다시 그리자</h3>
+<p>Spring Boot에서 인증·로깅·CORS·rate limit을 어떻게 묶는가. <code>SecurityFilterChain</code> 빈 한 개에 <code>HttpSecurity</code> 빌더로 필터를 줄 세우고, <code>HandlerInterceptor</code>로 횡단 관심사를 끼워 넣고, <code>@RestControllerAdvice</code>로 예외를 한 자리에 모은다. 세 도구가 세 자리에 흩어져 있다. 한 신참이 들어오면 <em>이게 어디서 어떻게 호출되는지</em> 추적하는 데 며칠이 걸린다.</p>
+<p>Hono의 미들웨어는 한 자리에 줄 세운다. <code>app.use()</code> 한 줄로 끝이다. Express를 써본 사람이라면 정확히 그 모양이고, 안 써본 사람이라도 <em>함수가 함수를 호출한다</em>는 가장 단순한 흐름이라 한 화면에 다 보인다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Hono } <span class="im">from</span> <span class="st">&quot;hono&quot;</span><span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { logger } <span class="im">from</span> <span class="st">&quot;hono/logger&quot;</span><span class="op">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { cors } <span class="im">from</span> <span class="st">&quot;hono/cors&quot;</span><span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { jwt } <span class="im">from</span> <span class="st">&quot;hono/jwt&quot;</span><span class="op">;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="im">type</span> { Context<span class="op">,</span> Next } <span class="im">from</span> <span class="st">&quot;hono&quot;</span><span class="op">;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Bindings <span class="op">=</span> {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  CACHE<span class="op">:</span> KVNamespace<span class="op">;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  DB<span class="op">:</span> D1Database<span class="op">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  JWT_SECRET<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  RATE_LIMIT<span class="op">:</span> KVNamespace<span class="op">;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Variables <span class="op">=</span> { userId<span class="op">:</span> <span class="dt">string</span> }<span class="op">;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> app <span class="op">=</span> <span class="kw">new</span> <span class="fu">Hono</span><span class="op">&lt;</span>{ Bindings<span class="op">:</span> Bindings<span class="op">;</span> Variables<span class="op">:</span> Variables }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">// 1. 전역: 로깅 + CORS</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(<span class="st">&quot;*&quot;</span><span class="op">,</span> <span class="fu">logger</span>())<span class="op">;</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(<span class="st">&quot;*&quot;</span><span class="op">,</span> <span class="fu">cors</span>({ origin<span class="op">:</span> [<span class="st">&quot;https://toby-shop.com&quot;</span>]<span class="op">,</span> credentials<span class="op">:</span> <span class="kw">true</span> }))<span class="op">;</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">// 2. /api/* 에만: rate limit</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(<span class="st">&quot;/api/*&quot;</span><span class="op">,</span> <span class="kw">async</span> (c<span class="op">,</span> next) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ip <span class="op">=</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">header</span>(<span class="st">&quot;CF-Connecting-IP&quot;</span>) <span class="op">??</span> <span class="st">&quot;unknown&quot;</span><span class="op">;</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> key <span class="op">=</span> <span class="vs">`rl:</span><span class="sc">${</span>ip<span class="sc">}</span><span class="vs">`</span><span class="op">;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> count <span class="op">=</span> <span class="pp">parseInt</span>((<span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">RATE_LIMIT</span><span class="op">.</span><span class="fu">get</span>(key)) <span class="op">??</span> <span class="st">&quot;0&quot;</span><span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (count <span class="op">&gt;</span> <span class="dv">100</span>) <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;rate limited&quot;</span> }<span class="op">,</span> <span class="dv">429</span>)<span class="op">;</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  c<span class="op">.</span><span class="at">executionCtx</span><span class="op">.</span><span class="fu">waitUntil</span>(</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">RATE_LIMIT</span><span class="op">.</span><span class="fu">put</span>(key<span class="op">,</span> <span class="bu">String</span>(count <span class="op">+</span> <span class="dv">1</span>)<span class="op">,</span> { expirationTtl<span class="op">:</span> <span class="dv">60</span> })<span class="op">,</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> <span class="fu">next</span>()<span class="op">;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co">// 3. /api/admin/* 에만: JWT 검증</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(<span class="st">&quot;/api/admin/*&quot;</span><span class="op">,</span> <span class="kw">async</span> (c<span class="op">,</span> next) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> middleware <span class="op">=</span> <span class="fu">jwt</span>({ secret<span class="op">:</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET</span> })<span class="op">;</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">middleware</span>(c<span class="op">,</span> next)<span class="op">;</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">// 4. /api/admin/* 에만: 인가 (관리자 권한)</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">use</span>(<span class="st">&quot;/api/admin/*&quot;</span><span class="op">,</span> <span class="kw">async</span> (c<span class="op">,</span> next) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> payload <span class="op">=</span> c<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;jwtPayload&quot;</span>) <span class="im">as</span> { role<span class="op">?:</span> <span class="dt">string</span> }<span class="op">;</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (payload<span class="op">.</span><span class="at">role</span> <span class="op">!==</span> <span class="st">&quot;admin&quot;</span>) <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;forbidden&quot;</span> }<span class="op">,</span> <span class="dv">403</span>)<span class="op">;</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  c<span class="op">.</span><span class="fu">set</span>(<span class="st">&quot;userId&quot;</span><span class="op">,</span> (payload <span class="im">as</span> { sub<span class="op">:</span> <span class="dt">string</span> })<span class="op">.</span><span class="at">sub</span>)<span class="op">;</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> <span class="fu">next</span>()<span class="op">;</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">// 5. 라우트</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/api/admin/orders&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> userId <span class="op">=</span> c<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;userId&quot;</span>)<span class="op">;</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... D1 쿼리</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ ok<span class="op">:</span> <span class="kw">true</span><span class="op">,</span> by<span class="op">:</span> userId })<span class="op">;</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co">// 6. 에러 핸들러 — @RestControllerAdvice 자리</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">onError</span>((err<span class="op">,</span> c) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(err)<span class="op">;</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;internal&quot;</span> }<span class="op">,</span> <span class="dv">500</span>)<span class="op">;</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">notFound</span>((c) <span class="kw">=&gt;</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;not found&quot;</span> }<span class="op">,</span> <span class="dv">404</span>))<span class="op">;</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> app<span class="op">;</span></span></code></pre></div>
+<p>이 한 파일이 Spring의 <code>SecurityFilterChain</code> + <code>HandlerInterceptor</code> + <code>@RestControllerAdvice</code> + <code>Filter</code> 네 자리에 흩어져 있던 모든 횡단 관심사를 <em>한 자리에 줄 세운 것</em>이다. 위에서 아래로 읽으면 라이프사이클이 그대로 흐른다. 매칭된 미들웨어들이 순서대로 실행되고, <code>next()</code> 호출 후 코드는 응답이 만들어진 뒤에 실행된다 (Express의 onion 모델 그대로). 이게 처음엔 어색하지만, 사흘이면 손에 붙는다.</p>
+<p>Spring <code>HandlerInterceptor</code>와 짧게 마주 놓아 보자.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode java"><code class="sourceCode java"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Spring — 인증 인터셉터</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="at">@Component</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AuthInterceptor <span class="kw">implements</span> HandlerInterceptor <span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">boolean</span> <span class="fu">preHandle</span><span class="op">(</span>HttpServletRequest req<span class="op">,</span> HttpServletResponse res<span class="op">,</span> <span class="bu">Object</span> handler<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">String</span> token <span class="op">=</span> req<span class="op">.</span><span class="fu">getHeader</span><span class="op">(</span><span class="st">&quot;Authorization&quot;</span><span class="op">);</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(!</span><span class="fu">isValid</span><span class="op">(</span>token<span class="op">))</span> <span class="op">{</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            res<span class="op">.</span><span class="fu">setStatus</span><span class="op">(</span><span class="dv">401</span><span class="op">);</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        req<span class="op">.</span><span class="fu">setAttribute</span><span class="op">(</span><span class="st">&quot;userId&quot;</span><span class="op">,</span> <span class="fu">parseUser</span><span class="op">(</span>token<span class="op">));</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">true</span><span class="op">;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">// 등록은 별도 자리</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="at">@Configuration</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> WebConfig <span class="kw">implements</span> WebMvcConfigurer <span class="op">{</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">@Override</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">addInterceptors</span><span class="op">(</span>InterceptorRegistry registry<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>        registry<span class="op">.</span><span class="fu">addInterceptor</span><span class="op">(</span><span class="kw">new</span> <span class="fu">AuthInterceptor</span><span class="op">()).</span><span class="fu">addPathPatterns</span><span class="op">(</span><span class="st">&quot;/api/admin/**&quot;</span><span class="op">);</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>기능은 정확히 같다. 다만 Spring 쪽은 <em>인터셉터 클래스 한 개 + 등록 클래스 한 개</em> 두 자리에 흩어진다. Hono는 한 자리. 어느 쪽이 더 좋다 나쁘다가 아니다 — 큰 팀, 다층 권한, 메서드 단위 보안이 필요한 시스템에는 Spring 모델이 더 안전하다. 작은 API, 빠른 추적, 단일 파일 가독성을 원하는 시스템에는 Hono 모델이 더 <em>솔직하다</em>. 5장의 결정 프레임을 한 번 더 떠올리자 — 모든 워크로드가 Workers로 옮겨가는 게 아니다. Spring의 <code>SecurityFilterChain</code>이 빛나는 어드민·금융 도메인은 Spring에 두고, edge에서 가벼운 게이트웨이만 Workers + Hono로 까는 <em>하이브리드</em>가 흔한 답이다.</p>
+<section id="미들웨어-우선순위-위에서-아래로-읽힌다" class="level4">
+<h4>미들웨어 우선순위 — 위에서 아래로 읽힌다</h4>
+<p>기억해두자. Hono는 <code>app.use(path, handler)</code>를 <em>등록 순서대로</em> 실행한다. 그래서 글로벌 로깅·CORS는 가장 위에, 경로별 인증은 그 아래, 라우트 핸들러는 맨 아래에 두는 게 자연스럽다. Spring의 <code>Filter</code> order 어노테이션처럼 숫자를 넣어 우선순위를 비틀지 말자. <em>위에서 아래로 읽히는 코드</em>가 가장 디버깅하기 쉽다는 사실은 Workers에서도 변함이 없다.</p>
+</section>
+</section>
+<section id="di를-다시-그리자-c.setc.get과-bindings-그리고-정직한-권유" class="level3">
+<h3>DI를 다시 그리자 — c.set/c.get과 Bindings, 그리고 정직한 권유</h3>
+<p>Spring 개발자가 Workers에서 가장 허전해하는 한 자리. <em>DI 컨테이너가 없다.</em> <code>@Component</code>도, <code>@Autowired</code>도, <code>ApplicationContext</code>도 없다. 그렇다면 어떻게 의존성을 주입할까. 답은 세 갈래다. <em>솔직하게 무엇이 권유할 만한지</em>부터 짚어 보자.</p>
+<section id="갈래-1.-bindings-런타임이-주입해주는-의존성" class="level4">
+<h4>갈래 1. Bindings — 런타임이 주입해주는 의존성</h4>
+<p>가장 먼저, 그리고 <em>가장 권유할 만한</em> 자리. <code>wrangler.toml</code>에 적은 KV·D1·R2·Queue·Service binding은 사실상 런타임 DI다. 코드에서 <code>c.env.DB.prepare(...)</code>로 쓰는 그 <code>DB</code>는 <code>wrangler.toml</code>이 주입한 D1 핸들이다. Spring의 <code>@Autowired DataSource</code>와 <em>기능적으로 같은 자리</em>다.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wrangler.toml</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[[d1_databases]]</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;DB&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="dt">database_name</span> <span class="op">=</span> <span class="st">&quot;toby-shop&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dt">database_id</span> <span class="op">=</span> <span class="st">&quot;xxxx&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">[[kv_namespaces]]</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;CACHE&quot;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="dt">id</span> <span class="op">=</span> <span class="st">&quot;yyyy&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 코드는 그냥 c.env.DB / c.env.CACHE 를 쓰면 된다</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/users/:id&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> row <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">DB</span><span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;SELECT * FROM users WHERE id = ?&quot;</span>)<span class="op">.</span><span class="fu">bind</span>(c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">param</span>(<span class="st">&quot;id&quot;</span>))<span class="op">.</span><span class="fu">first</span>()<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> row <span class="op">?</span> c<span class="op">.</span><span class="fu">json</span>(row) <span class="op">:</span> c<span class="op">.</span><span class="fu">notFound</span>()<span class="op">;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>이 자리는 <em>권유할 필요도 없다.</em> Workers에서는 이게 기본이고, <code>wrangler types</code>가 자동 생성한 <code>Env</code> 인터페이스 덕분에 타입까지 안전하다. 처음엔 이걸 DI로 부르기 어색하지만, 한 번 익숙해지면 Spring의 IoC 컨테이너보다 <em>오히려 더 명확한 의존성 표현</em>이라는 의견에 동의하는 자신을 발견하게 된다. 무엇이 어디에 주입되는지 <code>wrangler.toml</code> 한 파일에 다 적혀 있다.</p>
+</section>
+<section id="갈래-2.-c.set-c.get-요청-단위-컨텍스트-주입" class="level4">
+<h4>갈래 2. c.set / c.get — 요청 단위 컨텍스트 주입</h4>
+<p>미들웨어 체인 예제에서 이미 본 패턴이다. 인증 미들웨어가 <code>c.set("userId", ...)</code>로 값을 꽂으면, 라우트 핸들러가 <code>c.get("userId")</code>로 꺼낸다. Spring의 <code>RequestContextHolder</code>나 ThreadLocal과 비슷한 자리다. <em>요청 단위 의존성</em>을 표현하는 깔끔한 방법이고, Hono의 타입 시스템(<code>Variables</code> 제네릭)이 자동완성까지 받쳐준다.</p>
+<p>이 자리도 <em>권유할 만하다.</em> 다만 한 함정이 있다. <code>c.set</code>에 비즈니스 로직을 너무 많이 꽂으면 라우트 핸들러가 어디서 무엇이 들어왔는지 추적하기 어려워진다. Spring의 ThreadLocal 남용과 똑같은 함정이다. <em>userId·tenantId·tracerId처럼 진짜 횡단적인 값</em>만 꽂고, 비즈니스 객체는 함수 인자로 명시적으로 넘기는 편이 낫다.</p>
+</section>
+<section id="갈래-3.-함수형-di-가장-솔직하고-가장-가벼운-패턴" class="level4">
+<h4>갈래 3. 함수형 DI — 가장 솔직하고 가장 가벼운 패턴</h4>
+<p>서비스 클래스를 함수로 풀어 헤치고, 의존성을 첫 번째 인자로 명시적으로 받는다. 이게 사실상 <em>Workers에서 가장 권유할 만한 패턴</em>이다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// packages/shared/src/users.ts</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="im">type</span> { D1Database } <span class="im">from</span> <span class="st">&quot;@cloudflare/workers-types&quot;</span><span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">async</span> <span class="kw">function</span> <span class="fu">getUser</span>(db<span class="op">:</span> D1Database<span class="op">,</span> id<span class="op">:</span> <span class="dt">string</span>) {</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> db<span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;SELECT * FROM users WHERE id = ?&quot;</span>)<span class="op">.</span><span class="fu">bind</span>(id)<span class="op">.</span><span class="fu">first</span>()<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">async</span> <span class="kw">function</span> <span class="fu">createUser</span>(db<span class="op">:</span> D1Database<span class="op">,</span> input<span class="op">:</span> { name<span class="op">:</span> <span class="dt">string</span><span class="op">;</span> email<span class="op">:</span> <span class="dt">string</span> }) {</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> db</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;INSERT INTO users (name, email) VALUES (?, ?)&quot;</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">bind</span>(input<span class="op">.</span><span class="at">name</span><span class="op">,</span> input<span class="op">.</span><span class="at">email</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">run</span>()<span class="op">;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> result<span class="op">.</span><span class="at">meta</span><span class="op">.</span><span class="at">last_row_id</span><span class="op">;</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// apps/api/src/routes/users.ts</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Hono } <span class="im">from</span> <span class="st">&quot;hono&quot;</span><span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { getUser<span class="op">,</span> createUser } <span class="im">from</span> <span class="st">&quot;@toby-shop/shared/users&quot;</span><span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> users <span class="op">=</span> <span class="kw">new</span> <span class="fu">Hono</span><span class="op">&lt;</span>{ Bindings<span class="op">:</span> Bindings }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>users<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/:id&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> row <span class="op">=</span> <span class="cf">await</span> <span class="fu">getUser</span>(c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">DB</span><span class="op">,</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">param</span>(<span class="st">&quot;id&quot;</span>))<span class="op">;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> row <span class="op">?</span> c<span class="op">.</span><span class="fu">json</span>(row) <span class="op">:</span> c<span class="op">.</span><span class="fu">notFound</span>()<span class="op">;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> users<span class="op">;</span></span></code></pre></div>
+<p><code>UserService</code> 클래스도, <code>@Component</code>도 없다. 그냥 함수 + 명시적 의존성. 테스트 시에는 <code>getUser(mockDb, "1")</code>처럼 mock을 그대로 넘기면 된다. Spring 개발자에겐 <em>너무 단순해 보이는 게 함정</em>이다. 큰 시스템에서도 정말 이걸로 충분한가 묻고 싶어진다. 솔직히 답하자면, <em>Workers 한 개에 들어가는 정도의 도메인이라면 충분하다.</em> Workers는 코드 크기 한도(Free 3MiB / Paid 10MiB)가 있어서 한 Worker에 너무 많은 도메인을 묶을 수 없고, 그래서 <em>Spring Boot 모놀리스급 복잡도가 한 Worker에 들어올 일 자체가 드물다.</em> 도메인이 정말 커지면 Worker를 쪼개고 Service Bindings로 잇는다 (다음 챕터들에서 다룬다).</p>
+</section>
+<section id="갈래-4.-awilixtsyringe-같은-가벼운-컨테이너-권유하지-않는다" class="level4">
+<h4>갈래 4. awilix·tsyringe 같은 가벼운 컨테이너 — 권유하지 않는다</h4>
+<p>awilix, tsyringe, InversifyJS 같은 TypeScript DI 컨테이너를 Workers에 얹으면 어떨까. 가능은 하다. 다만 <em>권유하지 않는다.</em> 이유 셋.</p>
+<p>첫째, Workers는 한 isolate가 여러 요청을 처리한다. 컨테이너가 글로벌 싱글톤이 되면 한 요청의 의존성 상태가 다음 요청에 새는 함정이 생긴다. Spring처럼 RequestScope·SessionScope·SingletonScope를 분리해주는 인프라가 컨테이너 안에 없다. 직접 깔아야 한다.</p>
+<p>둘째, Workers의 코드 크기 한도. awilix만 해도 10~30KB 수준이지만 reflect-metadata + tsyringe 조합은 더 무겁다. 큰 의존성에 비해 얻는 게 함수형 DI보다 분명하지 않다.</p>
+<p>셋째, <em>팀 신참이 입사 첫 주에 코드를 읽을 때</em>. 함수형 DI는 import 한 줄만 따라가면 끝이지만, 컨테이너 등록은 별도 파일·별도 토큰을 추적해야 한다. Spring에서 이미 익숙하지만, Workers의 작은 도메인에 굳이 그 복잡도를 끌어올 이유가 빈약하다.</p>
+<p>그래서 권유: <em>Bindings + c.set/get + 함수형 DI 셋이면 충분하다.</em> 이 셋으로 안 풀리는 자리가 생기면 그 자리는 보통 “이 도메인은 한 Worker에 너무 많이 들어왔다”는 신호다. Worker를 쪼개라는 신호로 받아들이자. <em>DI 컨테이너의 부재가 처음엔 결핍 같다가, 나중엔 안내판처럼 보인다.</em></p>
+</section>
+</section>
+<section id="환경변수와-시크릿-.dev.vars-wrangler-secret-put-c.env" class="level3">
+<h3>환경변수와 시크릿 — <code>.dev.vars</code>, <code>wrangler secret put</code>, <code>c.env</code></h3>
+<p>다음으로 Spring의 <code>application-{profile}.yml</code> + Spring Cloud Config + AWS Secrets Manager 자리. Workers에서는 세 레이어가 한결 단순해진다.</p>
+<p><strong>로컬 개발용은 <code>.dev.vars</code></strong> — gitignore 필수. <code>.env</code>와 동시에 쓰지 말자. <code>.dev.vars</code>가 있으면 <code>wrangler dev</code>가 그걸 읽고 <code>.env</code>는 무시한다.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .dev.vars (gitignore 됨)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="va">JWT_SECRET</span><span class="op">=</span>local-only-do-not-deploy</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="va">DATABASE_URL</span><span class="op">=</span>postgresql://localhost/toby_shop_dev</span></code></pre></div>
+<p><strong>배포 환경의 시크릿은 <code>wrangler secret put</code></strong> — 대시보드에서 값은 다시 안 보인다.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler secret put JWT_SECRET</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">?</span> Enter a secret value: <span class="pp">********</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">✨</span> Success! Uploaded secret JWT_SECRET</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler secret put JWT_SECRET <span class="at">--env</span> production</span></code></pre></div>
+<p><strong>일반 환경변수는 <code>wrangler.toml</code>의 <code>vars</code></strong> — 코드 저장소에 그대로 들어가도 안전한 값. 로그 레벨, feature flag, 외부 API URL 같은 비기밀 값.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[env.production]</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dt">vars</span> <span class="op">=</span> <span class="op">{ </span><span class="dt">LOG_LEVEL</span><span class="op"> =</span> <span class="st">&quot;info&quot;</span><span class="op">, </span><span class="dt">IMAGE_CDN</span><span class="op"> =</span> <span class="st">&quot;https://images.toby-shop.com&quot;</span><span class="op"> }</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[env.staging]</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="dt">vars</span> <span class="op">=</span> <span class="op">{ </span><span class="dt">LOG_LEVEL</span><span class="op"> =</span> <span class="st">&quot;debug&quot;</span><span class="op">, </span><span class="dt">IMAGE_CDN</span><span class="op"> =</span> <span class="st">&quot;https://staging-images.toby-shop.com&quot;</span><span class="op"> }</span></span></code></pre></div>
+<p>코드에서는 모두 <code>c.env</code>로 동일하게 접근한다. 시크릿이든 vars든 <code>wrangler types</code>가 만들어 준 <code>Env</code> 타입으로 오타가 잡힌다.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>app<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/protected&quot;</span><span class="op">,</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> secret <span class="op">=</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">JWT_SECRET</span><span class="op">;</span>       <span class="co">// wrangler secret으로 등록</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> logLevel <span class="op">=</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">LOG_LEVEL</span><span class="op">;</span>      <span class="co">// [env.*].vars 로 등록</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>기억해두자. <em><code>.dev.vars</code>를 절대 git에 올리지 말자.</em> 한 번 올라가면 history에서 지우는 데 며칠을 쓴다. <code>.gitignore</code>에 <code>.dev.vars</code>를 처음 프로젝트 만들 때 적어두는 습관을 들이자.</p>
+<p>여러 Worker에서 같은 시크릿을 공유해야 한다면 2025년에 발표된 <strong>Cloudflare Secrets Store</strong>(account-level 중앙 관리)를 쓸 수 있다. 다만 새 프로젝트에서는 우선 <code>wrangler secret put</code>으로 시작하고, 시크릿 공유가 정말 늘어나는 시점에 Secrets Store로 옮기자. <em>지금 당장 권유하기엔 아직 새로운 자리</em>다.</p>
+</section>
+<section id="wrangler.toml의-env.-application-profile.yml을-다시-그리자" class="level3">
+<h3>wrangler.toml의 <code>[env.*]</code> — <code>application-{profile}.yml</code>을 다시 그리자</h3>
+<p>Spring 개발자가 환경 분리에 쓰는 <code>application-prod.yml</code> / <code>application-staging.yml</code> 자리. Workers에서는 <code>wrangler.toml</code>의 <code>[env.production]</code> / <code>[env.staging]</code> 블록이 그 역할이다.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-api&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">main</span> <span class="op">=</span> <span class="st">&quot;src/index.ts&quot;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">compatibility_date</span> <span class="op">=</span> <span class="st">&quot;2025-04-01&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">compatibility_flags</span> <span class="op">=</span> <span class="op">[</span><span class="st">&quot;nodejs_compat&quot;</span><span class="op">]</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 기본(개발) 환경 바인딩</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">[[kv_namespaces]]</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;CACHE&quot;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="dt">id</span> <span class="op">=</span> <span class="st">&quot;dev-kv-id&quot;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">[[d1_databases]]</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;DB&quot;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="dt">database_name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-dev&quot;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="dt">database_id</span> <span class="op">=</span> <span class="st">&quot;dev-db-id&quot;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Staging</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="kw">[env.staging]</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-api-staging&quot;</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="dt">vars</span> <span class="op">=</span> <span class="op">{ </span><span class="dt">LOG_LEVEL</span><span class="op"> =</span> <span class="st">&quot;debug&quot;</span><span class="op"> }</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="kw">[[env.staging.kv_namespaces]]</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;CACHE&quot;</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="dt">id</span> <span class="op">=</span> <span class="st">&quot;staging-kv-id&quot;</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="kw">[[env.staging.d1_databases]]</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;DB&quot;</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="dt">database_name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-staging&quot;</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="dt">database_id</span> <span class="op">=</span> <span class="st">&quot;staging-db-id&quot;</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Production</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="kw">[env.production]</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-api&quot;</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="dt">vars</span> <span class="op">=</span> <span class="op">{ </span><span class="dt">LOG_LEVEL</span><span class="op"> =</span> <span class="st">&quot;info&quot;</span><span class="op"> }</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a><span class="kw">[[env.production.kv_namespaces]]</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;CACHE&quot;</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="dt">id</span> <span class="op">=</span> <span class="st">&quot;prod-kv-id&quot;</span></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="kw">[[env.production.d1_databases]]</span></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;DB&quot;</span></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="dt">database_name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-prod&quot;</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="dt">database_id</span> <span class="op">=</span> <span class="st">&quot;prod-db-id&quot;</span></span></code></pre></div>
+<p>배포는 환경별로 한 명령씩.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler deploy <span class="at">--env</span> staging</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler deploy <span class="at">--env</span> production</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler secret put JWT_SECRET <span class="at">--env</span> staging</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler secret put JWT_SECRET <span class="at">--env</span> production</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> wrangler tail <span class="at">--env</span> production    <span class="co"># 라이브 로그</span></span></code></pre></div>
+<p>Spring의 <code>--spring.profiles.active=production</code> 자리에 <code>--env production</code>이 들어선다. 한 가지 다른 점이 있다 — Spring은 한 jar가 profile만 바꿔 여러 환경에 도는데, Workers는 환경별로 <em>별도 Worker가 배포된다.</em> <code>[env.production]</code> 블록은 사실상 새 Worker(<code>toby-shop-api-staging</code>)를 만든다. 같은 코드, 다른 바인딩·다른 시크릿·다른 이름. 처음엔 <em>이게 환경 분리가 맞나</em> 싶지만, 환경 사이 간섭이 원천적으로 막힌다는 점에서 <em>오히려 더 안전한 분리</em>다.</p>
+<p>흔한 함정 하나. preview 환경을 만들고 싶을 때다. PR마다 임시 URL을 띄우려면 <code>wrangler versions upload --env preview</code> 같은 패턴을 쓰는데, 이건 14장에서 마이그레이션 시 다시 다룬다. 일단 6장에서는 <code>staging</code> / <code>production</code> 둘이면 충분하다.</p>
+</section>
+<section id="테스트-vitest-miniflare로-단위통합" class="level3">
+<h3>테스트 — vitest + miniflare로 단위·통합</h3>
+<p>Spring의 <code>@SpringBootTest</code>는 컨텍스트 전체를 띄워 통합 테스트를 한다. 비싸고 느리지만, 진짜 빈을 그대로 검증할 수 있다는 안정감이 크다. Workers에서는 어떻게 그 안정감을 손에 쥐어야 할까.</p>
+<p>답은 두 갈래. <em>단위 테스트는 vitest 그대로</em>, <em>통합 테스트는 <code>@cloudflare/vitest-pool-workers</code> 위에서 miniflare가 띄운 가짜 Workers 환경</em>. miniflare는 workerd(production과 같은 V8 isolate 런타임)를 로컬에서 그대로 실행한다. 즉 production과 같은 환경에서 KV·D1·R2까지 SQLite 시뮬레이션으로 돌릴 수 있다.</p>
+<p>설치는 한 번에.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> pnpm add <span class="at">-D</span> vitest @cloudflare/vitest-pool-workers</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// vitest.config.ts</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { defineWorkersConfig } <span class="im">from</span> <span class="st">&quot;@cloudflare/vitest-pool-workers/config&quot;</span><span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> <span class="fu">defineWorkersConfig</span>({</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  test<span class="op">:</span> {</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    poolOptions<span class="op">:</span> {</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>      workers<span class="op">:</span> {</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        wrangler<span class="op">:</span> { configPath<span class="op">:</span> <span class="st">&quot;./wrangler.toml&quot;</span> }<span class="op">,</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    }<span class="op">,</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>이 위에 통합 테스트 한 토막을 써보자. 5장 워크시트의 2번 항목 <em>상품 검색 API</em> 를 검증한다.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// apps/api/test/products.test.ts</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { env<span class="op">,</span> createExecutionContext<span class="op">,</span> waitOnExecutionContext } <span class="im">from</span> <span class="st">&quot;cloudflare:test&quot;</span><span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { describe<span class="op">,</span> it<span class="op">,</span> expect<span class="op">,</span> beforeEach } <span class="im">from</span> <span class="st">&quot;vitest&quot;</span><span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> app <span class="im">from</span> <span class="st">&quot;../src/index&quot;</span><span class="op">;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&quot;GET /products/:id&quot;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">beforeEach</span>(<span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">// D1 스키마 시드</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> env<span class="op">.</span><span class="at">DB</span><span class="op">.</span><span class="fu">exec</span>(<span class="vs">`</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="vs">      CREATE TABLE IF NOT EXISTS products (</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="vs">        id INTEGER PRIMARY KEY,</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="vs">        name TEXT NOT NULL,</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="vs">        price INTEGER NOT NULL</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="vs">      );</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="vs">    `</span>)<span class="op">;</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> env<span class="op">.</span><span class="at">DB</span><span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;DELETE FROM products&quot;</span>)<span class="op">.</span><span class="fu">run</span>()<span class="op">;</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> env<span class="op">.</span><span class="at">DB</span><span class="op">.</span><span class="fu">prepare</span>(<span class="st">&quot;INSERT INTO products (id, name, price) VALUES (1, &#39;edge book&#39;, 25000)&quot;</span>)<span class="op">.</span><span class="fu">run</span>()<span class="op">;</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&quot;D1에서 가져온 상품을 반환한다&quot;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> ctx <span class="op">=</span> <span class="fu">createExecutionContext</span>()<span class="op">;</span></span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> res <span class="op">=</span> <span class="cf">await</span> app<span class="op">.</span><span class="fu">fetch</span>(<span class="kw">new</span> <span class="fu">Request</span>(<span class="st">&quot;http://x/products/1&quot;</span>)<span class="op">,</span> env<span class="op">,</span> ctx)<span class="op">;</span></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">waitOnExecutionContext</span>(ctx)<span class="op">;</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(res<span class="op">.</span><span class="at">status</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="dv">200</span>)<span class="op">;</span></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(<span class="cf">await</span> res<span class="op">.</span><span class="fu">json</span>())<span class="op">.</span><span class="fu">toEqual</span>({ id<span class="op">:</span> <span class="dv">1</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&quot;edge book&quot;</span><span class="op">,</span> price<span class="op">:</span> <span class="dv">25000</span> })<span class="op">;</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&quot;두 번째 요청은 KV 캐시에서 응답한다&quot;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> ctx <span class="op">=</span> <span class="fu">createExecutionContext</span>()<span class="op">;</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> app<span class="op">.</span><span class="fu">fetch</span>(<span class="kw">new</span> <span class="fu">Request</span>(<span class="st">&quot;http://x/products/1&quot;</span>)<span class="op">,</span> env<span class="op">,</span> ctx)<span class="op">;</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">waitOnExecutionContext</span>(ctx)<span class="op">;</span> <span class="co">// 캐시 쓰기 완료 대기</span></span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 캐시 hit 확인</span></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> cached <span class="op">=</span> <span class="cf">await</span> env<span class="op">.</span><span class="at">CACHE</span><span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;product:1&quot;</span><span class="op">,</span> <span class="st">&quot;json&quot;</span>)<span class="op">;</span></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(cached)<span class="op">.</span><span class="fu">toMatchObject</span>({ id<span class="op">:</span> <span class="dv">1</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&quot;edge book&quot;</span> })<span class="op">;</span></span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&quot;없는 상품은 404&quot;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> ctx <span class="op">=</span> <span class="fu">createExecutionContext</span>()<span class="op">;</span></span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> res <span class="op">=</span> <span class="cf">await</span> app<span class="op">.</span><span class="fu">fetch</span>(<span class="kw">new</span> <span class="fu">Request</span>(<span class="st">&quot;http://x/products/999&quot;</span>)<span class="op">,</span> env<span class="op">,</span> ctx)<span class="op">;</span></span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> <span class="fu">waitOnExecutionContext</span>(ctx)<span class="op">;</span></span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(res<span class="op">.</span><span class="at">status</span>)<span class="op">.</span><span class="fu">toBe</span>(<span class="dv">404</span>)<span class="op">;</span></span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>이 테스트가 도는 모습은 Spring의 <code>@SpringBootTest</code>와 다르고도 같다. <em>다른 점</em>은 컨텍스트를 띄우는 비용이 거의 없다는 것 — miniflare가 in-memory로 D1·KV를 돌리니까 한 테스트가 수십 ms 안에 끝난다. <em>같은 점</em>은 production과 같은 런타임에서 같은 바인딩으로 돌린다는 것. workerd가 production V8 isolate를 그대로 재현하므로, “테스트는 통과했는데 production에서 깨지는” 흔한 함정이 크게 줄어든다.</p>
+<p>순수 함수 테스트는 vitest 기본 모드로 돌리자. miniflare를 띄울 필요가 없다.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// packages/shared/test/users.test.ts (Workers pool 안 씀)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { describe<span class="op">,</span> it<span class="op">,</span> expect } <span class="im">from</span> <span class="st">&quot;vitest&quot;</span><span class="op">;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { getUser } <span class="im">from</span> <span class="st">&quot;../src/users&quot;</span><span class="op">;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="st">&quot;getUser&quot;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">it</span>(<span class="st">&quot;D1 mock으로 단위 테스트&quot;</span><span class="op">,</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> mockDb <span class="op">=</span> {</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>      prepare<span class="op">:</span> () <span class="kw">=&gt;</span> ({</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        bind<span class="op">:</span> () <span class="kw">=&gt;</span> ({</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>          first<span class="op">:</span> <span class="kw">async</span> () <span class="kw">=&gt;</span> ({ id<span class="op">:</span> <span class="dv">1</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&quot;alice&quot;</span> })<span class="op">,</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    } <span class="im">as</span> <span class="dt">unknown</span> <span class="im">as</span> D1Database<span class="op">;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> user <span class="op">=</span> <span class="cf">await</span> <span class="fu">getUser</span>(mockDb<span class="op">,</span> <span class="st">&quot;1&quot;</span>)<span class="op">;</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">expect</span>(user)<span class="op">.</span><span class="fu">toEqual</span>({ id<span class="op">:</span> <span class="dv">1</span><span class="op">,</span> name<span class="op">:</span> <span class="st">&quot;alice&quot;</span> })<span class="op">;</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>함수형 DI 패턴이 여기서 빛난다. mock을 그대로 인자로 넘기면 끝. Spring의 <code>@MockBean</code>이 자동으로 빈을 갈아 끼워주는 마법은 없지만, <em>어떤 mock이 어디 들어갔는지가 한 화면에 보이는 명시성</em>이 그 자리에 들어선다.</p>
+<p><strong>테스트 권유 지점</strong>: 단위 테스트는 빠른 피드백용으로 매번 돌리고, miniflare 통합 테스트는 PR 단위 CI에서 돌리자. Spring의 <code>@SpringBootTest</code>는 한 번 띄울 때 5~30초가 걸려 PR마다 돌리기 부담스럽지만, <em>miniflare는 cold start가 1초 안</em>이라 PR마다 마음 편히 돌릴 수 있다. 이게 Workers의 작은 자랑이다.</p>
+</section>
+<section id="짧은-kv-세션-실습-다음-장으로-넘어가기-전에" class="level3">
+<h3>짧은 KV 세션 실습 — 다음 장으로 넘어가기 전에</h3>
+<p>여기까지 라우팅·미들웨어·DI·시크릿·테스트까지 5도구를 깔았다. 마지막 한 토막으로 KV에 세션을 저장해보고 7장으로 넘기자. 5장 워크시트의 3번 항목 <em>사용자 세션</em> 이다.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// apps/api/src/routes/auth.ts</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { Hono } <span class="im">from</span> <span class="st">&quot;hono&quot;</span><span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { setCookie<span class="op">,</span> getCookie<span class="op">,</span> deleteCookie } <span class="im">from</span> <span class="st">&quot;hono/cookie&quot;</span><span class="op">;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Bindings <span class="op">=</span> { SESSIONS<span class="op">:</span> KVNamespace<span class="op">;</span> JWT_SECRET<span class="op">:</span> <span class="dt">string</span> }<span class="op">;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Variables <span class="op">=</span> { userId<span class="op">:</span> <span class="dt">string</span> }<span class="op">;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> auth <span class="op">=</span> <span class="kw">new</span> <span class="fu">Hono</span><span class="op">&lt;</span>{ Bindings<span class="op">:</span> Bindings<span class="op">;</span> Variables<span class="op">:</span> Variables }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>auth<span class="op">.</span><span class="fu">post</span>(<span class="st">&quot;/login&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { email<span class="op">,</span> password } <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">req</span><span class="op">.</span><span class="fu">json</span><span class="op">&lt;</span>{ email<span class="op">:</span> <span class="dt">string</span><span class="op">;</span> password<span class="op">:</span> <span class="dt">string</span> }<span class="op">&gt;</span>()<span class="op">;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 인증 로직 (실제로는 D1 + bcrypt)</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (email <span class="op">!==</span> <span class="st">&quot;demo@toby-shop.com&quot;</span> <span class="op">||</span> password <span class="op">!==</span> <span class="st">&quot;demo&quot;</span>) {</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;invalid&quot;</span> }<span class="op">,</span> <span class="dv">401</span>)<span class="op">;</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sessionId <span class="op">=</span> crypto<span class="op">.</span><span class="fu">randomUUID</span>()<span class="op">;</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> userId <span class="op">=</span> <span class="st">&quot;user-1&quot;</span><span class="op">;</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 1시간짜리 세션 — KV의 sweet spot</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">SESSIONS</span><span class="op">.</span><span class="fu">put</span>(</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="vs">`session:</span><span class="sc">${</span>sessionId<span class="sc">}</span><span class="vs">`</span><span class="op">,</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>({ userId<span class="op">,</span> createdAt<span class="op">:</span> <span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() })<span class="op">,</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    { expirationTtl<span class="op">:</span> <span class="dv">3600</span> }<span class="op">,</span></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setCookie</span>(c<span class="op">,</span> <span class="st">&quot;session&quot;</span><span class="op">,</span> sessionId<span class="op">,</span> {</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    httpOnly<span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    secure<span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>    sameSite<span class="op">:</span> <span class="st">&quot;Lax&quot;</span><span class="op">,</span></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    maxAge<span class="op">:</span> <span class="dv">3600</span><span class="op">,</span></span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ ok<span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a><span class="co">// 인증 미들웨어 — KV에서 세션 조회</span></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>auth<span class="op">.</span><span class="fu">use</span>(<span class="st">&quot;/me&quot;</span><span class="op">,</span> <span class="kw">async</span> (c<span class="op">,</span> next) <span class="kw">=&gt;</span> {</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sessionId <span class="op">=</span> <span class="fu">getCookie</span>(c<span class="op">,</span> <span class="st">&quot;session&quot;</span>)<span class="op">;</span></span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>sessionId) <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;unauthenticated&quot;</span> }<span class="op">,</span> <span class="dv">401</span>)<span class="op">;</span></span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> raw <span class="op">=</span> <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">SESSIONS</span><span class="op">.</span><span class="fu">get</span>(<span class="vs">`session:</span><span class="sc">${</span>sessionId<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>raw) <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&quot;expired&quot;</span> }<span class="op">,</span> <span class="dv">401</span>)<span class="op">;</span></span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> session <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(raw) <span class="im">as</span> { userId<span class="op">:</span> <span class="dt">string</span> }<span class="op">;</span></span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>  c<span class="op">.</span><span class="fu">set</span>(<span class="st">&quot;userId&quot;</span><span class="op">,</span> session<span class="op">.</span><span class="at">userId</span>)<span class="op">;</span></span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> <span class="fu">next</span>()<span class="op">;</span></span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>auth<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;/me&quot;</span><span class="op">,</span> (c) <span class="kw">=&gt;</span> c<span class="op">.</span><span class="fu">json</span>({ userId<span class="op">:</span> c<span class="op">.</span><span class="fu">get</span>(<span class="st">&quot;userId&quot;</span>) }))<span class="op">;</span></span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>auth<span class="op">.</span><span class="fu">post</span>(<span class="st">&quot;/logout&quot;</span><span class="op">,</span> <span class="kw">async</span> (c) <span class="kw">=&gt;</span> {</span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sessionId <span class="op">=</span> <span class="fu">getCookie</span>(c<span class="op">,</span> <span class="st">&quot;session&quot;</span>)<span class="op">;</span></span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (sessionId) <span class="cf">await</span> c<span class="op">.</span><span class="at">env</span><span class="op">.</span><span class="at">SESSIONS</span><span class="op">.</span><span class="fu">delete</span>(<span class="vs">`session:</span><span class="sc">${</span>sessionId<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">deleteCookie</span>(c<span class="op">,</span> <span class="st">&quot;session&quot;</span>)<span class="op">;</span></span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> c<span class="op">.</span><span class="fu">json</span>({ ok<span class="op">:</span> <span class="kw">true</span> })<span class="op">;</span></span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> auth<span class="op">;</span></span></code></pre></div>
+<p>이게 Spring Security의 <code>HttpSessionRepository</code> + <code>SessionAuthenticationFilter</code>가 차지하던 자리다. KV는 이런 <em>eventually consistent + read-heavy + 짧은 TTL</em> 워크로드의 sweet spot이다. 60초 정도의 전파 지연이 세션에는 문제가 안 된다 — 사용자가 로그인하자마자 다른 PoP로 옮겨가서 세션이 보이지 않을 확률이 그렇게 높지 않고, 보였다 안 보였다 하는 건 1분 안에 수렴한다.</p>
+<p><em>다만</em> — 세션 같은 데이터가 <em>strong consistency</em>를 요구하는 시스템이라면 KV는 답이 아니다. 여기서 한 박자 멈추자. 다음 장 7장에서 KV의 <em>무너지는 자리</em>와 D1의 자리를 본격적으로 다룬다. 일단 6장의 KV 세션은 “워밍업”이라고 이해하자.</p>
+</section>
+<section id="코드-품질-도구-짧게-한-자리" class="level3">
+<h3>코드 품질 도구 — 짧게 한 자리</h3>
+<p>마무리 전에 코드 품질 한 단락. Workers + Hono 프로젝트에 권유할 만한 셋.</p>
+<ul>
+<li><strong><code>wrangler types</code></strong> — <code>worker-configuration.d.ts</code>를 자동 생성. <code>Env</code> 타입과 compat date 기반 runtime types가 들어와서 IDE 자동완성이 산다. <code>package.json</code>의 prebuild 스크립트에 <code>wrangler types</code>를 걸어두자.</li>
+<li><strong>Biome 또는 ESLint + Prettier</strong> — Biome이 더 빠르고 설정이 한 파일이지만, 팀에 이미 ESLint config가 있으면 굳이 갈아엎지 말자.</li>
+<li><strong>TypeScript strict 모드</strong> — <code>tsconfig.json</code>에 <code>"strict": true</code>. <code>c.env.DB</code>의 타입이 strict일 때 더 정확히 좁혀진다.</li>
+</ul>
+<p>모노레포 구조는 reference §4.7 그대로 권유한다.</p>
+<pre><code>apps/
+  api/             # Workers + Hono (이번 장의 결과물)
+  web/             # Next.js (9장에서 추가)
+  worker-jobs/     # Cron + Workflows (12장에서 추가)
+packages/
+  shared/          # 도메인 함수 (오늘의 함수형 DI 베이스)
+  db/              # Drizzle 스키마 (다음 장에서 추가)</code></pre>
+<p>각 앱마다 <code>wrangler.toml</code> 분리, 공통 binding은 같은 namespace 공유. <em>지금 6장 단계에서는 <code>apps/api</code> 한 개와 <code>packages/shared</code> 한 개로 시작</em>하면 충분하다. 다음 장에서 <code>packages/db</code>가 들어온다.</p>
+</section>
+<section id="이-기술이-무너지는-자리-1" class="level3">
+<h3>이 기술이 무너지는 자리</h3>
+<p>이 장의 마지막은 정직한 한계로 닫자. Hono + Workers가 빛나는 자리가 분명하지만, <em>무너지는 자리</em>도 정직하게 적어야 6장이 광고가 아닌 게 된다.</p>
+<ul>
+<li><strong>거대한 npm 생태계 대비 작은 미들웨어 풀.</strong> Spring Boot의 starter 생태계가 수천 개라면, Hono의 공식·인기 미들웨어는 수십 개 수준이다. JWT·CORS·logger·basic auth·timing·secure-headers 같은 기본은 다 있지만, <em>Spring Cloud Gateway 같은 깊이 있는 게이트웨이 미들웨어, Resilience4j 수준의 circuit breaker·bulkhead 라이브러리는 부재</em>하다. 이런 기능이 핵심이면 직접 짜거나 외부 SaaS(예: AI Gateway는 LLM 트래픽 한정)에 맡겨야 한다.</li>
+<li><strong>AOP 부재.</strong> Spring의 <code>@Cacheable</code>·<code>@Transactional</code>·<code>@Retry</code> 같은 메서드 단위 cross-cutting concern을 미들웨어 레이어로 풀어 놓으면 라우트 단위까지는 깔끔하지만, <em>서비스 함수 안의 한 메서드만 캐시</em>하고 싶을 때는 Hono로 표현이 안 된다. 함수 호출 자리에 명시적으로 <code>withCache(fn)</code> 같은 wrapper를 끼워야 한다. 처음엔 번거롭지만 한 달 지나면 <em>명시성이 살아 있는 코드</em>에 정이 든다.</li>
+<li><strong>DI 컨테이너의 안전망 부재.</strong> awilix·tsyringe로 풀 수 있지만 위에서 권유하지 않은 이유가 그대로. 의존성 그래프가 100개를 넘는 도메인은 컨테이너의 lifecycle·scope 관리 없이는 직접 짜기 어렵다. 그런 도메인은 <em>Workers 한 개에 넣지 말자.</em> 5장 결정 프레임을 다시 펼쳐 — 이 도메인은 Spring 모놀리스에 두는 게 맞을 가능성이 높다.</li>
+<li><strong>테스트의 상한.</strong> miniflare가 production V8 isolate를 그대로 재현하지만, Cloudflare Network 측 동작(예: 일부 Zone 기능, AI Gateway 일부 동작)은 시뮬레이션 안 된다. <code>wrangler dev --remote</code>로 production edge에 띄워 통합 테스트를 한 번 더 돌려야 하는 자리가 있다.</li>
+<li><strong>에러 추적의 공백.</strong> <code>app.onError</code>로 한 자리에 모을 수는 있지만, Spring Boot Actuator + Sentry + Micrometer가 한 묶음으로 주는 metric·trace·log 통합은 아직 부재하다. Sentry는 됐지만 metric·tracing은 외부 APM(Datadog·Baselime)을 직접 붙여야 한다. 13장에서 다시 다룬다.</li>
+</ul>
+<p>이 다섯 자리에서 무너진다는 사실을 손에 쥔 채로 6장의 도구들을 쓰자. 모든 워크로드를 Workers + Hono로 밀어넣지 말고, 5장 워크시트가 <em>Move now</em>로 표시한 자리부터 차분히 옮기자. <em>지금 잘 돌고 있는 Spring Boot를 부수러 가는 게 아니다.</em></p>
+</section>
+<section id="마무리-7장-kvd1로-가기-전에" class="level3">
+<h3>마무리 — 7장 KV·D1로 가기 전에</h3>
+<p>빈 화면 앞에 앉았던 한 시간 전을 떠올려 보자. <code>@RestController</code>도 없고 <code>@Component</code>도 없고 <code>application-prod.yml</code>도 없는데 어디서부터 시작해야 할지 막막했던 그 자리. 지금은 손에 다섯 도구가 있다. <code>fetch(req, env, ctx)</code>라는 본질, Hono의 라우팅·미들웨어 체인, Bindings + c.set/get + 함수형 DI 셋, <code>.dev.vars</code>·<code>wrangler secret put</code>·<code>[env.*]</code>의 시크릿·환경 분리, vitest + miniflare의 테스트.</p>
+<p>5장 워크시트로 결정한 <em>Move now</em> 항목 중 가장 risk-low한 한 개를 골라, 이 6장의 골격 위에 사흘쯤 깔아 보자. 사용자 검색 API든, 정적 자산 게이트웨이든, 인증 미들웨어든 좋다. 한 번 깔아 본 코드 위에 다음 장의 데이터 레이어가 얹힌다.</p>
+<p>7장 <em>데이터 1 — KV와 D1, 워크로드 패턴으로 골라 쓰기</em>에서는 오늘 잠깐 만난 KV를 <em>어디까지 믿어도 되는지</em>, eventually consistent의 60초 전파가 무엇을 허용하고 무엇을 금지하는지, 그리고 SQL이 필요한 자리에 D1 + Drizzle을 어떻게 끼워 넣는지를 본격적으로 다룬다. 6장이 <em>골격</em>이었다면 7장은 그 골격에 <em>데이터의 살을 붙이는 장</em>이다. 사용자 CRUD에 D1을 추가하고, 세션은 KV로 분리하고, <code>drizzle-kit migrate</code>로 스키마를 첫 번째로 돌려보자.</p>
+<p>자, 다음 장을 펴자.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>

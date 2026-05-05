@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="ko" xml:lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>ch012.xhtml</title>
+  <style>
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" type="text/css" href="../styles/stylesheet1.css" />
+</head>
+<body epub:type="bodymatter">
+<section id="장.-next.js-on-cloudflare-workers-static-assetsopennext의-현실" class="level2">
+<h2>9장. Next.js on Cloudflare — Workers Static Assets·OpenNext의 현실</h2>
+<p>AWS Amplify Hosting에 올려둔 Next.js 상점 프론트가 한 개 있다고 해보자. 토큰 한 줄 바꾸면 자동 배포되고, Lambda@Edge도 알아서 깔리고, 큰 사고 없이 1년쯤 잘 굴러갔다. 그런데 어느 날 사용자가 도쿄·서울·LA·암스테르담에 흩어져 있다는 사실이 문제로 떠오른다. 미주 사용자에게서 “장바구니 페이지가 답답하다”는 컴플레인이 들어온다. CloudFront 캐시 hit률은 나쁘지 않은데, SSR 페이지 한 번에 800ms를 넘는 일이 잦다. 한국 리전에 박힌 Lambda@Edge가 미국에서 콜드스타트할 때마다 사용자가 1초씩 기다린다. 옮겨야 할까? 어디로 옮겨야 할까?</p>
+<p>7장에서 D1과 KV를 손에 쥐고, 8장에서 Durable Objects와 R2까지 들고 왔다. 백엔드 깊이로 두 챕터를 내달렸으니 이번 장은 호흡을 한 번 환기하자. 프론트 이야기다. Next.js 앱을 Cloudflare 위에 어떻게 올릴 것인가. 답이 한 줄로 정리되지 않는다는 사실부터 짚어둬야 한다 — 2025년 4월 이후로 Cloudflare의 프론트 호스팅은 <em>움직이고 있는 풍경</em>이기 때문이다.</p>
+<p>이 장에서 손에 쥐고 가야 할 것은 세 가지다. 첫째, Pages가 Workers Static Assets로 흡수된 흐름을 이해한다. 둘째, <code>@opennextjs/cloudflare</code> 어댑터로 Next.js 14/15 앱을 어떻게 올리는지 단계별로 따라간다. 셋째, <em>어떤 Next.js 앱은 옮겨도 되고 어떤 앱은 미루는 게 옳은지</em> 의사결정선을 그린다. 5장에서 만든 결정 프레임을 프론트에 한 번 더 적용하는 셈이다.</p>
+<p>자, Pages 이야기부터 살펴보자.</p>
+<section id="pages가-사라진-자리에-workers-static-assets가-들어왔다" class="level3">
+<h3>Pages가 사라진 자리에 Workers Static Assets가 들어왔다</h3>
+<p>3년 전쯤 Cloudflare 프론트 호스팅을 처음 만난 사람이라면 Pages를 기억할 것이다. GitHub 리포만 연결하면 자동 빌드·자동 배포·Preview deploy까지 한 번에 되던 그 제품이다. Vercel·Netlify와 거의 같은 DX, 게다가 무료 트래픽 무제한이라는 매력. 한국 커뮤니티에서도 한동안 “Vercel 비싸면 Pages 써봐라”는 말이 자연스럽게 돌았다.</p>
+<p>그런데 2025년 4월부터 분위기가 바뀐다. Cloudflare가 새 프론트 기능들을 Pages에 더 얹지 않고 <em>Workers Static Assets</em>라는 새 모델로 옮기기 시작한 것이다. 공식 문서의 톤도 달라진다. “Pages는 maintenance 모드, 신규 프로젝트는 Workers Static Assets로 시작하시오.” 한국말로 옮기면 “Pages는 그대로 두지만 더 손은 안 댄다” 정도의 뜻이다.</p>
+<p>이 흐름이 처음 들으면 살짝 찜찜하다. 프론트 호스팅을 두 번 갈아엎는 건가? 기존 Pages 사용자는 어떻게 되는 건가? 정직하게 말하면 — 기존 Pages는 당분간 멀쩡히 돈다. Cloudflare가 갑자기 끄지는 않는다. 하지만 새 프로젝트를 시작한다면 Pages를 고를 이유가 거의 없다. 두 가지 풍경이 동시에 지나가고 있다고 보면 된다.</p>
+<p>그렇다면 Workers Static Assets가 무엇인지 한 줄로 정리하자. <strong>Worker 코드 하나에 정적 자원(HTML·CSS·JS·이미지)을 묶어 한 배포 단위로 만드는 모델</strong>이다. 정적 SPA·SSG라면 정적 자원만 있고, SSR이 필요하다면 Worker가 그걸 담당한다. 같은 <code>wrangler deploy</code>로 두 가지가 한 번에 올라간다. 정적과 동적이 한 배포 단위 안에 들어와 있는 모양이다.</p>
+<p>3가지 옵션을 한 표로 비교하면 이렇다.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>방식</th>
+<th>권장도</th>
+<th>한 줄 메모</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cloudflare Pages</strong></td>
+<td>△ (legacy)</td>
+<td>2025년 4월 이후 maintenance. 기존 사용자는 그대로 두되, 새 프로젝트에는 권장 안 함.</td>
+</tr>
+<tr>
+<td><strong>Workers Static Assets</strong></td>
+<td>◎</td>
+<td>정적 SPA·SSG에 가장 자연스러운 자리. Worker SSR과 한 배포 단위.</td>
+</tr>
+<tr>
+<td><strong><code>@opennextjs/cloudflare</code></strong></td>
+<td>◎ (Next.js 풀 기능)</td>
+<td>1.0-beta 시점에 Next 14/15 대부분이 동작. Edge Runtime은 미지원.</td>
+</tr>
+<tr>
+<td><strong>Vercel</strong></td>
+<td>(외부 옵션)</td>
+<td>DX·기능 풀커버. 비용·벤더 종속이 단점.</td>
+</tr>
+</tbody>
+</table>
+<p>이 표를 보면서 처음 드는 물음은 이거다 — <em>내 Next.js 앱은 어디에 올려야 하나?</em> 답은 두 갈래다. 정적 사이트라면 Workers Static Assets만으로 충분하다. SSR·ISR·서버 컴포넌트가 들어간 풀 Next.js라면 그 위에 한 겹 더 — <code>@opennextjs/cloudflare</code> 어댑터가 필요하다. 이 어댑터 이야기는 잠시 뒤에 본격적으로 보자.</p>
+</section>
+<section id="opennext가-1.0-beta라는-한-줄에서-멈칫한다면" class="level3">
+<h3>OpenNext가 1.0-beta라는 한 줄에서 멈칫한다면</h3>
+<p>OpenNext라는 이름을 처음 들으면 무엇인지 짐작이 안 간다. “Next의 오픈?” 정도. 사실 이름 그대로다 — Vercel이 아닌 곳에서 Next.js를 돌리기 위한 <em>오픈 소스 어댑터</em>다. AWS Lambda용 OpenNext, Netlify용 OpenNext, 그리고 우리에게 중요한 <em>Cloudflare용</em> <code>@opennextjs/cloudflare</code>가 있다.</p>
+<p>Cloudflare 공식 블로그가 2024년에 “Next.js를 Workers에 그대로 올리는 길이 열렸다”고 발표한 그날부터, OpenNext가 사실상 표준이 됐다. 2026년 5월 시점에서 <code>@opennextjs/cloudflare</code>는 1.0-beta 단계에 있다. <em>1.0-beta</em>라는 말을 듣는 순간 살짝 찜찜하다. production에 올려도 되는 건가? 정직한 답은 — <em>대부분의 Next 14/15 앱은 동작한다, 다만 몇 가지 자리에서 발이 걸린다</em>. 곧 그 발이 걸리는 자리들을 짚는다.</p>
+<p>OpenNext for Cloudflare의 본질을 한 줄로 정리하면 이렇다. <strong>Next.js 빌드 결과물(<code>.next/</code> 폴더)을 Workers가 이해할 수 있는 형태로 바꿔주는 어댑터</strong>다. Vercel이 자체적으로 하는 일을 OpenNext가 오픈 소스로 풀어 놓은 셈이다. 빌드 시점에 Next의 서버 코드를 Worker용 번들로 변환하고, 정적 자원을 Workers Static Assets로 분리하고, ISR 캐시 어디에 둘지를 R2·KV로 매핑한다.</p>
+<p>좋아진 점도 있다. Workers runtime에 crypto·dns·timers·tls·net 같은 핵심 Node 모듈이 native로 들어왔다. 예전엔 polyfill로 비비 꼬아야 했던 자리들이 지금은 Node처럼 그냥 돈다. <code>next start</code>로 띄우던 앱을 Workers에 올렸을 때 깨지는 면적이 1년 전보다 한 자릿수 줄었다.</p>
+<p>그렇다면 한계는 뭔가. 다음 자리에서 발이 걸린다.</p>
+<ul>
+<li><strong>Edge Runtime 미지원</strong> — Vercel에서 <code>export const runtime = 'edge'</code>로 표시한 라우트가 있다면, OpenNext on Cloudflare에서는 그게 자동으로 Edge runtime으로 안 돈다. Node runtime으로만 돈다. 이름이 헷갈리는데, <em>Cloudflare Workers 자체는 V8 isolate인데 OpenNext의 라우트 분류상 “Node runtime”으로 잡힌다</em>는 의미다. 결과적으로 Edge runtime 가정의 코드(Web API만 사용, Node API 금지)가 그대로 들어가지 않는 경우가 있다. Vercel용 코드를 그대로 옮기면 일부 라우트가 깨진다.</li>
+<li><strong>스크립트 크기 한도</strong> — Workers Free 3MiB / Paid 10MiB. Sharp나 Prisma engine처럼 큰 의존성을 그대로 번들에 넣으면 한도에 걸린다. 이미지 최적화는 Cloudflare Images로 분리하고, Prisma를 쓰던 자리는 Drizzle이나 Kysely로 바꾸는 편이 낫다 (10장 Hyperdrive와 자연스럽게 연결되는 결정).</li>
+<li><strong>Windows 미완전 지원</strong> — 빌드가 Windows에서 완전히 안 도는 자리가 있다. 팀에 Windows 사용자가 있다면 WSL2 또는 컨테이너 빌드를 권한다. (Mac·Linux는 문제 없다.)</li>
+<li><strong><code>use cache</code> (composable caching)</strong> — Next.js 15의 새 캐싱 디렉티브는 다음 메이저 릴리즈에 들어온다는 게 OpenNext 로드맵이다. 책 집필 시점에는 <em>예정</em> 단계.</li>
+<li><strong>ISR 일부 시나리오</strong> — <code>revalidate</code>로 다시 빌드하는 ISR은 동작하지만, 글로벌 분산된 Workers PoP 사이의 ISR 캐시 전파에는 한 박자 시간차가 있다. 1초 안에 모든 PoP가 같은 페이지를 보여주리라 기대하면 어긋난다.</li>
+</ul>
+<p>이 다섯 가지 한계가 OpenNext가 “1.0-beta”인 이유다. 광고 없이 정직하게 말하면 — <em>production-ready</em>에 한 발 걸쳐 있는 상태. 무난한 e-commerce 프론트, 블로그, 대시보드, SaaS landing이라면 충분히 올릴 만하다. Edge runtime 가정이 깊게 박힌 앱이거나 Sharp 직접 호출이 필요한 미디어 앱이라면 잠시 미루는 편이 낫다.</p>
+</section>
+<section id="따라해보자-next.js-14-상점-프론트를-올리기까지" class="level3">
+<h3>따라해보자 — Next.js 14 상점 프론트를 올리기까지</h3>
+<p>말로만 풀면 멀리 있는 이야기처럼 들린다. <code>toby-shop</code>의 상점 프론트(Next.js 14)를 손가락으로 한 번 올려보자. 6장에서 만든 사용자 API와 7장에서 D1으로 옮긴 프로필 API가 이미 살아 있다고 가정하자. 이번 장의 목표는 그 위에 <em>Worker 한 개</em>를 더 띄우는 것이다 — Next.js 풀 기능이 도는 SSR Worker.</p>
+<section id="단계-프로젝트-만들기" class="level4">
+<h4>0단계 — 프로젝트 만들기</h4>
+<p>새 Next.js 앱을 만든다. 평범하다.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> create next-app@latest toby-shop-web</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># TypeScript: Yes</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># App Router: Yes</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Tailwind: 취향대로</span></span></code></pre></div>
+<p>여기까지는 Vercel과 똑같다. 이제 Cloudflare용 어댑터를 붙이자.</p>
+</section>
+<section id="단계-opennextjscloudflare-추가" class="level4">
+<h4>1단계 — <code>@opennextjs/cloudflare</code> 추가</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> toby-shop-web</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> add <span class="at">-D</span> @opennextjs/cloudflare wrangler</span></code></pre></div>
+<p>그리고 프로젝트 루트에 <code>open-next.config.ts</code>를 만든다. 사실 default config면 충분하다.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">// open-next.config.ts</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> { defineCloudflareConfig } <span class="im">from</span> <span class="st">&quot;@opennextjs/cloudflare&quot;</span><span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="im">default</span> <span class="fu">defineCloudflareConfig</span>({</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ISR 캐시를 어디에 둘지: R2 또는 KV.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// 지금은 default (작은 프로젝트면 KV, 큰 프로젝트면 R2 권장)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  incrementalCache<span class="op">:</span> <span class="st">&quot;kv&quot;</span><span class="op">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p><code>incrementalCache</code>가 처음 보는 옵션일 것이다. Next.js의 ISR은 빌드된 페이지를 어딘가에 캐시해 두고 일정 시간 뒤에 다시 빌드하는 모델이다. Vercel에서는 그 캐시가 Vercel KV에 들어가는데, OpenNext on Cloudflare에서는 <em>KV</em>냐 <em>R2</em>냐 우리가 정해야 한다. 작은 사이트라면 KV로도 충분하고, 캐시 페이지가 큰 e-commerce·미디어라면 R2가 비용 측면에서 낫다.</p>
+</section>
+<section id="단계-wrangler.toml로-묶기" class="level4">
+<h4>2단계 — <code>wrangler.toml</code>로 묶기</h4>
+<p>다음으로 <code>wrangler.toml</code>을 한 장 둔다. 이게 Workers Static Assets의 핵심 설정 파일이다.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wrangler.toml</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">&quot;toby-shop-web&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">main</span> <span class="op">=</span> <span class="st">&quot;.open-next/worker.js&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dt">compatibility_date</span> <span class="op">=</span> <span class="st">&quot;2026-04-01&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dt">compatibility_flags</span> <span class="op">=</span> <span class="op">[</span><span class="st">&quot;nodejs_compat&quot;</span><span class="op">]</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">[assets]</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dt">directory</span> <span class="op">=</span> <span class="st">&quot;.open-next/assets&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;ASSETS&quot;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="kw">[[kv_namespaces]]</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="dt">binding</span> <span class="op">=</span> <span class="st">&quot;NEXT_INC_CACHE_KV&quot;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="dt">id</span> <span class="op">=</span> <span class="st">&quot;your-kv-namespace-id&quot;</span></span></code></pre></div>
+<p>한 줄씩 풀어 보자.</p>
+<p><code>main = ".open-next/worker.js"</code> — 빌드 결과물의 진입점. <code>pnpm opennextjs-cloudflare build</code>를 한 번 돌리면 <code>.open-next/</code> 폴더가 생기고 그 안에 worker.js가 떨어진다. 이 한 파일이 Next.js의 모든 SSR 엔트리를 흡수한 결과물이다.</p>
+<p><code>compatibility_flags = ["nodejs_compat"]</code> — Workers runtime에서 Node 호환 API를 켜는 플래그. OpenNext가 만들어내는 코드는 일부 Node API에 의존하므로 이 플래그가 필수다. (예전에는 polyfill 패키지를 더해야 했는데 지금은 native 호환이 들어와 깔끔해졌다.)</p>
+<p><code>[assets] directory = ".open-next/assets"</code> — 정적 자원이 들어 있는 디렉터리. Workers Static Assets가 이 폴더 안의 모든 파일을 CDN처럼 서빙한다. CSS·JS·이미지·<code>/_next/static/...</code> 모두 여기에 들어간다.</p>
+<p><code>[[kv_namespaces]]</code> — ISR 캐시용 KV 바인딩. 이름이 <code>NEXT_INC_CACHE_KV</code>로 정해져 있다는 점에 주의하자. OpenNext가 이 이름을 기대한다. KV namespace는 미리 만들어 둬야 한다 — <code>wrangler kv namespace create NEXT_INC_CACHE_KV</code>로 한 번에 만들 수 있고, 출력으로 나오는 ID를 위 <code>id</code> 자리에 넣는다.</p>
+</section>
+<section id="단계-빌드와-로컬-미리보기" class="level4">
+<h4>3단계 — 빌드와 로컬 미리보기</h4>
+<p>이제 빌드한다.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> opennextjs-cloudflare build</span></code></pre></div>
+<p>이 한 줄이 무엇을 하는가. <code>next build</code>를 먼저 돌리고, 그 결과물을 OpenNext가 Workers용 번들로 다시 변환한다. 처음 돌리면 30초~1분쯤 걸린다. <code>.open-next/</code>라는 폴더가 새로 생긴다.</p>
+<p>로컬에서 한 번 미리 보자.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> wrangler dev</span></code></pre></div>
+<p><code>localhost:8787</code> 정도에 사이트가 뜬다. <code>wrangler dev</code>는 production runtime을 그대로 재현하므로 (workerd 위에서 도므로) 로컬에서 잘 돌면 production에서도 거의 그대로 돈다고 봐도 좋다. 4장에서 살펴봤던 <em>workerd local mode</em>의 신뢰가 여기서 빛난다.</p>
+</section>
+<section id="단계-배포" class="level4">
+<h4>4단계 — 배포</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pnpm</span> opennextjs-cloudflare deploy</span></code></pre></div>
+<p>또는 <code>wrangler deploy</code>. 1~2분 안에 <code>toby-shop-web.&lt;sub&gt;.workers.dev</code> 도메인에 사이트가 올라온다. 7장에서 만든 사용자 API가 같은 계정에 있으면 같은 KV·D1 namespace를 공유할 수도 있다. 모노레포라면 더 자연스럽다 — <code>apps/web</code>이 <code>wrangler.toml</code> 한 장을 가지고, <code>apps/api</code>도 자기 <code>wrangler.toml</code>을 가지고, 둘이 같은 D1을 본다. 4장에서 권장했던 모노레포 구조가 이 자리에서 자연스럽게 동작한다.</p>
+<p>여기까지 따라왔다면 Next.js 14 앱 한 개가 Cloudflare 글로벌 PoP에 깔린 셈이다. 한국에서 접속하면 도쿄 PoP, LA에서 접속하면 LA PoP. SSR이 가까운 PoP에서 돌고, 정적 자원은 같은 PoP의 Workers Static Assets에서 나간다.</p>
+</section>
+<section id="단계-preview-deploy-구성하기" class="level4">
+<h4>5단계 — Preview deploy 구성하기</h4>
+<p>여기서 Vercel 사용자라면 한 가지가 빠진 것을 눈치챈다 — <em>PR마다 자동으로 뜨는 preview URL.</em> Vercel에서는 GitHub PR을 열면 30초 만에 preview 환경이 깔리는 그 마법이 OpenNext on Cloudflare에서는 직접 구성해야 한다. 처음 보면 살짝 번거롭지만 GitHub Actions 한 장으로 풀린다.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .github/workflows/preview.yml</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Preview Deploy</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span><span class="at"> pull_request</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">preview</span><span class="kw">:</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> pnpm/action-setup@v3</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/setup-node@v4</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">node-version</span><span class="kw">:</span><span class="at"> </span><span class="dv">22</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pnpm install --frozen-lockfile</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">run</span><span class="kw">:</span><span class="at"> pnpm opennextjs-cloudflare build</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy preview</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>          pnpm wrangler deploy \</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            --name toby-shop-web-pr-${{ github.event.number }} \</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>            --compatibility-date 2026-04-01</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">CLOUDFLARE_API_TOKEN</span><span class="kw">:</span><span class="at"> ${{ secrets.CF_API_TOKEN }}</span></span></code></pre></div>
+<p>PR이 열릴 때마다 <code>toby-shop-web-pr-123.&lt;sub&gt;.workers.dev</code> 같은 URL이 뜬다. 매끄럽지는 않지만 동작은 한다. <code>wrangler</code> versions API를 쓰면 더 정교한 staging deploy도 가능한데, 여기까지 들어가면 호흡 환기가 아니라 본격 DevOps 챕터가 되니 부록 A의 wrangler 치트시트로 미루자.</p>
+<p>기억해두자 — <em>OpenNext의 매끈하지 않은 자리는 거의 다 직접 구성으로 풀린다.</em> Vercel만큼 즉각적이지 않지만, 한 번 GitHub Actions를 잘 짜두면 그 다음부터는 자동이다.</p>
+</section>
+</section>
+<section id="라우트별-runtime-선택-무엇을-어디서-돌릴까" class="level3">
+<h3>라우트별 runtime 선택 — 무엇을 어디서 돌릴까</h3>
+<p>Next.js 14/15에는 라우트마다 runtime을 지정하는 두 줄이 있다. App Router 기준으로 라우트 파일 상단에 다음을 적는다.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode ts"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// app/api/health/route.ts</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">export</span> <span class="kw">const</span> runtime <span class="op">=</span> <span class="st">&quot;nodejs&quot;</span><span class="op">;</span> <span class="co">// 또는 &quot;edge&quot;</span></span></code></pre></div>
+<p>Vercel에서는 이 한 줄이 굵직한 결정이다 — <code>edge</code>로 하면 Vercel Edge runtime에서, <code>nodejs</code>로 하면 AWS Lambda Node runtime에서 돈다. OpenNext on Cloudflare에서는 어떻게 동작할까. 정직하게 말하면 — <em>현 시점(2026년 5월)에서는 Edge runtime export가 미지원</em>이라 모두 Workers의 Node-호환 모드(<code>nodejs_compat</code>)에서 돈다. <code>edge</code>로 표시한 라우트가 있어도 Node 모드로 돈다.</p>
+<p>이게 좋은 면도 있고 헷갈리는 면도 있다. 좋은 면은 — Vercel용 Edge runtime으로 못 옮겼던 라우트들이 <em>그냥 다 잘 돈다</em>. Edge에서는 못 쓰던 Node API들이 들어가 있어도 Workers의 <code>nodejs_compat</code>이 받아준다. 헷갈리는 면은 — <code>runtime = "edge"</code>라는 표시 자체가 OpenNext on Cloudflare에서는 <em>의미가 없다</em>는 점이다. 코드에 그렇게 적혀 있어도 실제 실행 환경은 Workers V8 isolate 위의 Node-호환 모드다. 이 차이를 모르고 “Edge runtime이니까 빠르겠지”라고 가정하면 어긋난다.</p>
+<p>그래서 권하는 모양은 단순하다. <em>runtime 표시를 안 적거나 <code>nodejs</code>로 통일한다.</em> OpenNext 가이드의 default가 그렇다. 라우트별 차이는 따로 두지 말고, 무거운 의존성이 들어가는 라우트만 별도 Worker로 분리하는 식으로 가는 편이 낫다.</p>
+<p>여기서 한 단계 더 들어가면, ISR과 SSR의 선택 기준이 헷갈릴 수 있다. 한 표로 정리하자.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>페이지 종류</th>
+<th>권장 모양</th>
+<th>Cloudflare 위에서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정적 콘텐츠 (랜딩·about)</td>
+<td>SSG</td>
+<td>빌드 시점에 HTML 생성, Workers Static Assets에서 그대로 서빙</td>
+</tr>
+<tr>
+<td>자주 바뀌는 콘텐츠 (블로그·뉴스)</td>
+<td>ISR</td>
+<td>revalidate 주기 설정. 캐시는 KV 또는 R2 (<code>incrementalCache</code> 옵션)</td>
+</tr>
+<tr>
+<td>사용자별 콘텐츠 (대시보드·장바구니)</td>
+<td>SSR</td>
+<td>매 요청마다 Worker가 SSR. 빠른 PoP에서 돌아 Vercel 대비 콜드스타트 이점</td>
+</tr>
+<tr>
+<td>검색·필터 (DB 쿼리 무거움)</td>
+<td>SSR + Hyperdrive</td>
+<td>DB는 그대로 두고 Hyperdrive로 가속 (10장에서 본격)</td>
+</tr>
+<tr>
+<td>이미지 처리</td>
+<td>Cloudflare Images</td>
+<td>next/image 대신 분리 (다음 절)</td>
+</tr>
+</tbody>
+</table>
+<p>이 표가 본문 14장 마이그레이션 시퀀스의 프론트 부분 베이스다. 5장에서 그렸던 결정 워크시트의 “정적 콘텐츠”·“사용자 facing CRUD” 칸이 이 자리에서 구체적으로 풀린다.</p>
+<p>ISR 동작을 한 번 손가락으로 그려 보자. <code>app/products/[id]/page.tsx</code>에 <code>export const revalidate = 60</code>이라고 적었다고 해보자. 무엇이 일어나는가?</p>
+<ol type="1">
+<li>첫 사용자(서울)가 <code>/products/123</code>을 부른다 — Worker가 SSR로 페이지를 만들고, 결과를 KV(<code>NEXT_INC_CACHE_KV</code>)에 저장한 뒤 사용자에게 응답한다.</li>
+<li>60초 안에 두 번째 사용자(서울)가 같은 페이지를 부른다 — Worker가 KV에서 캐시된 페이지를 꺼내 즉시 응답한다. SSR 안 돈다.</li>
+<li>60초가 지난 뒤 세 번째 사용자가 부른다 — Worker가 stale 페이지를 일단 응답하고, 백그라운드로 새 페이지를 빌드해 KV에 갱신한다 (stale-while-revalidate 모델).</li>
+<li>그런데 LA 사용자가 같은 시점에 <code>/products/123</code>을 부르면? KV는 글로벌 분산이라 <em>대체로</em> 같은 캐시를 보지만, 60초 정도 전파 시간차가 있을 수 있다. <em>이 시간차가 위에서 짚었던 한계 한 줄이다.</em></li>
+</ol>
+<p>이 모양이 머리에 들어오면 ISR을 어디에 쓸지 감이 잡힌다. 1초 단위 신선도가 중요한 페이지(주식 시세·실시간 재고)는 ISR로 풀지 말자. 1분~1시간 단위 신선도면 충분한 페이지(상품 상세·블로그 글·카탈로그)에 ISR이 빛난다. <em>Cloudflare의 ISR은 “거의 정적인 페이지를 거의 즉시 응답하는” 자리에서 가장 잘 어울린다.</em></p>
+</section>
+<section id="이미지-최적화-nextimage-vs-cloudflare-images" class="level3">
+<h3>이미지 최적화 — <code>next/image</code> vs Cloudflare Images</h3>
+<p>Next.js의 <code>next/image</code>는 Vercel 위에서 한 줄로 끝나는 마법이다. 컴포넌트만 쓰면 알아서 리사이즈·WebP 변환·lazy loading이 다 된다. Cloudflare 위에서는 어떻게 다룰까.</p>
+<p>선택지가 두 개다.</p>
+<p><strong>선택지 1. <code>next/image</code> 그대로 쓰기.</strong> OpenNext가 Workers 위에서 Next.js의 이미지 최적화 엔드포인트를 돌리도록 어댑터해 둔다. 다만 큰 함정이 있다 — <code>next/image</code>의 내부는 Sharp 라이브러리를 쓴다. Sharp는 native binary 의존성이 깊어서 Workers 스크립트 크기 한도(Free 3MiB / Paid 10MiB)를 곧잘 넘긴다. 작은 사이트라면 안 걸리지만, 이미지 종류가 많은 e-commerce에서는 빌드 단계에서 한도 초과로 거부되는 일이 잦다. 정직하게 말하면 — <em>2026년 5월 시점에서는 권하지 않는다.</em></p>
+<p><strong>선택지 2. Cloudflare Images로 분리하기.</strong> 이쪽이 권장 패턴이다. Cloudflare Images는 별도 제품으로, 5,000 transforms/월 무료, 이후 $0.50/1,000의 가격이다. 이미지 자체는 R2 버킷이나 외부 origin(예: 기존 S3)에 두고, 변환만 Cloudflare Images에 맡긴다. 코드는 이렇게 된다.</p>
+<pre class="tsx"><code>// app/products/[id]/page.tsx
+import Image from &quot;next/image&quot;;
+
+const cfLoader = ({ src, width, quality }: any) =&gt; {
+  const params = `width=${width},quality=${quality || 75},format=auto`;
+  return `https://imagedelivery.net/your-account-hash/${src}/${params}`;
+};
+
+export default function Product({ params }: any) {
+  return (
+    &lt;Image
+      loader={cfLoader}
+      src=&quot;product-123-hero&quot;
+      width={1200}
+      height={800}
+      alt=&quot;Hero&quot;
+    /&gt;
+  );
+}</code></pre>
+<p><code>next/image</code>의 컴포넌트 인터페이스는 그대로 살리되, <code>loader</code>만 Cloudflare Images로 바꾸는 모양이다. Next의 React 컴포넌트 DX를 잃지 않으면서 이미지 처리를 Workers 번들 바깥으로 빼낸 셈이다. 스크립트 크기 한도에 걸릴 일이 없고, transform 비용도 Vercel Image Optimization 대비 큰 폭 저렴하다.</p>
+<p>기억해두자 — Next.js를 Cloudflare에 올린다면 이미지는 처음부터 Cloudflare Images로 분리하는 편이 낫다. 시작할 때 이 결정을 미뤘다가 나중에 바꾸면, 이미 깔린 이미지의 URL 패턴을 다 갈아엎어야 한다. 끔찍한 일이다.</p>
+<p>한 가지 더. 이미지 자체를 어디에 둘지도 함께 정하자. 세 가지 패턴이 있다.</p>
+<ul>
+<li><strong>Cloudflare Images에 직접 업로드</strong> — 가장 단순. 5,000장까지 무료 storage 포함. 작은 사이트.</li>
+<li><strong>R2에 두고 Cloudflare Images로 변환</strong> — storage는 R2(egress free), transform만 Cloudflare Images. 이미지 종류가 많은 e-commerce에 가장 합리적인 모양.</li>
+<li><strong>기존 S3에 두고 Cloudflare Images로 변환</strong> — 이미지가 이미 S3에 있다면 그대로 두고 transform 레이어만 Cloudflare로. 마이그레이션 비용을 한 자릿수 가볍게 만든다. 하이브리드 패턴의 자연스러운 자리.</li>
+</ul>
+<p>세 번째 패턴이 이 책 전체의 권장 모양과 가장 잘 맞는다. <em>S3는 그대로, 컴퓨트 한 겹만 Cloudflare로.</em> 10장에서 RDS를 두고 Hyperdrive로 가속하는 그림과 같은 멘탈이다.</p>
+</section>
+<section id="aws-amplifyvercel과의-비용dx-비교" class="level3">
+<h3>AWS Amplify·Vercel과의 비용·DX 비교</h3>
+<p>매핑 표만으로는 결정이 안 선다. 비용과 DX를 함께 봐야 한다. 한 표로 정리하자.</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>기준</th>
+<th>AWS Amplify Hosting</th>
+<th>Vercel</th>
+<th>Cloudflare (Workers Static Assets + OpenNext)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DX (배포·롤백)</strong></td>
+<td>GitHub 연결, preview deploy, 매끈한 편</td>
+<td><em>최강</em>. preview·rollback·analytics 한 화면</td>
+<td>wrangler 기반, GitHub Actions 연동. preview는 직접 구성</td>
+</tr>
+<tr>
+<td><strong>글로벌 지연</strong></td>
+<td>CloudFront + Lambda@Edge. 일부 PoP에서 콜드스타트 큼</td>
+<td>Edge Network 글로벌, 콜드스타트 작음</td>
+<td>Workers 글로벌 PoP, 콜드스타트 &lt; 5ms</td>
+</tr>
+<tr>
+<td><strong>비용 (트래픽)</strong></td>
+<td>egress 청구가 주범</td>
+<td>무료 tier 후 빠르게 가파름. team plan부터 의무</td>
+<td>egress free, Workers 요청 단가 저렴</td>
+</tr>
+<tr>
+<td><strong>이미지 최적화</strong></td>
+<td>별도 구성 (CloudFront + Lambda)</td>
+<td>Vercel Image Optimization 비싼 편</td>
+<td>Cloudflare Images 저렴</td>
+</tr>
+<tr>
+<td><strong>Edge runtime 호환성</strong></td>
+<td>부분 지원 (Lambda@Edge)</td>
+<td>100% 지원 (네이티브)</td>
+<td>미지원 (Node mode로만)</td>
+</tr>
+<tr>
+<td><strong>벤더 종속</strong></td>
+<td>AWS 전반에 깊이 통합</td>
+<td>Vercel 고유 API 다수</td>
+<td>Workers 고유 binding API 일부</td>
+</tr>
+<tr>
+<td><strong>2025 outage 영향</strong></td>
+<td>AWS region outage 시 영향</td>
+<td>Vercel infra outage 영향</td>
+<td>Cloudflare outage 시 영향 (13장에서 다룸)</td>
+</tr>
+</tbody>
+</table>
+<p>이 표만 보면 Cloudflare가 압도적으로 보일 수 있는데, 정직하게 균형을 잡자. <strong>Vercel의 DX는 여전히 강하다.</strong> Cloudflare 어댑터로 옮기면 preview deploy를 직접 구성해야 하고, 빌드 로그·배포 history UI도 Vercel만큼 매끈하지 않다. 작은 팀에서 <em>DX의 시간 절약</em>이 비용보다 중요하다면 Vercel이 합리적인 선택이다. 한국 Next.js 개발자 사이에서 잘 알려진 velopert(veltrends) 사례가 그 한 모양이다 — 처음 Cloudflare Pages에 올렸다가 SSR·Node 호환성 문제로 Vercel로 회귀했다. 그 결정이 틀렸다고 말하기 어렵다. 1인 개발자 + 빠른 출시 + DX 우선이라는 입력에서 Vercel은 합리적이다.</p>
+<p>반대로 Baselime 사례처럼 <em>글로벌 분포 + spike-y 트래픽 + 비용 민감</em>한 입력이라면 Cloudflare로 옮기는 동기가 매우 분명해진다. 5장의 5축 결정 트리가 프론트에서도 그대로 작동한다 — 요청 패턴·일관성·글로벌성·런타임 의존·컴플라이언스. 다섯 축이 다 초록불인 Next.js 앱이라면 OpenNext on Cloudflare가 잘 어울리고, 한 축이라도 빨간불이면 Vercel을 유지하는 편이 낫다.</p>
+<p>기억해두자 — <em>Vercel을 떠나는 것이 목표가 아니다.</em> 5장에서 강조했던 그 한 줄이 9장에서도 유효하다. 자기 앱에 올바른 자리를 내주는 것이 목표다.</p>
+</section>
+<section id="vinext-곧-등장할-또-하나라는-풍경" class="level3">
+<h3>Vinext — “곧 등장할 또 하나”라는 풍경</h3>
+<p>OpenNext가 사실상 표준이 된 자리에서, Cloudflare가 직접 만드는 또 하나의 라인이 보이기 시작했다. <em>Vinext</em>다. 이름은 Vite + Next의 합성어 같고, 실제로도 Vite 플러그인 형태로 Next.js 호환을 제공하는 어댑터다. GitHub의 <code>cloudflare/vinext</code> 리포에서 진행 상황을 추적할 수 있다.</p>
+<p>이 풍경은 정직하게 <em>불확실성</em>을 안고 있다. 책 집필 시점(2026년 5월)에서는 실험적 라인이고, OpenNext와 별개로 굴러간다. <em>책 집필 시점에 사실 확인 필요</em>라는 면책을 한 줄 박아둔다 — 이 책이 출간되고 1년 뒤에 Vinext가 OpenNext를 대체할지, 아니면 두 라인이 공존할지, 아니면 조용히 사라질지 지금은 알 수 없다.</p>
+<p>그렇다면 우리가 어떻게 해야 할까. 두 가지 권장사항이다.</p>
+<p>첫째, <strong>새 프로젝트는 OpenNext로 시작한다.</strong> 1.0-beta라는 라벨이 붙어 있어도 사실상 표준이고 사례도 많다. 안전하다.</p>
+<p>둘째, <strong>Vinext의 진행 상황은 분기마다 한 번 살핀다.</strong> Cloudflare 공식 블로그·OpenNext 뉴스·GitHub 리포 README. 이 셋이 Vinext의 위상이 바뀔 때 가장 먼저 신호를 준다. 만약 Cloudflare가 Vinext를 1순위로 밀기 시작하고 OpenNext 어댑터의 유지보수가 줄어드는 신호가 보이면, 그때 옮길 결정을 한다.</p>
+<p>이 풍경 자체가 Cloudflare 생태계의 변동성을 보여준다. 부록 E에서 “책 이후 추적 가이드”를 별도로 둔 이유다 — Cloudflare는 분기마다 풍경이 바뀐다. Vinext만이 아니다. Workers Containers GPU·Vectorize hybrid search·Dynamic Workers 같은 영역도 마찬가지다. 한 번 책에 박아둔 가이드를 1년이 지나도 그대로 믿으면 위험하다. <em>분기마다 한 번씩 공식 페이지를 다시 보자.</em></p>
+</section>
+<section id="어떤-next.js-앱은-옮기지-말자" class="level3">
+<h3>어떤 Next.js 앱은 옮기지 말자</h3>
+<p>5장의 결정 프레임을 프론트에 한 번 더 적용해 보자. 다음 자리에서는 Cloudflare로 옮기지 않는 게 정직한 답이다.</p>
+<ul>
+<li><strong>Edge runtime 가정이 깊은 앱.</strong> 코드 곳곳에 <code>runtime = "edge"</code>가 박혀 있고, Web API만 쓰도록 다듬은 라우트가 절반 이상이라면, OpenNext on Cloudflare에서 그 가정이 깨진다. Vercel을 유지하자.</li>
+<li><strong>Sharp 또는 큰 native binary 의존성이 핵심.</strong> 이미지 처리·PDF 생성·headless Chrome을 직접 호출해야 하는 앱. 스크립트 크기 한도와 native binary 제약에서 곧 막힌다. 이쪽은 별도 ECS/Lambda task로 분리하거나 Cloudflare Images 같은 외부 제품으로 빼자.</li>
+<li><strong>DX 우선 + 작은 팀.</strong> 1~2인 팀이고 <em>시간이 가장 비싼 자원</em>이라면 Vercel의 매끈함이 비용을 정당화한다. velopert 사례의 결정이 그 자리다.</li>
+<li><strong><code>use cache</code> (Next.js 15) 깊이 의존.</strong> OpenNext의 <code>use cache</code> 지원이 다음 메이저 릴리즈 예정이므로, 이 디렉티브를 적극 쓰는 앱은 잠시 미루자.</li>
+<li><strong>Windows 전용 빌드 환경.</strong> Mac·Linux로 옮길 의향이 없다면 OpenNext의 빌드가 매끄럽지 않다.</li>
+</ul>
+<p>반대로 다음 자리는 옮길 만하다.</p>
+<ul>
+<li><strong>글로벌 사용자 분포 + e-commerce / SaaS 대시보드.</strong> 이게 OpenNext on Cloudflare의 sweet spot이다.</li>
+<li><strong>이미 R2·KV·D1을 쓰고 있는 백엔드와 한 단위로 묶고 싶은 앱.</strong> 같은 binding을 공유해서 데이터·세션을 깔끔하게 나눠 갖는다.</li>
+<li><strong>Vercel 비용이 가파르게 올라간 앱.</strong> 트래픽 큰 사이트라면 Cloudflare로 옮겼을 때 절감 폭이 한 자릿수 차이가 날 수 있다.</li>
+<li><strong>DX보다 글로벌 분포·비용이 우선인 앱.</strong> 엔지니어링 시간이 절약되는 자리.</li>
+</ul>
+<p>이 결정도 5장의 워크시트처럼 <em>지금 당장</em>이 아니라 <em>권장</em>이다. Vercel에 잘 굴러가는 프론트를 굳이 옮길 필요가 없다. 비용·지연·운영 부담이 한 축이라도 점점 무거워질 때, OpenNext on Cloudflare가 옵션 한 자리에 들어가 있으면 그때 옮기면 된다. <em>옮기지 않는 결정도 정직한 결정이다.</em></p>
+</section>
+<section id="opennext가-무너지는-자리" class="level3">
+<h3>OpenNext가 무너지는 자리</h3>
+<p>이 책이 광고서가 아니라는 약속을 9장에서도 지키자. OpenNext on Cloudflare가 무너지는 자리들을 한 번 더 짚어둔다.</p>
+<ul>
+<li><strong>Edge Runtime 미지원.</strong> Vercel용 코드 그대로 옮기면 일부 라우트가 깨지거나 의도와 다르게 Node 모드로 돈다. 운영 환경에서 동작이 다르면 디버깅이 까다롭다.</li>
+<li><strong>스크립트 크기 한도.</strong> Sharp·Prisma engine·headless Chrome 같은 큰 의존성은 빌드 단계에서 거부된다. 빠른 워크어라운드가 없는 자리.</li>
+<li><strong>Windows 빌드 미지원.</strong> 팀 일부가 Windows라면 WSL2 또는 컨테이너 빌드 강제. 매끈하지 않다.</li>
+<li><strong><code>use cache</code> 미지원 (현 시점).</strong> Next.js 15의 새 캐싱 모델을 적극 쓰는 앱은 잠시 미뤄야 한다.</li>
+<li><strong>ISR PoP 전파 시간차.</strong> 글로벌 분산된 PoP 사이의 ISR 캐시 전파에 시간차가 있다. “1초 안에 모두 같은 페이지”를 기대하면 어긋난다.</li>
+<li><strong>Preview deploy DX.</strong> Vercel만큼 매끈한 preview deploy를 직접 구성해야 한다. GitHub Actions + wrangler로 풀 수는 있지만 즉시 되는 모양은 아니다.</li>
+<li><strong>Vinext와의 미래 관계.</strong> OpenNext의 향후 위상이 Vinext의 진행에 따라 흔들릴 가능성이 있다. 1년 뒤 책 가이드가 <em>그대로</em> 유효할지 사실상 보장 못 한다.</li>
+<li><strong>빌드 실패 디버깅.</strong> OpenNext 빌드 에러 메시지가 처음 보면 의미가 잘 안 잡힌다. 부록 F에 자주 보이는 7가지 에러를 별도로 정리해 두었다 — 처음 막히면 거기를 펼쳐 보자.</li>
+</ul>
+<p>이 무너지는 자리들을 알고도 옮길 만한가? 충분히 그렇다. 다만 <em>알고 옮기는</em> 것이지 <em>모르고 옮기는</em> 것이 아니다. 그 차이가 6개월 뒤 회귀 사례를 만드는지 안 만드는지를 가른다.</p>
+</section>
+<section id="마무리-3" class="level3">
+<h3>마무리</h3>
+<p>Next.js를 Cloudflare에 올리는 길을 9장에서 한 번 짚어 봤다. Pages가 Workers Static Assets로 흡수된 흐름, <code>@opennextjs/cloudflare</code> 어댑터로 Next 14/15를 올리는 단계별 명령, 라우트별 runtime 선택의 함정, 이미지 최적화는 Cloudflare Images로 분리하는 권장 패턴, AWS Amplify·Vercel과의 DX·비용 비교, 그리고 Vinext라는 곧 등장할 풍경. 호흡 환기 챕터답게 따라 하기 친화적으로 풀었지만, 결정 자체는 결코 가볍지 않다.</p>
+<p>이 한 장으로 우리는 한 가지 그림을 손에 쥐었다. <strong>Workers + Hono로 만든 백엔드 API 옆에, OpenNext로 빌드된 Next.js 프론트가 같은 Cloudflare 계정 안에서 한 단위로 묶여 돈다.</strong> <code>toby-shop</code>은 이제 Worker 한 개(API), Worker 한 개(채팅 DO), Web 한 개(Next.js 상점)로 구성된다. 같은 D1·KV·R2를 공유한다. 이 모양이 4장 매핑 카탈로그에서 약속했던 모노레포 구조의 자연스러운 결과다.</p>
+<p>물론 9장의 이 그림에도 큰 한계가 하나 있다. <em>우리는 아직 RDS를 만지지 못했다.</em> <code>toby-shop</code>의 주문 도메인은 여전히 Aurora Postgres 같은 곳에 있을 가능성이 높고, 그걸 옮기는 일은 위험이 크다. 옮기지 않고도 edge에서 빠르게 쓸 길이 있다면 어떻겠는가? 다음 장에서 그 답을 손에 쥔다. <strong>10장 — Hyperdrive로 RDS를 그대로 살려두기</strong>. 점진 마이그레이션의 가장 risk-low한 첫 발걸음을 다음 페이지에서 살펴보자.</p>
+<hr />
+</section>
+</section>
+</body>
+</html>
