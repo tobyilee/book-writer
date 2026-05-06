@@ -13,6 +13,9 @@ Thumbs.db
 # _workspace/
 # _workspace_prev*/
 
+# Previous EPUB/md builds rotated aside by epub-build skill
+_prev/
+
 # Build output
 # output/
 
