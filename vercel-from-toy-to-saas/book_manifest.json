@@ -1,0 +1,15 @@
+{
+  "title": "토이부터 SaaS까지, Vercel과 함께 자라기",
+  "subtitle": "Next.js 개발자가 한 단계씩 올라설 때 Vercel을 어떻게 쓰고, 언제 의심해야 하는가",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "slug": "vercel-from-toy-to-saas",
+  "pub_date": "2026-05-06",
+  "identifier": "urn:uuid:vercel-from-toy-to-saas-v1.0.0",
+  "description": "Vercel을 처음 만난 개발자가 토이·사이드·초기 스타트업·본격 SaaS의 4단계를 거치며 자기 프로젝트와 함께 자라는 안내서다. 단계마다 켜야 할 가드레일과 끄지 말아야 할 기능을 잡아주고, 청구서 폭탄·시크릿 노출·preview 사고 같은 함정을 미리 시뮬레이션해 본다. 비판으로만 닫지 않고 Cloudflare·OpenNext 같은 대안과 비상 탈출 옵션까지 손에 쥐어, 잘 쓰는 능력과 떠날 수 있는 능력을 동시에 길러주는 입문서이자 운영 의식의 동반자.",
+  "audience": "JS/TS·React·Next.js의 기본은 알지만 Vercel 운영 깊이는 얕은 개발자. `vercel deploy`로 첫 배포는 해봤고 그 다음 한 시간이 막막했던 사람, Hobby와 Pro 사이에서 망설이는 사람, 청구서가 흔들려 항목별 진단이 필요한 사람, 첫 엔터프라이즈 고객이 SOC 2를 요구하기 시작한 SaaS 운영자.",
+  "logline": "토이의 첫 배포부터 SaaS의 분기 결정까지, Vercel과 함께 자라며 잘 쓰는 능력과 떠날 수 있는 능력을 동시에 손에 쥐는 4단계 안내서.",
+  "version_label": "v1.0.0",
+  "tags": ["Vercel", "Next.js", "Frontend Cloud", "SaaS", "DevOps", "비용 관리", "보안", "입문서"]
+}
