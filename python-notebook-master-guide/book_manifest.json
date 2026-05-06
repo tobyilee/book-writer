@@ -1,0 +1,70 @@
+{
+  "title": "Python 노트북 마스터 가이드",
+  "subtitle": "Jupyter부터 Marimo까지, 도구를 가르는 안목",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "slug": "python-notebook-master-guide",
+  "pub_date": "2026-05-06",
+  "identifier": "urn:uuid:b3e123fd-809c-46ec-bedf-d3f8c9228c09",
+  "cover": "python-notebook-master-guide/cover.png",
+  "manuscript": "python-notebook-master-guide/04_manuscript.md",
+  "description": "Jupyter부터 Marimo까지 노트북 9개 환경을 한 권에 묶은 도구·안목 가이드.",
+  "chapters": [
+    {
+      "number": 1,
+      "title": "왜 우리는 노트북을 쓰게 됐나"
+    },
+    {
+      "number": 2,
+      "title": "셀, 커널, 상태 — 노트북의 해부학"
+    },
+    {
+      "number": 3,
+      "title": "매직 커맨드, 셸, 파일 포맷 — 모든 노트북에 통하는 도구상자"
+    },
+    {
+      "number": 4,
+      "title": "Jupyter와 JupyterLab — 표준을 깊이 이해하기"
+    },
+    {
+      "number": 5,
+      "title": "클라우드 노트북 — Colab과 Kaggle, GPU의 대중화"
+    },
+    {
+      "number": 6,
+      "title": "에디터 안의 노트북 — VS Code, Cursor, IDE 통합"
+    },
+    {
+      "number": 7,
+      "title": "Marimo — 노트북을 다시 짜다"
+    },
+    {
+      "number": 8,
+      "title": "팀과 엔터프라이즈의 노트북 — Deepnote, Hex, Databricks"
+    },
+    {
+      "number": 9,
+      "title": "Hidden State와 재현성 — 노트북의 가장 큰 그림자"
+    },
+    {
+      "number": 10,
+      "title": "노트북을 git, 협업, 자동화, 배포까지 끌어내기"
+    },
+    {
+      "number": 11,
+      "title": "노트북을 잘 쓰는 사람 — 베스트 프랙티스와 2026 이후"
+    },
+    {
+      "number": "A",
+      "title": "부록 A. 환경 설정 미니 가이드 — pip / conda / venv / uv"
+    }
+  ],
+  "tags": [
+    "python",
+    "jupyter",
+    "notebook",
+    "data-science",
+    "marimo"
+  ]
+}
