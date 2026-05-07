@@ -1,0 +1,29 @@
+{
+  "title": "검증 세금",
+  "subtitle": "AI 코딩 시대, 빨라진 줄 알았던 19%의 진실",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "date": "2026-05-07",
+  "pub_date": "2026-05-07",
+  "identifier": "urn:uuid:97f0733a-c685-4bb7-9b17-ec01af02ecea",
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png",
+  "chapters": [
+    { "number": 1, "title": "5초마다 결정해야 한다 — 감독관이 된 개발자의 피로", "word_count": 8199 },
+    { "number": 2, "title": "1.7배 결함, 4배 클론, 그리고 사라진 신뢰 — AI 코드의 진짜 비용", "word_count": 7191 },
+    { "number": 3, "title": "작업 기억은 늘지 않는다 — 인지부하 이론으로 본 AI 코딩", "word_count": 7634 },
+    { "number": 4, "title": "자동조종의 함정 — 자동화의 역설과 두뇌 튀김의 미시 메커니즘", "word_count": 9425 },
+    { "number": 5, "title": "Amplifier — 강한 팀은 더 강해지고, 약한 팀은 더 약해진다", "word_count": 8807 },
+    { "number": 6, "title": "Agent = Model + Harness — 인지 보철로서의 하네스", "word_count": 9481 },
+    { "number": 7, "title": "Guides + Sensors — 일주일 안에 세울 최소 하네스", "word_count": 8280 },
+    { "number": 8, "title": "주의력을 회복시키는 팀 — 책임 순환·명시적 체크포인트·되돌림의 미덕", "word_count": 10788 },
+    { "number": 9, "title": "다시, 사람이 중심에 있다", "word_count": 9968 }
+  ],
+  "front_matter": ["서문 — 솔직히 밝힌다", "차례"],
+  "back_matter": ["에필로그(9장 통합)", "부록 A — 5개 핵심 수치", "부록 B — 1차 출처 목록", "부록 C — 이 책의 한계", "저자 소개"],
+  "total_word_count": 79773,
+  "total_chapters": 9,
+  "harness_version": "v1.1.0",
+  "description": "AI 코딩 시대, 빨라진 줄 알았던 19%의 진실 — METR의 -19%와 DORA의 +21%가 동시에 사실인 시대의 풍경을 검증 세금이라는 한 단어로 묶고, 인지부하·자동화의 역설·하네스 엔지니어링의 9장 여정으로 풀어낸다."
+}
