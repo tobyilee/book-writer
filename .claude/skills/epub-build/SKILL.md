@@ -18,6 +18,9 @@ description: Build a standards-compliant EPUB 3 file from a manuscript markdown,
    - `author` 필드 존재 (기본값 `Toby-AI`, 사용자 지정 시 매니페스트 값을 그대로 사용)
    - `language` 존재 (`ko`)
    - `version` 존재 (예: `1.0.0`)
+   - `license` (옵션) — 비어 있으면 하네스 기본값 `CC BY-NC-SA 4.0` 적용. 다른 라이선스를 쓰려면 명시 (`"CC BY 4.0"`, `"CC0"`, `"All rights reserved"` 등)
+   - `harness_version` (옵션) — 비어 있으면 루트 `VERSION` 파일에서 자동 주입
+   - `rights` (옵션) — 비어 있으면 `© {year} {author} — Licensed under {license}`로 자동 생성
 3. **스크립트 실행** — `scripts/build_epub.sh {slug}`
 4. **결과 검증**
    - 파일 존재, 크기 ≥ 50KB
@@ -68,6 +71,8 @@ pandoc {manuscript} \
 - [ ] 메타 조회: `pandoc -f epub -t plain --template=metadata.tpl` 등
 - [ ] `epubcheck` 통과 (설치되어 있는 경우)
 - [ ] 책 소개 md (`{책-제목}-v{version}.md`)가 EPUB 옆에 존재하고, 차례·저자·버전이 매니페스트와 일치
+- [ ] `unzip -p {output} OEBPS/content.opf | grep -i rights` — `rights` 메타에 라이선스 문구 포함 (`Licensed under {license}` 또는 매니페스트의 명시값)
+- [ ] `04_manuscript.md`의 `## 판권` 섹션이 매니페스트의 `license`/`version`/`pub_date`와 일치 (drift 시 editor 재호출)
 
 ## 실패 대응
 

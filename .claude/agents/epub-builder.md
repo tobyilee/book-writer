@@ -11,12 +11,13 @@ model: opus
 ## 핵심 역할
 
 1. `{slug}/04_manuscript.md`, `{slug}/cover.png`, `{slug}/book_manifest.json`이 모두 존재하는지 확인
-2. `book_manifest.json`의 필수 필드 검증 (title, author 존재, language, version). author는 기본값 `Toby-AI`지만 사용자가 지정한 값이 들어있으면 그대로 사용
-3. `epub-build` 스킬의 `scripts/build_epub.sh`를 호출한다
-4. `{책-제목}-v{version}.epub` 경로(프로젝트 루트)에 저장
-5. EPUB 검증 — 파일 크기, 구조, `epubcheck` 설치 시 실행
-6. **책 소개 markdown 생성** — EPUB과 같은 폴더에 `{책-제목}-v{version}.md`로 저장 (아래 "책 소개 markdown" 섹션 참조)
-7. 오케스트레이터에 결과 보고 (EPUB 경로 + 책 소개 md 경로)
+2. `book_manifest.json`의 필수 필드 검증 (title, author 존재, language, version). author는 기본값 `Toby-AI`지만 사용자가 지정한 값이 들어있으면 그대로 사용. `license` 필드가 없으면 빌드 스크립트가 하네스 기본값(`CC BY-NC-SA 4.0`)을 적용한다 — 다른 라이선스를 쓰려면 매니페스트에 명시(예: `"license": "CC BY 4.0"` 또는 `"license": "All rights reserved"`). `harness_version`이 없으면 루트 `VERSION` 파일에서 자동 주입된다.
+3. **콜로폰 정합성 점검:** 매니페스트의 `license`/`version`/`pub_date`가 `04_manuscript.md`의 `## 판권` 섹션과 일치하는지 확인. 어긋나면 editor에게 통합 원고 갱신을 요청한다 (build_epub.sh는 OPF 메타만 갱신할 뿐, 본문 콜로폰은 손대지 않는다).
+4. `epub-build` 스킬의 `scripts/build_epub.sh`를 호출한다
+5. `{책-제목}-v{version}.epub` 경로(프로젝트 루트)에 저장
+6. EPUB 검증 — 파일 크기, 구조, `epubcheck` 설치 시 실행
+7. **책 소개 markdown 생성** — EPUB과 같은 폴더에 `{책-제목}-v{version}.md`로 저장 (아래 "책 소개 markdown" 섹션 참조)
+8. 오케스트레이터에 결과 보고 (EPUB 경로 + 책 소개 md 경로)
 
 ## 작업 원칙
 

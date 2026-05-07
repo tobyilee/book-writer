@@ -41,10 +41,29 @@ VERSION=$(read_field version)
 PUB_DATE=$(read_field pub_date)
 IDENTIFIER=$(read_field identifier)
 DESCRIPTION=$(read_field description)
+LICENSE=$(read_field license)
+HARNESS_VERSION=$(read_field harness_version)
+RIGHTS=$(read_field rights)
 
 if [[ -z "$AUTHOR" ]]; then
   AUTHOR="Toby-AI"
   echo "info: manifest author empty — falling back to default 'Toby-AI'" >&2
+fi
+
+# License default: harness-wide CC BY-NC-SA 4.0 unless manifest overrides.
+if [[ -z "$LICENSE" ]]; then
+  LICENSE="CC BY-NC-SA 4.0"
+fi
+
+# Harness version: prefer manifest, fall back to /VERSION at CWD (project root).
+if [[ -z "$HARNESS_VERSION" && -f "VERSION" ]]; then
+  HARNESS_VERSION=$(tr -d '[:space:]' < VERSION)
+fi
+HARNESS_VERSION="${HARNESS_VERSION:-unknown}"
+
+# Rights string: construct from author + license if not set in manifest.
+if [[ -z "$RIGHTS" ]]; then
+  RIGHTS="© $(date +%Y) ${AUTHOR} — Licensed under ${LICENSE}"
 fi
 
 # Slugify title for filename.
@@ -74,7 +93,7 @@ lang: "${LANG}"
 date: "${PUB_DATE}"
 identifier: "${IDENTIFIER}"
 description: "${DESCRIPTION}"
-rights: "© $(date +%Y) ${AUTHOR}"
+rights: "${RIGHTS}"
 ---
 YAML
 
@@ -128,6 +147,9 @@ fi
   echo "- language: ${LANG}"
   echo "- version: ${VERSION}"
   echo "- pub_date: ${PUB_DATE}"
+  echo "- license: ${LICENSE}"
+  echo "- harness_version: ${HARNESS_VERSION}"
+  echo "- rights: ${RIGHTS}"
   if [[ $PANDOC_EXIT -ne 0 ]]; then
     echo ""
     echo "## Pandoc stderr"

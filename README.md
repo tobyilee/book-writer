@@ -1,15 +1,16 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
-[![Version](https://img.shields.io/badge/harness-v1.1.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/harness-v1.2.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. 모든 챕터는 `toby-book-writing-style.md`에 정의된 **Toby 문체**로 저술되며, 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
-- **하네스 버전:** `v1.1.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **하네스 버전:** `v1.2.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **라이선스:** 하네스 코드는 **MIT** ([`LICENSE`](LICENSE)). 산출되는 책 콘텐츠 기본값은 **CC BY-NC-SA 4.0** — `book_manifest.json`의 `license` 필드로 책별 오버라이드 가능
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
 - **저자 모델:** Claude Opus (하네스 내 모든 에이전트가 `model: opus` 사용)
 
-> **버전 두 개를 헷갈리지 말자.** 위 `v1.1.0`은 *하네스 버전*(이 도구 자체)이고, 산출 파일명에 들어가는 `{책-제목}-v{version}.epub`의 `version`은 *책 매니페스트의 책 버전*(각 책의 판본)이다. 둘은 독립적으로 진화한다.
+> **버전 두 개를 헷갈리지 말자.** 위 `v1.2.0`은 *하네스 버전*(이 도구 자체)이고, 산출 파일명에 들어가는 `{책-제목}-v{version}.epub`의 `version`은 *책 매니페스트의 책 버전*(각 책의 판본)이다. 둘은 독립적으로 진화한다. 둘 다 v1.2.0부터는 책 본문의 `## 판권` 페이지에 노출된다.
 
 ## 이 하네스가 하는 일
 

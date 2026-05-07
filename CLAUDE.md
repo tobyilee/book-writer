@@ -18,7 +18,9 @@
 
 **브랜치 운영 패턴:** 하네스 자체(에이전트·스킬·CLAUDE.md·README)는 `main` 브랜치에서 관리하고, **각 책은 자기 브랜치**(예: `rust-for-java-developer`, `french-cooking`, `worktree-sf`)에서 산출한다. 새 책을 시작할 때는 `main`에서 새 브랜치를 따고, 거기서 오케스트레이터를 돌린다. 이렇게 하면 하네스 변경과 책 산출물이 섞이지 않는다.
 
-**하네스 버전:** 프로젝트 루트의 `VERSION` 파일이 단일 출처. 현재 `v1.1.0`. 책 매니페스트의 `version`(책의 판본)과 다른 개념이다 — 하네스는 도구의 진화, 책 매니페스트는 각 책의 개정을 추적한다.
+**하네스 버전:** 프로젝트 루트의 `VERSION` 파일이 단일 출처. 현재 `v1.2.0`. 책 매니페스트의 `version`(책의 판본)과 다른 개념이다 — 하네스는 도구의 진화, 책 매니페스트는 각 책의 개정을 추적한다. 매니페스트의 `harness_version` 필드를 통해 산출된 책의 콜로폰에도 노출된다.
+
+**책 콘텐츠 라이선스:** 산출되는 책의 기본 라이선스는 `CC BY-NC-SA 4.0`(저작자 표시·비상업적 이용·동일조건 변경허락). 하네스 코드 라이선스(MIT)와 별개다 — `LICENSE` 파일은 하네스 자체에만 적용되고, 각 책의 라이선스는 EPUB의 콜로폰(`## 판권` 섹션)과 OPF의 `<dc:rights>`로 표기된다. 책별로 다른 라이선스를 쓰려면 `book_manifest.json`의 `license` 필드(예: `"CC BY 4.0"`, `"CC0"`, `"All rights reserved"`)에 명시한다.
 
 ## 변경 이력
 
@@ -30,3 +32,4 @@
 | 2026-04-18 | 0.2.0 | 라이선스를 MIT로 전환 | LICENSE | 오픈 소스 배포 정합성 |
 | 2026-04-28 | **1.0.0** | EPUB과 짝을 이루는 책 소개 markdown 산출 추가 — feature-complete 베이스라인 (~12권 산출 검증) | epub-builder, epub-build, 오케스트레이터, README | 마케팅·공유용 외부 독자 카피 자동화 |
 | 2026-05-04 | **1.1.0** | 정합성 정비 (CLAUDE.md 저자 가변 반영, 변경 이력 도입, 브랜치 운영 패턴 명시, 리서처/스타일 가디언 재실행 정책 보강) + `VERSION` 파일 도입 + README 버전 표시 | CLAUDE.md, README, VERSION, web/paper/community-researcher, style-guardian, plan-reviewer | 하네스 감사로 발견된 drift 보정 + 공식 버저닝 도입 (minor 업그레이드, breaking change 없음) |
+| 2026-05-07 | **1.2.0** | 책 본문에 콜로폰(`## 판권`) 페이지 도입 — 책 버전·발행일·라이선스 명문화·CC 마크/링크·하네스 크레딧·식별자 노출. 기본 콘텐츠 라이선스 `CC BY-NC-SA 4.0` 채택 (매니페스트 `license` 필드로 책별 오버라이드 가능). `build_epub.sh`의 하드코딩된 `rights:` 줄을 매니페스트 기반으로 교체. | editor, book-editing, build_epub.sh, epub-builder, epub-build, orchestrator, VERSION, CLAUDE.md | 책 버전을 독자에게 노출 + CC 라이선스 정책 명문화 + `rights` drift 정리 |

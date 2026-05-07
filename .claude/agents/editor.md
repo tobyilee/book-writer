@@ -42,7 +42,35 @@ model: opus
 # {책 제목}
 
 ## 저자
-Toby-AI
+{author}
+
+**판본:** v{version} · {pub_date}
+
+---
+
+## 판권
+
+**{책 제목}**
+**판본:** v{version}
+**발행일:** {pub_date}
+**저자:** {author}
+**식별자:** {identifier}
+
+### 라이선스
+
+이 책은 [Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 라이선스로 배포된다.
+
+- **저작자 표시(BY):** 출처를 밝힐 것.
+- **비상업적 이용(NC):** 상업적 목적으로 이용할 수 없다.
+- **동일조건 변경허락(SA):** 변경·재배포 시 동일한 라이선스를 적용해야 한다.
+
+매니페스트에 `license` 필드가 다른 값으로 명시되어 있으면 그 값으로 위 문장과 링크를 갈음한다.
+
+### 출처
+
+이 책은 [book-writer](https://github.com/) 하네스 v{harness_version}로 자동 생성되었다.
+
+---
 
 ## 서문
 {독자 초대장}
@@ -79,9 +107,14 @@ Toby-AI
   "identifier": "urn:uuid:...",
   "description": "한 문단 소개",
   "cover_image": "cover.png",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "rights": "© {year} {author} — Licensed under {license}"
 }
 ```
+
+`license`, `harness_version`, `rights`는 옵션 필드. 비우면 빌드 스크립트가 하네스 기본값(`CC BY-NC-SA 4.0` + 루트 `VERSION` + 자동 생성 rights)으로 채운다. 다른 라이선스(예: `CC BY 4.0`, `CC0`, `All rights reserved`)를 쓰려면 매니페스트에 명시한다.
 
 ## 팀 통신 프로토콜
 
