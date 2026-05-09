@@ -1,0 +1,88 @@
+{
+  "title": "목적이 이끄는 독서법",
+  "subtitle": "뇌과학에서 제텔카스텐까지, 책의 종류만큼 많은 읽기 방식",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "published_date": "2026-05-09",
+  "license": "CC BY-NC-SA 4.0",
+  "slug": "purpose-driven-reading",
+  "description": "모든 책을 같은 방식으로 읽으면 안 된다. 뇌과학·인지심리학·고전 독서론·디지털 환경·AI·PKM을 한 권에 통합한 지식노동자를 위한 다차원적 독서 전략서.",
+  "target_audience": "직장인·지식노동자, 학생·연구자, 깊이 있는 지식 생산을 원하는 독자",
+  "chapters": [
+    {
+      "id": "prologue",
+      "title": "프롤로그",
+      "file": "chapters/00_prologue_final.md"
+    },
+    {
+      "id": "ch01",
+      "title": "1장. 깊은 독서 회로는 타고나는 게 아니다",
+      "file": "chapters/01_final.md"
+    },
+    {
+      "id": "ch02",
+      "title": "2장. 작업기억의 한계 안에서 읽기",
+      "file": "chapters/02_final.md"
+    },
+    {
+      "id": "ch03",
+      "title": "3장. 정보 추출과 체험 사이",
+      "file": "chapters/03_final.md"
+    },
+    {
+      "id": "ch04",
+      "title": "4장. Adler의 4단계",
+      "file": "chapters/04_final.md"
+    },
+    {
+      "id": "ch05",
+      "title": "5장. 학습 독서 5종 세트",
+      "file": "chapters/05_final.md"
+    },
+    {
+      "id": "ch06",
+      "title": "6장. 실용서·자기계발서",
+      "file": "chapters/06_final.md"
+    },
+    {
+      "id": "ch07",
+      "title": "7장. 학술논문 — Keshav 3-Pass",
+      "file": "chapters/07_final.md"
+    },
+    {
+      "id": "ch08",
+      "title": "8장. 인문서·철학서",
+      "file": "chapters/08_final.md"
+    },
+    {
+      "id": "ch09",
+      "title": "9장. 문학·소설",
+      "file": "chapters/09_final.md"
+    },
+    {
+      "id": "ch10",
+      "title": "10장. 종이 vs 화면 vs 오디오",
+      "file": "chapters/10_final.md"
+    },
+    {
+      "id": "ch11",
+      "title": "11장. AI 시대의 독서",
+      "file": "chapters/11_final.md"
+    },
+    {
+      "id": "ch12",
+      "title": "12장. 읽은 것을 자산으로 만드는 시스템",
+      "file": "chapters/12_final.md"
+    },
+    {
+      "id": "epilogue",
+      "title": "에필로그",
+      "file": "chapters/13_epilogue_final.md"
+    }
+  ],
+  "cover_image": "cover.png",
+  "harness_version": "1.2.0",
+  "pub_date": "2026-05-09",
+  "identifier": "urn:uuid:a91ccd06-5994-5bd1-8bbc-921ed1650cc4"
+}
