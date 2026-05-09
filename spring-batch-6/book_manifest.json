@@ -1,0 +1,33 @@
+{
+  "title": "직접 짜본 사람을 위한 Spring Batch 6",
+  "subtitle": "첫 잡부터 운영까지",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "harness_version": "1.2.0",
+  "license": "CC BY-NC-SA 4.0",
+  "published": "2026-05-09",
+  "pub_date": "2026-05-09",
+  "slug": "spring-batch-6",
+  "identifier": "urn:uuid:spring-batch-6-toby-ai-v1.0.0",
+  "description": "Spring과 Spring Boot에 익숙하지만 Spring Batch는 처음인 개발자를 위한 실전 가이드. 배치 프로그래밍의 기본부터 Spring Batch 6의 새로운 변경점, 다양한 유스케이스, K8s 운영까지 한 호흡으로 다룬다.",
+  "chapters": [
+    {"number": 1, "title": "배치라는 문제, 그리고 우리가 매번 다시 만들던 것", "file": "chapters/01_final.md"},
+    {"number": 2, "title": "Spring Batch가 약속하는 것 — 청크, 트랜잭션, 메타데이터", "file": "chapters/02_final.md"},
+    {"number": 3, "title": "첫 번째 잡 만들기 — 그리고 @StepScope 함정", "file": "chapters/03_final.md"},
+    {"number": 4, "title": "ItemReader/Processor/Writer 계약 — 그리고 Tasklet의 1할", "file": "chapters/04_final.md"},
+    {"number": 5, "title": "Spring Batch 6의 변경점 — 무엇이, 왜 달라졌는가", "file": "chapters/05_final.md"},
+    {"number": 6, "title": "실전 유스케이스 — 카카오페이 정산 사례 해부", "file": "chapters/06_final.md"},
+    {"number": 7, "title": "Fault Tolerance와 테스트 — Skip/Retry/Restart와 멱등성", "file": "chapters/07_final.md"},
+    {"number": 8, "title": "성능과 확장 — 파티셔닝, 멀티스레드, Remote Step", "file": "chapters/08_final.md"},
+    {"number": 9, "title": "모니터링과 옵저버빌리티 — Micrometer, JFR, 알람 설계", "file": "chapters/09_final.md"},
+    {"number": 10, "title": "K8s 운영 — CronJob, Graceful Shutdown, JobRepository 정리", "file": "chapters/10_final.md"},
+    {"number": 11, "title": "5에서 6으로 마이그레이션 — 직렬화 함정과 실전 시나리오", "file": "chapters/11_final.md"},
+    {"number": 12, "title": "운영 1년차 회고 — 5번째 잡을 만들 때 보이는 것", "file": "chapters/12_final.md"},
+    {"number": "A", "title": "유스케이스 패턴 카탈로그", "file": "chapters/appendix_a_final.md"}
+  ],
+  "cover": "cover.png",
+  "cover_image": "cover.png",
+  "manuscript": "04_manuscript.md",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
