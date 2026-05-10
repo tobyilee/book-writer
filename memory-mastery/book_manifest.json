@@ -1,0 +1,28 @@
+{
+  "title": "잊지 않는 기술 — 기억의 궁전부터 AI 카드까지",
+  "subtitle": "기억의 궁전부터 AI 카드까지",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "date": "2026-05-10",
+  "pub_date": "2026-05-10",
+  "identifier": "memory-mastery-v1.0.0-2026-0510",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "slug": "memory-mastery",
+  "description": "고대 기억의 궁전부터 AI 가속 학습까지, 기억을 설계하는 완전한 안내서",
+  "chapters": [
+    {"id": "preface", "title": "서문: 구글링이면 충분한가", "file": "chapters/00_preface_final.md"},
+    {"id": "ch01", "title": "1장: 잊는 게 정상이다", "file": "chapters/01_ch1_final.md"},
+    {"id": "ch02", "title": "2장: 당신이 옳다고 느낀 방법이 사실 가장 비효율적이다", "file": "chapters/02_ch2_final.md"},
+    {"id": "ch03", "title": "3장: 기억의 세 무대", "file": "chapters/03_ch3_final.md"},
+    {"id": "ch04", "title": "4장: 기억의 궁전", "file": "chapters/04_ch4_final.md"},
+    {"id": "ch05", "title": "5장: 기억의 궁전 밖의 세계", "file": "chapters/05_ch5_final.md"},
+    {"id": "ch06", "title": "6장: 망각 곡선을 길들이다", "file": "chapters/06_ch6_final.md"},
+    {"id": "ch07", "title": "7장: 도구의 시대", "file": "chapters/07_ch7_final.md"},
+    {"id": "ch08", "title": "8장: AI 가속", "file": "chapters/08_ch8_final.md"},
+    {"id": "ch09", "title": "9장: 학습자를 위한 기억 전략", "file": "chapters/09_ch9_final.md"},
+    {"id": "ch10", "title": "10장: 지식 노동자를 위한 기억 전략", "file": "chapters/10_ch10_final.md"},
+    {"id": "ch11", "title": "11장: 왜 좋은 줄 알면서도 못 하는가", "file": "chapters/11_ch11_final.md"}
+  ]
+}
