@@ -1,0 +1,26 @@
+{
+  "title": "개발자를 위한 제텔카스텐",
+  "subtitle": "옵시디언으로 코드와 글을 함께 키우는 법",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "date": "2026-05-10",
+  "pub_date": "2026-05-10",
+  "license": "CC BY-NC-SA 4.0",
+  "slug": "zettelkasten-for-developers",
+  "harness_version": "1.2.0",
+  "identifier": "zettelkasten-for-developers-v1.0.0-20260510",
+  "description": "소프트웨어 개발자를 위한 Zettelkasten 완전 가이드. Obsidian으로 코드 리뷰·ADR·TIL부터 블로그·발표·책 저술까지, AI 도구(Claude, NotebookLM)와 함께하는 개인 지식 시스템 구축법.",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "chapters": [
+    {"number": 1, "title": "우리는 왜 노트를 다시 안 볼까", "file": "chapters/01_final.md"},
+    {"number": 2, "title": "Zettelkasten 한 페이지 요약", "file": "chapters/02_final.md"},
+    {"number": 3, "title": "옵시디언 30분 셋업", "file": "chapters/03_final.md"},
+    {"number": 4, "title": "매일 30분 워크플로우", "file": "chapters/04_final.md"},
+    {"number": 5, "title": "개발자의 일상에 녹이기", "file": "chapters/05_final.md"},
+    {"number": 6, "title": "AI와 함께", "file": "chapters/06_final.md"},
+    {"number": 7, "title": "노트가 글이 되고 글이 책이 되는", "file": "chapters/07_final.md"},
+    {"number": 8, "title": "임계점을 넘기 위한 100일", "file": "chapters/08_final.md"},
+    {"number": 9, "title": "당신의 Zettelkasten은 당신을 닮는다", "file": "chapters/09_final.md"}
+  ]
+}
