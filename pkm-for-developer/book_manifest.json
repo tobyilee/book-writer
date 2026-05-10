@@ -1,0 +1,13 @@
+{
+  "title": "수집을 지식으로 — 50대 개발자를 위한 PKM 다시 짜기",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "description": "Google Docs와 Obsidian을 써왔지만 수집한 자료가 지식으로 연결되지 않는 50대 개발자를 위한 PKM 전략서",
+  "subject": "Personal Knowledge Management, PKM, Obsidian, AI tools",
+  "date": "2026-05-10",
+  "pub_date": "2026-05-10",
+  "identifier": "pkm-for-developer-v1.0.0",
+  "harness_version": "1.2.0"
+}
