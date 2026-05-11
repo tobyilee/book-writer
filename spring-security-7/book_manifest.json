@@ -1,0 +1,19 @@
+{
+  "title": "토비의 Spring Security 7",
+  "subtitle": "내부 아키텍처부터 Zero Trust·Passkeys·MFA까지, Spring Boot 4 기반 심층 레퍼런스",
+  "slug": "toby-spring-security-7",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-05-11",
+  "publication_date": "2026-05-11",
+  "identifier": "book/toby-spring-security-7@v1.0.0",
+  "description": "Spring Security 7.0 GA(2025-11-17)와 Spring Boot 4를 기준으로 다시 쓰는 한국어 심층 레퍼런스. 필터 체인부터 컴포넌트 모델, JWT/OAuth2/Passkeys/MFA·DPoP, 인가의 5층 구조, CSRF·CORS·헤더, 세션·쿠키·컨텍스트, Reactive 보안, 테스팅, 5/6→7 마이그레이션, Zero Trust·BFF·운영의 모서리, 그리고 통합 실전 워크스루까지 15개 챕터로 한 권을 끝까지 따라간다.",
+  "cover_image": "cover.png",
+  "cover": "cover.png",
+  "manuscript": "04_manuscript.md",
+  "chapter_count": 15,
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
