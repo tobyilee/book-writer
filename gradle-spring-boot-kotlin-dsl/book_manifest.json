@@ -1,0 +1,22 @@
+{
+  "title": "빌드를 다시 짠다",
+  "subtitle": "Spring Boot × Gradle 9.5 × Kotlin DSL 실전 가이드",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.1",
+  "license": "CC BY-NC-SA 4.0",
+  "publication_date": "2026-05-11",
+  "pub_date": "2026-05-11",
+  "description": "build.gradle.kts에 의존성 몇 줄만 추가하던 Spring Boot 백엔드 개발자가 멀티 모듈·커스텀 플러그인·Native까지 자기 빌드를 도구로 키우는 여정. Gradle 9.5 · Kotlin DSL 기준.",
+  "identifier": "gradle-spring-boot-kotlin-dsl-v1.0.1",
+  "slug": "gradle-spring-boot-kotlin-dsl",
+  "harness_version": "1.2.0",
+  "logline": "build.gradle.kts에 의존성 몇 줄만 추가하던 Spring Boot 백엔드 개발자가 멀티 모듈·커스텀 플러그인·Native까지 자기 빌드를 도구로 키우는 여정. Gradle 9.5 · Kotlin DSL 기준.",
+  "audience": "Spring Boot로 개발은 해봤지만 Gradle은 build.gradle.kts에 의존성 몇 줄 추가하는 수준으로만 써온 백엔드 개발자. Maven 출신, 멀티 모듈·플러그인 개발·CI 최적화에서 막혀본 적 있는 사람.",
+  "structure": {
+    "parts": 5,
+    "chapters": 18
+  },
+  "manuscript_path": "gradle-spring-boot-kotlin-dsl/04_manuscript.md",
+  "cover_path": "gradle-spring-boot-kotlin-dsl/cover.png"
+}
