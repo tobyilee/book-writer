@@ -16,6 +16,9 @@ Thumbs.db
 # _workspace/
 # _workspace_prev*/
 
+# Per-book copyrighted source extraction (e.g., pandoc-extracted reference EPUBs)
+**/source/
+
 # Build output
 # output/
 
