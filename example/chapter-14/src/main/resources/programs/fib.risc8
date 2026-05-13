@@ -1,0 +1,29 @@
+; RISC-8 Fibonacci — F(0)..F(9)를 memory[0x10..0x19]에 저장한다.
+;
+; 레지스터 사용
+;   R0 = 0 (하드와이어 zero)
+;   R1 = F(n)        — 현재 값
+;   R2 = F(n+1)      — 다음 값
+;   R3 = base addr   — 0x10
+;   R4 = counter     — 10
+;   R5 = index       — 0..9
+;   R6 = scratch     — 메모리 주소
+;   R7 = scratch     — 합산 임시값
+;
+; 루프 구조 — BEQ로 짧은 forward 분기 + JAL로 긴 backward 점프.
+; (BEQ/BNE 즉치는 3-bit signed라 ±4, JAL은 6-bit signed라 ±32.)
+
+        LI    R1, 0           ; F(0)
+        LI    R2, 1           ; F(1)
+        LI    R3, 16          ; base = 0x10
+        LI    R4, 10          ; counter
+        LI    R5, 0           ; index
+loop:   ADD   R6, R3, R5      ; R6 = base + index
+        SB    R1, R6, 0       ; mem[R6] = R1
+        ADD   R7, R1, R2      ; R7 = F(n+1) 새 값
+        ADD   R1, R0, R2      ; R1 ← R2
+        ADD   R2, R0, R7      ; R2 ← R7
+        ADDI  R5, R5, 1       ; index++
+        BEQ   R5, R4, end     ; index == counter ? 종료
+        JAL   R0, loop        ; 무조건 점프 (rd=R0이라 복귀주소 버림)
+end:    HALT
