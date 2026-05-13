@@ -1,0 +1,19 @@
+rootProject.name = "kotlin-8bit-cpu-examples"
+
+include(
+    "chapter-01",
+    "chapter-02",
+    "chapter-03",
+    "chapter-04",
+    "chapter-05",
+    "chapter-06",
+    "chapter-07",
+    "chapter-08",
+    "chapter-09",
+    "chapter-10",
+    "chapter-11",
+    "chapter-12",
+    "chapter-13",
+    "chapter-14",
+    "chapter-15",
+)
