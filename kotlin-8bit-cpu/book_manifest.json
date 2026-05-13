@@ -1,0 +1,32 @@
+{
+  "title": "코드로 짓는 CPU",
+  "subtitle": "Kotlin으로 SAP-1에서 8비트 RISC까지",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-13",
+  "identifier": "urn:uuid:kotlin-8bit-cpu-1.0.0",
+  "description": "Kotlin/Java 중급 개발자를 위한 8비트 CPU 시뮬레이터 저술서. SAP-1의 16바이트 우주에서 시작해 SAP-2로 진화시키고, 1980년대 RISC 논쟁을 거쳐 자기 자신의 8비트 RISC ISA를 직접 설계한다. 마지막에는 instruction-accurate에서 cycle-accurate로 한 단계 더 내려가며 ‘정확도’라는 단어가 한 가지가 아니라는 사실을 손에 익힌다. 15장 5부 + 부록 4개. 만들어 봐야 안다는 한 줄을 닻으로 삼는 15주의 산행.",
+  "cover_image": "cover.png",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "slug": "kotlin-8bit-cpu",
+  "chapters": [
+    { "number": 1, "title": "컴퓨터는 왜 이런 모습인가", "part": 1 },
+    { "number": 2, "title": "fetch-decode-execute를 Kotlin 30줄로", "part": 1 },
+    { "number": 3, "title": "SAP-1의 청사진과 첫 모듈", "part": 2 },
+    { "number": 4, "title": "레지스터와 8비트 산술", "part": 2 },
+    { "number": 5, "title": "overflow라는 무덤", "part": 2 },
+    { "number": 6, "title": "메모리·버스·컨트롤러 — SAP-1이 처음 돌아가는 순간", "part": 2 },
+    { "number": 7, "title": "어셈블러와 디스어셈블러", "part": 2 },
+    { "number": 8, "title": "16바이트의 한계 — SAP-2는 왜 다시 설계되었는가", "part": 3 },
+    { "number": 9, "title": "조건 분기·서브루틴·I/O", "part": 3 },
+    { "number": 10, "title": "마이크로코드와 디버거", "part": 3 },
+    { "number": 11, "title": "같은 Fibonacci, 네 가지 어셈블리", "part": 4 },
+    { "number": 12, "title": "RISC의 약속 — 1980년대의 격렬한 논쟁", "part": 4 },
+    { "number": 13, "title": "우리의 8비트 RISC를 설계하다", "part": 4 },
+    { "number": 14, "title": "instruction-accurate에서 cycle-accurate로", "part": 5 },
+    { "number": 15, "title": "여기서 어디로 — 컴퓨터 전체로 가는 다리", "part": 5 }
+  ]
+}
