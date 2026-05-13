@@ -1,0 +1,14 @@
+; "Hello\n" 를 출력 포트 0(ASCII 스트림)에 흘려보낸다.
+        LDI A, 'H'
+        OUT 0
+        LDI A, 'e'
+        OUT 0
+        LDI A, 'l'
+        OUT 0
+        LDI A, 'l'
+        OUT 0
+        LDI A, 'o'
+        OUT 0
+        LDI A, 10        ; '\n'
+        OUT 0
+        HLT

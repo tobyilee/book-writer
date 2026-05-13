@@ -1,0 +1,7 @@
+; SAP-1 program: 42 + 5 = 47
+start:  LDA  $9
+        ADD  $A
+        OUT
+        HLT
+9:      $2A
+A:      $05

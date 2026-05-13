@@ -1,0 +1,67 @@
+; Fibonacci 처음 10개(F0..F9 = 0,1,1,2,3,5,8,13,21,34)를 포트 0에 출력한다.
+; 누산기 A는 매 사이클의 next, B는 prev, C는 curr로 쓴다.
+; F2~F9 계산 블록을 8번 펼쳐 단순화한다(루프 카운터 없음, 분기 명령은 별도 테스트에서 검증).
+
+        LDI A, 0
+        OUT 0          ; F0 = 0
+        LDI A, 1
+        OUT 0          ; F1 = 1
+
+        LDI B, 0       ; prev = F0
+        LDI C, 1       ; curr = F1
+
+        ; --- 1 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F2 = 1
+        MOV B, C
+        MOV C, A
+
+        ; --- 2 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F3 = 2
+        MOV B, C
+        MOV C, A
+
+        ; --- 3 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F4 = 3
+        MOV B, C
+        MOV C, A
+
+        ; --- 4 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F5 = 5
+        MOV B, C
+        MOV C, A
+
+        ; --- 5 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F6 = 8
+        MOV B, C
+        MOV C, A
+
+        ; --- 6 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F7 = 13
+        MOV B, C
+        MOV C, A
+
+        ; --- 7 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F8 = 21
+        MOV B, C
+        MOV C, A
+
+        ; --- 8 ---
+        MOV A, B
+        ADD C
+        OUT 0          ; F9 = 34
+
+        HLT
