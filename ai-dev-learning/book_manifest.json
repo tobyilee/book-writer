@@ -1,0 +1,22 @@
+{
+  "title": "바이브 너머의 엔지니어",
+  "subtitle": "Agentic Coding 시대, 무엇을 위임하고 무엇을 끝까지 알아야 하는가",
+  "slug": "beyond-the-vibe",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "harness_version": "1.2.0",
+  "license": "CC BY-NC-SA 4.0",
+  "pub_date": "2026-05-17",
+  "identifier": "urn:uuid:beyond-the-vibe-v1.0.0",
+  "manuscript": "ai-dev-learning/04_manuscript.md",
+  "cover": "ai-dev-learning/cover.png",
+  "cover_image": "cover.png",
+  "description": "Agentic Coding · Vibe Coding 시대, 개발자의 학습과 성장에 관한 에세이형 기술서. 학생·신입부터 CTO까지 — AI에 위임할 것과 끝까지 알아야 할 것의 경계를 묻는다. 4진영 충돌을 보존하면서도 책 마지막에 저자의 잠정 답 4개를 책임지고 적는다.",
+  "logline": "AI 시대에 자기 코드를 갖는 법.",
+  "target_audience": "학생·신입·주니어·시니어·CTO 모두",
+  "chapter_count": 10,
+  "total_chars_estimate": 138298,
+  "harness_credit": "book-writer harness v1.2.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
