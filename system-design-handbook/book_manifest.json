@@ -1,0 +1,16 @@
+{
+  "title": "현장에서 살아남는 시스템 디자인",
+  "subtitle": "작은 internal 시스템부터 글로벌 SaaS까지",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "harness_version": "1.2.0",
+  "license": "CC BY-NC-SA 4.0",
+  "publication_date": "2026-05-17",
+  "pub_date": "2026-05-17",
+  "identifier": "system-design-handbook-v1.0.0",
+  "slug": "system-design-handbook",
+  "description": "면접이 아닌 production에서 통하는 설계 감각. 3~7년차 한국 백엔드를 위한 빌딩 블록·패턴·케이스 스터디 통합 가이드 — 캐시·DB·큐·검색·LB·CDN·시간·보안 9개 부품, 멱등성·Saga·합의·샤딩·관측성·파이프라인 6개 패턴, 채팅·피드·검색·결제·이커머스 5개 케이스 스터디. 토스·카카오·당근·쿠팡의 한국 사례가 챕터마다 박혀 있다.",
+  "cover_image": "cover.png",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
