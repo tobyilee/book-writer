@@ -1,0 +1,18 @@
+{
+  "title": "느린 JPA에는 이유가 있다",
+  "subtitle": "Vlad의 눈으로 보는 고성능 영속성",
+  "slug": "slow-jpa-has-reasons",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "harness_version": "1.2.0",
+  "license": "CC BY-NC-SA 4.0",
+  "publication_date": "2026-05-17",
+  "pub_date": "2026-05-17",
+  "identifier": "urn:uuid:cea6a8a6-b9be-4fe1-b354-08bc11d179c3",
+  "description": "JPA·Hibernate를 쓰지만 왜 느린지는 모르는 미드~시니어 백엔드 개발자를 위한 책. Vlad Mihalcea의 시각으로 라운드트립과 트랜잭션을 두 축에 두고, JDBC 토대부터 Hibernate 6 신기능까지 12개 챕터로 '왜 느린가'를 한 번에 정리한다. 매 챕터 끝 '내 코드 체크리스트 3개'(총 36개)가 책을 덮은 뒤 자기 IDE를 열게 만든다.",
+  "target_audience": "JPA/Hibernate 실무 경험 있는 미드~시니어 백엔드 개발자",
+  "manuscript_path": "04_manuscript.md",
+  "cover_path": "cover.png",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
