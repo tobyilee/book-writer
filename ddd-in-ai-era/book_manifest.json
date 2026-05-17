@@ -1,0 +1,15 @@
+{
+  "title": "에이전트의 시대, DDD는 여전히 유효한가? — 변하는 것, 살아남는 것, 사라지는 것",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "publication_date": "2026-05-17",
+  "pub_date": "2026-05-17",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "subject": "AI 에이전틱 코딩 시대의 Domain-Driven Design",
+  "description": "AI 에이전틱 코딩 시대에 DDD가 어떻게 변하고 강화되고 흡수되는지를 다섯 핵심 명제로 분석한 시니어/아키텍트 대상의 에세이형 기술서. 16개 챕터와 2개 부록으로 구성되며, 결제 게이트웨이 가상 프로젝트로 실증.",
+  "chapter_count": 16,
+  "identifier": "urn:uuid:ai-ddd-era-v1",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
