@@ -1,0 +1,31 @@
+{
+  "title": "PostgreSQL 종합 바이블 — MySQL 베테랑 개발자·DBA·Tech Lead를 위한 v17/v18 실전 가이드",
+  "subtitle": "MySQL 베테랑 개발자·DBA·Tech Lead를 위한 v17/v18 실전 가이드",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-18",
+  "publication_date": "2026-05-18",
+  "identifier": "urn:uuid:c5e65a05-c213-49b6-9af3-bff72a2d0b71",
+  "slug": "postgresql-bible",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "cover_image": "cover.png",
+  "description": "PostgreSQL v17/v18 시대의 종합 바이블. MySQL 베테랑 개발자, DBA, Tech Lead 세 페르소나를 정조준한 25장 분량의 실전 가이드. fork 프로세스 모델과 append-only MVCC 같은 PG의 진짜 정체성에서 출발해, JSON·검색·GIS·벡터·이벤트·OLAP·API 백엔드까지 9가지 활용 시나리오를 본 뒤, 마이그레이션 실전·VACUUM·HA·보안·튜닝·매니지드 클라우드까지 운영의 무게를 한 권에 담았다. 4억 row를 옮긴 한국 후기와 카카오·당근페이·공공의 실제 결정 사례를 본문으로 끌어올린다.",
+  "logline": "MySQL 베테랑·DBA·Tech Lead를 위한 PostgreSQL v17/v18 종합 바이블 — 정체성·활용 9가지·운영 9가지를 한 권에",
+  "target_audience": "MySQL 또는 Oracle을 오래 써온 베테랑 개발자, PostgreSQL 운영을 시작하는 DBA, 메인 DB 의사결정을 책임지는 Tech Lead",
+  "key_promises": [
+    "fork 프로세스 모델·append-only MVCC·HOT·WAL·SSI라는 PG 정체성의 다섯 토대를 정면으로 다룬다",
+    "JSON·검색·GIS·벡터·이벤트·OLAP·API 백엔드까지 9가지 활용 시나리오를 'PG로 가도 되는 선'과 함께 그어준다",
+    "4억 row·6개월·다운타임 18시간·발견 버그 127개 한국 마이그레이션 케이스를 분해해 자기 시스템에 매핑할 수 있게 만든다",
+    "autovacuum·XID wraparound·페일오버·CVE 추적까지 DBA 야간 호출 영역을 운영 매뉴얼로 잡아준다",
+    "RDS·Aurora·AlloyDB·Supabase·Neon 등 매니지드 PG 의사결정 트리와 'Aurora는 진짜 PG인가' 논쟁의 정직한 결론을 담는다"
+  ],
+  "parts": [
+    {"name": "Part 1. 만남", "chapters": [1, 2, 3]},
+    {"name": "Part 2. 정체성", "chapters": [4, 5, 6, 7]},
+    {"name": "Part 3. 활용", "chapters": [8, 9, 10, 11, 12, 13, 14, 15, 16]},
+    {"name": "Part 4. 운영", "chapters": [17, 18, 19, 20, 21, 22, 23, 24, 25]}
+  ]
+}
