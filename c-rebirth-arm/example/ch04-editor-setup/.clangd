@@ -1,0 +1,8 @@
+# clangd 설정. compile_commands.json이 같은 디렉터리에 있을 때
+# 별 설정 없이도 잘 동작하지만, 추가 경고를 켜 두면 에디터가
+# 더 깐깐하게 잡아 준다.
+CompileFlags:
+  Add: [-Wall, -Wextra, -Wpedantic, -std=c23]
+
+Diagnostics:
+  UnusedIncludes: Strict

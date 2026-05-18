@@ -1,0 +1,50 @@
+[
+  {
+    "directory": "REPLACE_WITH_ABS_PATH",
+    "file": "main.c",
+    "arguments": [
+      "clang",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-c",
+      "main.c",
+      "-o",
+      "main.o"
+    ]
+  },
+  {
+    "directory": "REPLACE_WITH_ABS_PATH",
+    "file": "util.c",
+    "arguments": [
+      "clang",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-c",
+      "util.c",
+      "-o",
+      "util.o"
+    ]
+  },
+  {
+    "directory": "REPLACE_WITH_ABS_PATH",
+    "file": "extern_global.c",
+    "arguments": [
+      "clang",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-c",
+      "extern_global.c",
+      "-o",
+      "extern_global.o"
+    ]
+  }
+]

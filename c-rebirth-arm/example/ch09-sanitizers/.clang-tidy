@@ -1,0 +1,10 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  clang-analyzer-*,
+  cert-*,
+  readability-magic-numbers,
+  readability-misleading-indentation
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'

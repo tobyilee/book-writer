@@ -1,0 +1,16 @@
+# Raspberry Pi 4 베어메탈 부팅용 config.txt
+#
+# 이 파일을 SD카드 루트에 두면 GPU 펌웨어가 아래 옵션을 적용한다.
+
+# 1) ARM CPU를 64비트(AArch64)로 깨운다 — 우리 코드의 전제.
+arm_64bit=1
+
+# 2) 64비트 모드용 커널 이미지 파일명. (기본값이지만 명시.)
+kernel=kernel8.img
+
+# 3) UART를 켜고 클럭을 고정한다. 이 한 줄이 없으면 보레이트가 흔들린다.
+enable_uart=1
+
+# 4) 블루투스를 끄고 PL011(UART0)을 외부 GPIO 14/15번 핀으로 라우팅한다.
+#    이 한 줄이 곧 우리가 PL011을 쓸 수 있게 해주는 약속이다.
+dtoverlay=disable-bt

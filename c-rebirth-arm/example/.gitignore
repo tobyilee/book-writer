@@ -1,0 +1,35 @@
+# Build artifacts — recreated by `make` in each chapter dir.
+*.o
+*.a
+*.elf
+*.img
+*.dSYM/
+compile_commands.local.json
+main.i
+main.s
+
+# Executables (no extension) — list explicitly per chapter to avoid
+# accidentally ignoring source files.
+ch01-hello-2026/hello_c89
+ch01-hello-2026/hello_c23
+ch02-std-matrix/std_demo_c89
+ch02-std-matrix/std_demo_c99
+ch02-std-matrix/std_demo_c11
+ch02-std-matrix/std_demo_c17
+ch02-std-matrix/std_demo_c23
+ch02-std-matrix/c23_only
+ch03-day0-setup/triple
+ch04-editor-setup/geom_demo
+ch05-pointers/pointers
+ch06-memory/leak
+ch06-memory/uaf
+ch06-memory/ok
+ch07-ub/ub_zoo
+ch07-ub/ub_zoo_unsafe
+ch08-linker/app
+ch09-sanitizers/bug_asan
+ch09-sanitizers/bug_ubsan
+ch09-sanitizers/bug_msan
+ch09-sanitizers/bug_release
+ch10-libc-gap/ch10-demo
+ch14-rpi4/dist/
