@@ -1,0 +1,38 @@
+{
+  "title": "토비의 스프링 부팅: AOT, Native, CRaC, 그리고 Leyden",
+  "subtitle": "Java는 왜 느리게 시작하는가 — AOT·Native·CRaC·Leyden으로 5단계 비용 줄이기",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-18",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "identifier": "urn:uuid:52c2bc9d-a9e2-434a-90d7-72fe31039f6c",
+  "slug": "spring-aot-startup",
+  "cover_image": "cover.png",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "description": "Java 애플리케이션의 시작 시간을 다섯 단계 비용(JVM 부팅·클래스 로딩·프레임워크 초기화·JIT warm-up·첫 요청 처리)으로 분해하고, CDS·Spring AOT·GraalVM Native Image·CRaC·SnapStart·Azul·Dragonwell·OpenJ9·Project Leyden 여덟 가지 기술을 그 격자 위에 배치한다. 카탈로그가 아니라 결정의 격자 — 자기 워크로드에 무엇이 맞고 무엇이 깨지는지를 스스로 답할 수 있게 돕는 토비식 정공법 기술서.",
+  "target_audience": "Spring Boot 운영 경험 1~3년 이상의 백엔드 중급+ 개발자, 그리고 컨테이너·Kubernetes·Lambda 환경에서 JVM 시작 시간이 비용·SLA 문제로 다가온 시니어 엔지니어와 테크 리드",
+  "chapters": [
+    {"number": 1, "title": "6초의 무게: 왜 시작 시간이 다시 문제가 됐나"},
+    {"number": 2, "title": "Java는 왜 느리게 시작하는가: 다섯 단계의 해부"},
+    {"number": 3, "title": "그들은 어떻게 빌드 타임으로 갔는가: Quarkus, Micronaut, 그리고 Spring의 응답"},
+    {"number": 4, "title": "첫걸음, 그러나 절반의 답: CDS 계보"},
+    {"number": 5, "title": "Spring AOT: 런타임을 빌드 타임으로 옮기다"},
+    {"number": 6, "title": "closed-world의 결단: GraalVM Native Image의 철학"},
+    {"number": 7, "title": "Native Image 실전: 빌드 시간, 트러블슈팅, PGO"},
+    {"number": 8, "title": "시간 여행: CRaC와 SnapStart, 살아 있는 JVM을 동결하다"},
+    {"number": 9, "title": "warm-up의 시대: Azul, Alibaba, OpenJ9가 먼저 푼 문제"},
+    {"number": 10, "title": "Leyden의 점진주의: condenser와 AOT 캐시의 길"},
+    {"number": 11, "title": "결정 트리: 당신의 워크로드에 무엇이 맞는가"},
+    {"number": 12, "title": "진단의 기술: 결정 후, 그 결정이 옳았는지 확인하기"},
+    {"number": 13, "title": "다음 10년: AOT Code, Loom, ZGC, 그리고 시작이라는 개념의 종말"}
+  ],
+  "appendices": [
+    {"id": "A", "title": "8개 기술 한눈 비교 카탈로그"},
+    {"id": "B", "title": "결정 트리 인쇄용 단축판"},
+    {"id": "C", "title": "벤치마크 raw data와 재현 가이드"},
+    {"id": "D", "title": "진단 도구 치트시트"},
+    {"id": "E", "title": "참고문헌 분류 색인"}
+  ]
+}
