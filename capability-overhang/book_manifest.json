@@ -1,0 +1,16 @@
+{
+  "title": "AI의 숨은 능력 — 우리가 아직 꺼내지 못한 90%",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "slug": "capability-overhang",
+  "harness_version": "1.2.0",
+  "publication_date": "2026-05-18",
+  "pub_date": "2026-05-18",
+  "identifier": "capability-overhang-1.0.0",
+  "description": "AI의 잠재 능력과 우리가 실제로 끌어내는 능력 사이의 격차 — capability overhang — 을 다층적으로 해부하고, 일반 사용자·개발자·전문가 각자의 자리에서 그 격차를 좁히는 길을 안내한다.",
+  "audience": "AI를 일상·업무에 쓰지만 잠재력을 충분히 끌어내지 못한다고 느끼는 사람, AI 코딩을 하는 개발자, AI 전문가·연구자.",
+  "manuscript": "04_manuscript.md",
+  "cover": "cover.png"
+}
