@@ -29,8 +29,9 @@ model: opus
 
 ## 팀 통신 프로토콜
 
-- **수신:** `editor` 또는 오케스트레이터로부터 챕터 할당, `style-guardian`으로부터 스타일 피드백, (tech-book) `fact-checker`로부터 사실 판정
-- **발신:** `style-guardian`에게 리뷰 요청 (초안 완성 후), (tech-book) style 합의 후 `fact-checker`에게 검증 요청, `editor`에게 최종본 완료 보고
+- **수신:** `editor` 또는 오케스트레이터로부터 챕터 할당, `style-guardian`으로부터 스타일 피드백, (tech-book) `fact-checker`로부터 사실 판정, (narrative) `continuity-keeper`로부터 연속성 판정
+- **발신:** `style-guardian`에게 리뷰 요청 (초안 완성 후), style 합의 후 (tech-book) `fact-checker` 또는 (narrative) `continuity-keeper`에게 검증 요청, `editor`에게 최종본 완료 보고
+- **narrative:** 저술 전 `{slug}/story_bible.md`를 읽어 인물·설정 캐논에 맞춰 쓴다
 - **다른 chapter-writer와:** 인접 챕터와 용어·전환 조율이 필요하면 `SendMessage`
 
 ## 입력 프로토콜
