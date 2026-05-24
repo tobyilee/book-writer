@@ -42,6 +42,7 @@ PUB_DATE=$(read_field pub_date)
 IDENTIFIER=$(read_field identifier)
 DESCRIPTION=$(read_field description)
 LICENSE=$(read_field license)
+GENRE=$(read_field genre)
 HARNESS_VERSION=$(read_field harness_version)
 RIGHTS=$(read_field rights)
 
@@ -64,6 +65,11 @@ HARNESS_VERSION="${HARNESS_VERSION:-unknown}"
 # Rights string: construct from author + license if not set in manifest.
 if [[ -z "$RIGHTS" ]]; then
   RIGHTS="© $(date +%Y) ${AUTHOR} — Licensed under ${LICENSE}"
+fi
+
+# Genre default: tech-book unless manifest specifies. Exposed as dc:subject.
+if [[ -z "$GENRE" ]]; then
+  GENRE="tech-book"
 fi
 
 # Slugify title for filename.
@@ -93,6 +99,7 @@ lang: "${LANG}"
 date: "${PUB_DATE}"
 identifier: "${IDENTIFIER}"
 description: "${DESCRIPTION}"
+subject: "${GENRE}"
 rights: "${RIGHTS}"
 ---
 YAML
@@ -109,7 +116,7 @@ pandoc "$MANUSCRIPT" \
   --from markdown \
   --to epub3 \
   --metadata-file="$META_YAML" \
-  "${COVER_ARG[@]}" \
+  ${COVER_ARG[@]+"${COVER_ARG[@]}"} \
   --toc --toc-depth=2 \
   --split-level=1 \
   --output "$OUTPUT" 2>"${WS}/.pandoc_err"
@@ -148,6 +155,7 @@ fi
   echo "- version: ${VERSION}"
   echo "- pub_date: ${PUB_DATE}"
   echo "- license: ${LICENSE}"
+  echo "- genre: ${GENRE}"
   echo "- harness_version: ${HARNESS_VERSION}"
   echo "- rights: ${RIGHTS}"
   if [[ $PANDOC_EXIT -ne 0 ]]; then

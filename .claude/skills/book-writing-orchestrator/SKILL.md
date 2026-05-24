@@ -1,6 +1,6 @@
 ---
 name: book-writing-orchestrator
-description: Orchestrate a full book-writing workflow from topic to finished EPUB with cover image. Use when the user asks to "write a book", "draft a book", "author a book", "책 쓰기", "책 저술해줘", "책 만들어줘", "전자책 만들어줘", "EPUB 생성", provides a topic/audience/outline and asks to turn it into a book, or says "~에 대한 책을 써줘". Also triggers on follow-ups like "다시 저술", "계획 수정", "챕터 다시 써줘", "표지 바꿔", "책 업데이트", "특정 챕터 보완", "이전 책 개선", "리서치만 다시". Coordinates research, planning, review, chapter writing in Toby's style, style enforcement, editing, cover design, and EPUB assembly. Author defaults to Toby-AI (overridable via user prompt — include "저자: {이름}").
+description: Orchestrate a full book-writing workflow from topic to finished EPUB with cover image. Use when the user asks to "write a book", "draft a book", "author a book", "책 쓰기", "책 저술해줘", "책 만들어줘", "전자책 만들어줘", "EPUB 생성", provides a topic/audience/outline and asks to turn it into a book, or says "~에 대한 책을 써줘". Also triggers on follow-ups like "다시 저술", "계획 수정", "챕터 다시 써줘", "표지 바꿔", "책 업데이트", "특정 챕터 보완", "이전 책 개선", "리서치만 다시". Coordinates research, planning, review, chapter writing in the active genre voice (auto-detected; defaults to tech-book = Toby's style), style enforcement, editing, cover design, and EPUB assembly. Author defaults to Toby-AI (overridable via user prompt — include "저자: {이름}").
 ---
 
 # Book Writing Orchestrator
@@ -22,10 +22,11 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 워크플로우를 시작하기 전에 기존 산출물 존재 여부를 확인한다.
 
 1. 사용자 입력에서 **주제, 주요 내용, 대상 독자**를 추출한다. 셋 중 하나라도 불명확하면 사용자에게 짧게 질문한다 (AskUserQuestion 사용). 추가로 `저자: {이름}` 형태의 저자 지정이 있는지 확인한다 — 없으면 기본값 `Toby-AI`를 사용하고, 있으면 해당 값을 매니페스트·표지 메타까지 전파한다. `라이선스: {값}` 형태가 있는지도 확인한다 — 없으면 하네스 기본값 `CC BY-NC-SA 4.0`을 매니페스트에 그대로 두고(또는 `license` 필드를 비워두면 빌드 스크립트가 채움), 있으면 해당 값을 매니페스트의 `license` 필드로 전달한다.
-2. 책 제목 후보(슬러그 포함)를 만든다. 예: `AI 시대의 개발자 철학` → 슬러그 `ai-developer-philosophy`.
-3. `{slug}/`의 존재 여부를 확인한다.
+2. **장르 감지 + 확인.** `profiles/_registry.md`의 자동 감지 규칙으로 주제·주요 내용·대상 독자에서 장르를 추정한다 (`tech-book` / `narrative` / `practical` / `essay`, 기본 `tech-book`). 사용자가 `장르: {값}`을 명시했으면 그대로 채택. 아니면 `AskUserQuestion`으로 추정값을 첫 옵션·추천으로 제시해 **확인받는다** (단, 신호가 강하고 명백하면 추정값을 알리고 진행해도 된다). 확정된 `genre`는 이후 모든 Phase로 전파되고, Phase 4의 editor가 `book_manifest.json`의 `genre` 필드에 기록한다. 활성 프로필 경로는 `profiles/{genre}/`.
+3. 책 제목 후보(슬러그 포함)를 만든다. 예: `AI 시대의 개발자 철학` → 슬러그 `ai-developer-philosophy`.
+4. `{slug}/`의 존재 여부를 확인한다.
    - **미존재** → 초기 실행, Phase 1부터 순차 실행
-   - **존재 + 사용자가 부분 수정 요청** (예: "챕터 3만 다시", "계획만 수정") → 부분 재실행, 해당 Phase만 재호출
+   - **존재 + 사용자가 부분 수정 요청** (예: "챕터 3만 다시", "계획만 수정") → 부분 재실행, 해당 Phase만 재호출. 이때 장르는 기존 `book_manifest.json`의 `genre`를 재사용한다 (사용자가 장르 변경을 명시하지 않는 한)
    - **존재 + 새 입력 제공** → 기존 `{slug}/`를 `{slug}_prev-{timestamp}/`로 이동 후 새 실행
 
 ## Phase 1: 리서치 (팬아웃)
@@ -45,7 +46,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 `book-planner` 에이전트를 호출한다.
 
-**입력:** 주제, 주요 내용, 대상 독자, `{slug}/01_reference.md`
+**입력:** `genre`, 주제, 주요 내용, 대상 독자, `{slug}/01_reference.md`, 활성 `profiles/{genre}/scaffolds.md`
 **출력:** `{slug}/02_plan.md` — 책 구조 설계 문서
 - 책 제목 후보 3개
 - 책 특성 (장르, 분량, 난이도, 독자 여정)
@@ -82,9 +83,9 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 6. 모든 챕터 완료 후 `editor`가 전환부를 점검하고 `{slug}/04_manuscript.md`에 통합 원고를 만든다.
 7. 팀을 해체한다.
 
-**챕터 수가 3개를 초과하면** chapter-writer를 챕터 수만큼 만들지 않고, 3명으로 시작해 각자 여러 챕터를 순차 처리한다(풀 방식). 너무 많은 팀원은 조율 오버헤드를 만든다.
+**챕터 수가 3개를 초과하면** chapter-writer를 챕터 수만큼 만들지 않고, 3명으로 시작해 각자 여러 챕터를 순차 처리한다(풀 방식). 너무 많은 팀원은 조율 오버헤드를 만든다. **단 `narrative` 장르는** 연속성(인물·복선·타임라인)이 챕터 독립성보다 중요하므로 풀 크기를 1~2로 줄이거나 순차 저술을 우선한다 — 병렬 저술은 서사를 갈라놓기 쉽다.
 
-**스타일 가이드:** `toby-book-writing-style.md`를 모든 chapter-writer가 참조한다. `chapter-writing` 스킬 내 `references/toby-style-guide.md`에 확장된 가이드가 있다.
+**스타일 가이드:** 활성 `profiles/{genre}/voice.md`와 `scaffolds.md`를 모든 chapter-writer가 참조한다 (genre는 Phase 0에서 확정, 기본 `tech-book`). 프로필 목록·선택 규칙은 `profiles/_registry.md`. style-guardian은 `profiles/{genre}/style-checklist.md`로 검수한다.
 
 ## Phase 5: 표지 + EPUB 빌드 (팬아웃)
 
@@ -101,6 +102,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 - 버전: 초기 실행 시 `1.0.0`, 재실행 시 사용자 요청에 따라 증가 (예: `1.1.0`)
 - 언어: `ko`
 - 라이선스: `CC BY-NC-SA 4.0` (하네스 기본값, Phase 0에서 사용자가 다른 값을 지정했으면 그 값)
+- 장르: Phase 0에서 확정된 `genre`. editor가 매니페스트 `genre` 필드에 기록한다 (재실행 결정성·프로필 재사용용).
 - 하네스 버전: Phase 4의 editor가 매니페스트 작성 시 루트 `VERSION` 파일을 읽어 `harness_version` 필드에 주입한다. editor가 빠뜨려도 빌드 스크립트가 백업으로 채운다.
 
 **콜로폰 페이지:** editor가 통합 원고(`04_manuscript.md`)에 `## 판권` 섹션을 작성한다 — 책 버전·발행일·라이선스 명문화·CC 마크/링크·하네스 출처 크레딧·식별자가 한 페이지에 들어간다. 매니페스트의 `license`가 기본값과 다르면 콜로폰 본문도 그 라이선스로 갈음하도록 editor에 명시한다.

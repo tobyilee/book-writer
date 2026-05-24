@@ -1,11 +1,11 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
-[![Version](https://img.shields.io/badge/harness-v1.2.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/harness-v1.3.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. 모든 챕터는 `toby-book-writing-style.md`에 정의된 **Toby 문체**로 저술되며, 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
+주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. v1.3.0부터 **장르별 문체 프로필**을 지원한다 — 기술서(Toby 문체)·소설·실용서(요리/여행)·에세이. 장르는 자동 감지 후 확인하며, 기본값은 `tech-book`이다 (아래 [장르 프로필](#장르-프로필) 참고). 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
-- **하네스 버전:** `v1.2.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **하네스 버전:** `v1.3.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
 - **라이선스:** 하네스 코드는 **MIT** ([`LICENSE`](LICENSE)). 산출되는 책 콘텐츠 기본값은 **CC BY-NC-SA 4.0** — `book_manifest.json`의 `license` 필드로 책별 오버라이드 가능
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
 - **저자 모델:** Claude Opus (하네스 내 모든 에이전트가 `model: opus` 사용)
@@ -157,9 +157,26 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 ## 커스터마이징
 
+### 장르 프로필
+
+v1.3.0부터 문체·구조·검수 기준은 장르별 프로필로 관리된다. 각 프로필은 `profiles/{genre}/`에 세 파일로 산다.
+
+| genre | 적용 대상 | voice 한 줄 |
+|-------|----------|-------------|
+| `tech-book` (기본) | IT·기술서·최신 기술 해설 | Toby 문체 — 함께 생각하는 선배 개발자 (+ 신선도·사실 규율) |
+| `narrative` | 소설·서사 | 보여주는 산문 — 씬·시점·대사로 끌고 간다 |
+| `practical` | 요리·여행·DIY 실용서 | 명료한 안내자 — 따라 하면 되는 단계와 안전 |
+| `essay` | 에세이·사색 | 사색하는 1인칭 — 일화에서 통찰로 |
+
+- 각 프로필: `voice.md`(문체)·`scaffolds.md`(구조)·`style-checklist.md`(검수)
+- 장르 선택: 오케스트레이터가 Phase 0에서 주제·대상으로 **자동 감지 후 확인**. 프롬프트에 `장르: {값}`을 넣으면 바로 지정된다. 신호가 약하면 `tech-book` 기본
+- 선택 규칙·자동 감지 표는 [`profiles/_registry.md`](profiles/_registry.md)
+- 확정 장르는 `book_manifest.json`의 `genre` 필드에 기록되어 재실행 시 결정적으로 재사용된다
+- 확장 후속(장르별 fact-checker·구조화 EPUB·소설 연속성 추적)은 [`docs/harness-roadmap.md`](docs/harness-roadmap.md)
+
 ### 문체 조정
 
-프로젝트 루트의 `toby-book-writing-style.md`가 모든 챕터 저술의 제약 조건이다. 여기를 수정하면 저술 톤이 바뀐다. 확장 가이드는 `.claude/skills/chapter-writing/references/toby-style-guide.md`에 있다.
+특정 장르의 톤을 바꾸려면 해당 `profiles/{genre}/voice.md`(와 `scaffolds.md`·`style-checklist.md`)를 수정한다. `tech-book`의 뿌리는 루트 `toby-book-writing-style.md`이며 하위호환을 위해 유지된다. 새 장르를 추가하려면 `profiles/{새장르}/`에 세 파일을 만들고 `profiles/_registry.md` 표에 행을 추가한다.
 
 ### 저자명 변경
 
@@ -202,7 +219,16 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 book-writer/
 ├── CLAUDE.md                        # 하네스 포인터 + 변경 이력 (새 세션 자동 로드)
 ├── README.md                        # 이 파일
-├── toby-book-writing-style.md       # Toby 문체 기본 가이드
+├── VERSION                          # 하네스 버전 단일 출처
+├── toby-book-writing-style.md       # tech-book 프로필의 뿌리 (하위호환)
+├── profiles/                        # 장르별 문체 프로필 (v1.3.0+)
+│   ├── _registry.md                 # 장르 목록 + 자동 감지 규칙
+│   ├── tech-book/                   # voice.md / scaffolds.md / style-checklist.md
+│   ├── narrative/                   # 〃
+│   ├── practical/                   # 〃
+│   └── essay/                       # 〃
+├── docs/
+│   └── harness-roadmap.md           # 장르 확장 후속 백로그 (P2·P3·P4)
 ├── .gitignore                       # .omc 등 툴 로컬 파일 제외 (책 산출물은 버전 관리 대상)
 └── .claude/
     ├── agents/                      # 11개 에이전트 정의

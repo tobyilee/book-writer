@@ -8,7 +8,7 @@
 
 **트리거:** 책/전자책/EPUB 저술 관련 작업 요청 시 `book-writing-orchestrator` 스킬을 사용하라. 특정 Phase만 재실행하거나 챕터 수정 요청도 동일 스킬이 처리한다. 단순 질문(예: "책 저술이 뭐야?")은 직접 응답 가능.
 
-**스타일 가이드:** 프로젝트 루트의 `toby-book-writing-style.md`가 모든 챕터 저술의 제약 조건이다. 챕터 저술가와 스타일 가디언은 반드시 이를 준수한다.
+**스타일 가이드 (장르 프로필):** 하네스 v1.3.0부터 문체는 단일 가이드가 아니라 **장르별 프로필**(`profiles/{genre}/`)로 관리된다. 오케스트레이터가 Phase 0에서 장르(`tech-book`/`narrative`/`practical`/`essay`, 기본 `tech-book`)를 감지·확인하면, 그 프로필의 `voice.md`·`scaffolds.md`·`style-checklist.md`가 저술·검수의 제약 조건이 된다. 챕터 저술가와 스타일 가디언은 활성 프로필을 준수한다. 프로필 목록·선택 규칙은 `profiles/_registry.md`. 루트 `toby-book-writing-style.md`는 `tech-book` 프로필의 뿌리이자 하위호환 기준 문서로 유지된다. 확장 후속(장르별 fact-checker·구조화 EPUB·소설 연속성 추적)은 `docs/harness-roadmap.md` 참조.
 
 **산출 경로:**
 - 중간 산출물: `{book-slug}/`
@@ -18,7 +18,7 @@
 
 **브랜치 운영 패턴:** 하네스 자체(에이전트·스킬·CLAUDE.md·README)는 `main` 브랜치에서 관리하고, **각 책은 자기 브랜치**(예: `rust-for-java-developer`, `french-cooking`, `worktree-sf`)에서 산출한다. 새 책을 시작할 때는 `main`에서 새 브랜치를 따고, 거기서 오케스트레이터를 돌린다. 이렇게 하면 하네스 변경과 책 산출물이 섞이지 않는다.
 
-**하네스 버전:** 프로젝트 루트의 `VERSION` 파일이 단일 출처. 현재 `v1.2.0`. 책 매니페스트의 `version`(책의 판본)과 다른 개념이다 — 하네스는 도구의 진화, 책 매니페스트는 각 책의 개정을 추적한다. 매니페스트의 `harness_version` 필드를 통해 산출된 책의 콜로폰에도 노출된다.
+**하네스 버전:** 프로젝트 루트의 `VERSION` 파일이 단일 출처. 현재 `v1.3.0`. 책 매니페스트의 `version`(책의 판본)과 다른 개념이다 — 하네스는 도구의 진화, 책 매니페스트는 각 책의 개정을 추적한다. 매니페스트의 `harness_version` 필드를 통해 산출된 책의 콜로폰에도 노출된다.
 
 **책 콘텐츠 라이선스:** 산출되는 책의 기본 라이선스는 `CC BY-NC-SA 4.0`(저작자 표시·비상업적 이용·동일조건 변경허락). 하네스 코드 라이선스(MIT)와 별개다 — `LICENSE` 파일은 하네스 자체에만 적용되고, 각 책의 라이선스는 EPUB의 콜로폰(`## 판권` 섹션)과 OPF의 `<dc:rights>`로 표기된다. 책별로 다른 라이선스를 쓰려면 `book_manifest.json`의 `license` 필드(예: `"CC BY 4.0"`, `"CC0"`, `"All rights reserved"`)에 명시한다.
 
@@ -33,3 +33,4 @@
 | 2026-04-28 | **1.0.0** | EPUB과 짝을 이루는 책 소개 markdown 산출 추가 — feature-complete 베이스라인 (~12권 산출 검증) | epub-builder, epub-build, 오케스트레이터, README | 마케팅·공유용 외부 독자 카피 자동화 |
 | 2026-05-04 | **1.1.0** | 정합성 정비 (CLAUDE.md 저자 가변 반영, 변경 이력 도입, 브랜치 운영 패턴 명시, 리서처/스타일 가디언 재실행 정책 보강) + `VERSION` 파일 도입 + README 버전 표시 | CLAUDE.md, README, VERSION, web/paper/community-researcher, style-guardian, plan-reviewer | 하네스 감사로 발견된 drift 보정 + 공식 버저닝 도입 (minor 업그레이드, breaking change 없음) |
 | 2026-05-07 | **1.2.0** | 책 본문에 콜로폰(`## 판권`) 페이지 도입 — 책 버전·발행일·라이선스 명문화·CC 마크/링크·하네스 크레딧·식별자 노출. 기본 콘텐츠 라이선스 `CC BY-NC-SA 4.0` 채택 (매니페스트 `license` 필드로 책별 오버라이드 가능). `build_epub.sh`의 하드코딩된 `rights:` 줄을 매니페스트 기반으로 교체. | editor, book-editing, build_epub.sh, epub-builder, epub-build, orchestrator, VERSION, CLAUDE.md | 책 버전을 독자에게 노출 + CC 라이선스 정책 명문화 + `rights` drift 정리 |
+| 2026-05-25 | **1.3.0** | **장르 추상화** — 단일 Toby 문체 고정을 장르별 프로필로 분리. `profiles/{genre}/`(voice·scaffolds·style-checklist) 신설: `tech-book`(기존 Toby + 신선도·사실 규율)·`narrative`·`practical`·`essay`. Phase 0에 장르 자동 감지+확인 추가, `genre`를 전 Phase로 전파. 매니페스트에 `genre` 필드(빌드 시 dc:subject로 노출). 후속 백로그 `docs/harness-roadmap.md`(P2 fact-checker·P3 구조화 EPUB·P4 소설 연속성). | profiles/*, orchestrator, book-planner, book-planning, chapter-writer, chapter-writing, style-guardian, style-review, community-researcher, editor, book-editing, build_epub.sh, VERSION, CLAUDE.md, README | IT 외 장르(소설·실용서·에세이) 지원 + 최신 기술서 신선도 강화 (minor, breaking 없음 — tech-book 기본값) |

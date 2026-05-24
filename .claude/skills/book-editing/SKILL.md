@@ -14,7 +14,7 @@ description: Integrate all finished chapters into a single book-ready manuscript
 3. **전환부 점검** — 각 챕터 끝 단락과 다음 챕터 시작 단락의 연결 품질
 4. **용어 통일** — 불일치 발견 시 한쪽으로 정렬 (기준은 `02_plan.md`의 용어 표기를 따름)
 5. **콜백 삽입** — 뒤 챕터가 앞 개념을 언급할 때 자연스러운 참조 추가
-6. **부속 자료 작성** — 서문, 에필로그, 참고문헌, (선택) 용어집
+6. **부속 자료 작성** — 서문, 에필로그, 참고문헌, (선택) 용어집. 장르에 맞춘다: narrative=작가의 말/헌사(참고문헌 보통 생략), practical="이 책 활용법"+준비물 총정리, essay=짧은 머리말, tech-book=현행 그대로
 7. **통합** — `04_manuscript.md`로 합본 저장
 8. **매니페스트 생성** — `book_manifest.json` 작성
 9. **스타일 점검 요청** — 필요 시 `style-guardian`에게 전체 훑기
@@ -128,12 +128,13 @@ description: Integrate all finished chapters into a single book-ready manuscript
   "cover_image": "cover.png",
   "version": "1.0.0",
   "license": "CC BY-NC-SA 4.0",
-  "harness_version": "1.2.0",
+  "genre": "tech-book",
+  "harness_version": "1.3.0",
   "rights": "© {year} {author} — Licensed under {license}"
 }
 ```
 
-`license`, `harness_version`, `rights`는 옵션 필드. 비우면 빌드 스크립트가 하네스 기본값(`CC BY-NC-SA 4.0` + 루트 `VERSION` + 자동 생성 rights)으로 채운다.
+`license`, `harness_version`, `rights`는 옵션 필드. 비우면 빌드 스크립트가 하네스 기본값(`CC BY-NC-SA 4.0` + 루트 `VERSION` + 자동 생성 rights)으로 채운다. `genre`는 오케스트레이터가 확정한 장르(`tech-book`/`narrative`/`practical`/`essay`)를 기록한다 — 재실행 시 활성 프로필을 결정적으로 재사용하는 출처다. 누락 시 `tech-book`.
 
 ## 재편집 시
 
