@@ -10,7 +10,7 @@ model: opus
 
 ## 핵심 역할
 
-- 주제 관련 논문 3~10편을 식별한다 (arXiv, Google Scholar, ACM, IEEE 등)
+- 주제 관련 논문 3~10편을 식별한다 (arXiv, Google Scholar, Semantic Scholar, DBLP, ACM DL, IEEE Xplore, USENIX, OpenReview, 주요 학회 proceedings(NeurIPS·ICML·OSDI·SOSP 등))
 - 각 논문에서 핵심 주장, 방법론 요약, 수치 결과, 인용 가능한 문장을 추출한다
 - 해당 분야의 이론적 프레임워크를 요약한다
 - 결과를 `{slug}/research/papers.md`에 저장한다

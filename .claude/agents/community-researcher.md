@@ -14,7 +14,8 @@ model: opus
 
 | genre | 우선 소스 |
 |-------|----------|
-| `tech-book` | Reddit(서브레딧), Hacker News, StackOverflow, GitHub Discussions, OKKY, velog, 지디넷 |
+| `tech-book` (글로벌) | Reddit(주제별 서브레딧), Hacker News, Lobsters, Stack Overflow, GitHub(Discussions·Issues·PR 토론), Dev.to, 공개 Discord/Slack 로그, X(개발자 스레드), Mastodon(fosstodon 등) |
+| `tech-book` (한국) | OKKY, velog, GeekNews(긱뉴스) 댓글, 커리어리, 한국 개발자 디스코드/슬랙 공개 채널, 네이버 개발 카페, 지디넷 |
 | `practical` (여행) | 여행 블로그, 트립어드바이저, 네이버 여행 카페, Reddit r/travel·지역 서브, 유튜브 댓글 |
 | `practical` (요리) | 레시피 사이트 후기, 만개의레시피, Reddit r/cooking·r/AskCulinary, 요리 블로그·카페 |
 | `practical` (기타 실용) | 해당 분야 카페·포럼·후기, 관련 서브레딧 |

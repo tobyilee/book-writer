@@ -9,9 +9,10 @@ description: Mine developer/practitioner communities (Reddit, Hacker News, Stack
 
 ## 절차
 
-1. **커뮤니티 선택** — 주제·대상 독자에 맞춰 플랫폼 조합:
-   - 글로벌: Reddit (서브레딧), Hacker News, StackOverflow, GitHub Discussions
-   - 한국: OKKY, velog, 지디넷, 네이버 개발자 카페, 디스코드 공개 채널 로그
+1. **커뮤니티 선택** — 주제·대상 독자에 맞춰 플랫폼 조합 (tech-book 기준, 다른 장르는 community-researcher 에이전트의 장르별 소스 표 참조):
+   - 글로벌: Reddit(주제별 서브레딧), Hacker News, Lobsters, Stack Overflow, GitHub(Discussions·Issues·PR 토론), Dev.to, 공개 Discord/Slack 로그, X(개발자 스레드), Mastodon
+   - 한국: OKKY, velog, GeekNews(긱뉴스) 댓글, 커리어리, 한국 개발자 디스코드/슬랙, 네이버 개발 카페, 지디넷
+   - **버전·릴리스 민감 주제:** GitHub Issues/PR과 릴리스 토론을 비중 있게 — 최신 변경의 실무 반응이 여기 먼저 뜬다 (신선도 메타 기록, fact-checker 대조용)
 2. **검색 실행** — Firecrawl·WebSearch로 토론 페이지 수집
 3. **패턴 추출**
    - **반복되는 고통/질문** — 3명 이상이 비슷한 고민을 토로한 패턴
