@@ -4,23 +4,25 @@
 
 | 트랙 | 제목 | 의존 | 상태 |
 |------|------|------|------|
-| P2 | 최신 기술서: 전용 fact-checker | P1 tech-book 프로필 | 대기 |
+| P2 | 최신 기술서: 전용 fact-checker | P1 tech-book 프로필 | ✅ 완료 (하네스 v1.4.0) |
 | P3 | 실용서: 구조화 데이터 EPUB 템플릿 | P1 practical 프로필 | 대기 |
 | P4 | 소설: 캐릭터·플롯 연속성 추적 | P1 narrative 프로필 | 대기 |
 
 ---
 
-## P2 — 최신 기술서: 전용 fact-checker
+## P2 — 최신 기술서: 전용 fact-checker ✅ 완료 (v1.4.0)
 
-**왜:** P1은 tech-book 프로필의 `style-checklist.md`에 사실/버전 점검 항목을 넣는 선에서 멈춘다. 즉 style-guardian이 부차적으로 사실을 살핀다. 최신 기술서는 수치·API·버전·릴리스 연도가 6개월이면 낡고, 틀리면 책 신뢰를 통째로 깎는다. 사실 검증을 일급 역할로 분리할 필요가 있다.
+**왜:** P1은 tech-book 프로필의 `style-checklist.md`에 사실/버전 점검 항목을 넣는 선에서 멈췄다. 즉 style-guardian이 부차적으로 사실을 살폈다. 최신 기술서는 수치·API·버전·릴리스 연도가 6개월이면 낡고, 틀리면 책 신뢰를 통째로 깎는다. 사실 검증을 일급 역할로 분리했다.
 
-**할 일:**
-- `fact-checker` 에이전트 신설 — 챕터 final 직전, 레퍼런스에 근거 없는 구체 주장(수치·인용·버전·연도)을 색출하고 출처 대조.
-- chapter-writer의 `(사실 확인 필요)` 주석을 fact-checker가 소비·해소하는 프로토콜.
-- 리서치 단계 신선도 메타: 출처 published date 기록, "검색 시점 {날짜} 기준" 라벨.
-- Phase 4 팀에 fact-checker를 옵션 멤버로 (tech-book 장르일 때만 합류).
+**한 일:**
+- ✅ `fact-checker` 에이전트 + `fact-check` 스킬 신설 — style 합의 후, 구체 주장(수치·인용·버전·연도·API·단정)을 레퍼런스 대조로 판정(✅확인/❌정정/⚠️출처없음/🕒신선도). `{slug}/factcheck_log.md` 기록.
+- ✅ chapter-writer의 `(사실 확인 필요)` 주석을 fact-checker가 소비·해소하는 프로토콜. final에 미해소 주석 금지.
+- ✅ 리서치 신선도 메타: web-researcher/paper-researcher/research-lead가 발행일·"{버전}/{연도} 기준"·"검색 시점" 라벨 기록.
+- ✅ Phase 4 팀에 fact-checker를 tech-book일 때만 합류시키는 옵션 멤버로 배선. 사실 오류는 저술가 재량으로 덮지 않음(style 이견과 다른 에스컬레이션).
 
-**범위 주의:** 웹 재검증이 필요하므로 web-researcher 재호출 비용 고려. 장르가 tech-book이 아니면 비활성.
+**구현된 비용 통제:** 1차 레퍼런스 대조 → Critical 주장만 2차 웹 에스컬레이션(WebSearch/WebFetch) → 확정 불가 시 주장 약화/삭제 권고. 장르 ≠ tech-book이면 단계 자체를 생략.
+
+**남은 확장(후속 후보):** practical의 안전·식품 사실 검증으로 fact-checker 활성 장르 확대.
 
 ---
 

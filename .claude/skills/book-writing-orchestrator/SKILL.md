@@ -38,6 +38,8 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 **입력:** 주제, 주요 내용, 대상 독자
 **출력:** `{slug}/01_reference.md` — 리서치 종합 문서 (섹션: 개념·정의, 주요 관점, 사례, 논쟁점, 참고문헌)
 
+**신선도 메타:** tech-book·최신 기술 주제에서는 리서처가 각 출처의 발행일과 검색 시점("검색: {날짜} 기준")을 기록한다. 버전·릴리스 정보는 "{버전}/{연도} 기준"으로 못 박는다. 이 메타가 Phase 4 `fact-checker`의 대조 기준이 된다.
+
 Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 ## Phase 2: 저술 계획
@@ -71,6 +73,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 - `chapter-writer` × N (N = min(챕터 수, 3)) — 챕터별 저술
 - `style-guardian` × 1 — 실시간 스타일 검수
+- `fact-checker` × 1 — **`genre`가 `tech-book`일 때만 합류** (특히 최신 기술 주제). 구체 사실 주장 검증. 다른 장르면 제외
 - `editor` × 1 — 챕터 간 전환·일관성 관리
 
 **절차:**
@@ -78,10 +81,11 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 1. `TeamCreate`로 위 팀을 구성한다. 팀 이름: `book-writing-team`.
 2. `TaskCreate`로 각 챕터를 task로 등록한다. task당 `chapter-writer` 1명을 할당한다.
 3. 각 `chapter-writer`는 자기 챕터 초안을 쓰고 `{slug}/chapters/{NN}_draft.md`에 저장한 뒤 `SendMessage`로 `style-guardian`에게 리뷰를 요청한다.
-4. `style-guardian`은 Toby 스타일 기준(평어체, 청유형, 수사적 질문, 공감 표현 등)으로 검수하고, 편차가 있으면 구체적 수정 제안을 작성해 `SendMessage`로 응답한다.
-5. `chapter-writer`가 수정하고 `{NN}_final.md`로 저장한다.
-6. 모든 챕터 완료 후 `editor`가 전환부를 점검하고 `{slug}/04_manuscript.md`에 통합 원고를 만든다.
-7. 팀을 해체한다.
+4. `style-guardian`은 활성 프로필의 체크리스트로 검수하고, 편차가 있으면 구체적 수정 제안을 작성해 `SendMessage`로 응답한다.
+5. **(tech-book만)** style 합의 후 `chapter-writer`가 `fact-checker`에게 검증을 요청한다. `fact-checker`는 구체 사실 주장과 `(사실 확인 필요)` 주석을 레퍼런스 대조로 판정하고 정정안을 `SendMessage`로 보낸다. 사실 오류(❌·⚠️)는 반드시 반영한다 — style 이견과 달리 저술가 재량으로 덮지 않는다.
+6. `chapter-writer`가 style·fact 피드백을 반영하고 `{NN}_final.md`로 저장한다 (미해소 `(사실 확인 필요)` 주석이 남으면 안 된다).
+7. 모든 챕터 완료 후 `editor`가 전환부를 점검하고 `{slug}/04_manuscript.md`에 통합 원고를 만든다.
+8. 팀을 해체한다.
 
 **챕터 수가 3개를 초과하면** chapter-writer를 챕터 수만큼 만들지 않고, 3명으로 시작해 각자 여러 챕터를 순차 처리한다(풀 방식). 너무 많은 팀원은 조율 오버헤드를 만든다. **단 `narrative` 장르는** 연속성(인물·복선·타임라인)이 챕터 독립성보다 중요하므로 풀 크기를 1~2로 줄이거나 순차 저술을 우선한다 — 병렬 저술은 서사를 갈라놓기 쉽다.
 
@@ -115,6 +119,8 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 |---------|------|
 | 리서치 에이전트 하나가 실패 | 1회 재시도, 재실패 시 해당 섹션 누락 명시하고 진행 |
 | 스타일 가디언과 챕터 저술가가 3회 왕복에도 합의 실패 | 저술가의 최종본을 채택하고 reviewlog에 기록 |
+| 팩트체커와 저술가가 3회 왕복에도 사실 미합의 | 사실 오류는 덮지 않는다 — `factcheck_log.md`에 "미해소(위험)" 명시, editor·사용자에 에스컬레이션 (style 이견과 다른 처리) |
+| 레퍼런스가 빈약해 fact-checker가 핵심 주장 검증 불가 | Critical 주장만 웹 에스컬레이션, 나머지는 주장 약화/삭제 권고 + 리서치 보강 필요 보고 |
 | 표지 생성 실패 | 플레이스홀더 이미지(검은 배경 + 제목 텍스트)로 대체, 사용자에게 알림 |
 | EPUB 빌드 실패 | pandoc 에러 메시지 그대로 보고, 원고 마크다운은 보존 |
 
