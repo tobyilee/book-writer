@@ -1,11 +1,11 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
-[![Version](https://img.shields.io/badge/harness-v1.4.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/harness-v1.5.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. v1.3.0부터 **장르별 문체 프로필**을 지원한다 — 기술서(Toby 문체)·소설·실용서(요리/여행)·에세이. 장르는 자동 감지 후 확인하며, 기본값은 `tech-book`이다 (아래 [장르 프로필](#장르-프로필) 참고). 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
-- **하네스 버전:** `v1.4.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **하네스 버전:** `v1.5.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
 - **라이선스:** 하네스 코드는 **MIT** ([`LICENSE`](LICENSE)). 산출되는 책 콘텐츠 기본값은 **CC BY-NC-SA 4.0** — `book_manifest.json`의 `license` 필드로 책별 오버라이드 가능
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
 - **저자 모델:** Claude Opus (하네스 내 모든 에이전트가 `model: opus` 사용)
@@ -130,7 +130,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ### Phase 5: 표지 + EPUB 빌드 + 책 소개 (팬아웃)
 
 - `cover-designer`가 이미지 생성 (MCP > API > ImageMagick 폴백 순)
-- `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드
+- `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드 (번들 `styles/epub.css`를 자동 임베드 — 실용서 구조화 블록 스타일)
 - `pandoc`으로 `04_manuscript.md` + `cover.png` + `book_manifest.json`을 EPUB 3로 변환
 - `epubcheck` 설치 시 자동 검증
 - EPUB 빌드 직후 `epub-builder`가 `02_plan.md`·`04_manuscript.md`·매니페스트를 읽어 **책 소개 markdown**(`{책-제목}-v{version}.md`)을 EPUB 옆에 작성
@@ -262,8 +262,10 @@ book-writer/
         ├── book-editing/
         ├── cover-design/
         └── epub-build/
-            └── scripts/
-                └── build_epub.sh
+            ├── scripts/
+            │   └── build_epub.sh
+            └── styles/
+                └── epub.css        # 구조화 블록 스타일 (v1.5.0+)
 ```
 
 ## 데이터 전달 규칙

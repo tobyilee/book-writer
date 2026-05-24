@@ -111,7 +111,7 @@ model: opus
   "version": "1.0.0",
   "license": "CC BY-NC-SA 4.0",
   "genre": "tech-book",
-  "harness_version": "1.4.0",
+  "harness_version": "1.5.0",
   "rights": "© {year} {author} — Licensed under {license}"
 }
 ```

@@ -110,6 +110,16 @@ if [[ -f "$COVER" ]]; then
   COVER_ARG+=(--epub-cover-image="$COVER")
 fi
 
+# Structured-block stylesheet (bundled next to this script). Scoped to block
+# classes only, so applying it to every genre is safe. Practical books rely on
+# it for meta/ingredients/steps/tip/warning/itinerary blocks.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CSS_FILE="${SCRIPT_DIR}/../styles/epub.css"
+CSS_ARG=()
+if [[ -f "$CSS_FILE" ]]; then
+  CSS_ARG+=(--css="$CSS_FILE")
+fi
+
 # Run pandoc.
 set +e
 pandoc "$MANUSCRIPT" \
@@ -117,6 +127,7 @@ pandoc "$MANUSCRIPT" \
   --to epub3 \
   --metadata-file="$META_YAML" \
   ${COVER_ARG[@]+"${COVER_ARG[@]}"} \
+  ${CSS_ARG[@]+"${CSS_ARG[@]}"} \
   --toc --toc-depth=2 \
   --split-level=1 \
   --output "$OUTPUT" 2>"${WS}/.pandoc_err"
@@ -156,6 +167,7 @@ fi
   echo "- pub_date: ${PUB_DATE}"
   echo "- license: ${LICENSE}"
   echo "- genre: ${GENRE}"
+  echo "- stylesheet: $([[ -f "$CSS_FILE" ]] && echo "epub.css" || echo "none")"
   echo "- harness_version: ${HARNESS_VERSION}"
   echo "- rights: ${RIGHTS}"
   if [[ $PANDOC_EXIT -ne 0 ]]; then

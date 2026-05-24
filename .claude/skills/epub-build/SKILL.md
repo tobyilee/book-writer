@@ -42,11 +42,16 @@ pandoc {manuscript} \
   --to epub3 \
   --metadata-file={manifest_yaml} \
   --epub-cover-image={cover} \
+  --css={styles/epub.css} \
   --toc --toc-depth=2 \
   --output {output_path}
 ```
 
 매니페스트(JSON)를 YAML로 변환한 뒤 pandoc에 전달한다. 스크립트 전문은 `scripts/build_epub.sh` 참조.
+
+## 구조화 블록 스타일시트 (v1.5.0+)
+
+`styles/epub.css`를 스크립트가 자동으로 임베드한다(스크립트 위치 기준 상대 경로). 특정 블록 클래스(`meta`/`ingredients`/`steps`/`tip`/`warning`/`itinerary`, 태스크 리스트)만 스타일하므로 모든 장르에 안전하게 적용된다 — body·heading은 건드리지 않는다. 실용서(practical) 챕터는 이 클래스들을 pandoc fenced div(`::: meta` 등)로 작성한다(규약은 `profiles/practical/scaffolds.md`). CSS 파일이 없으면 스크립트는 `--css` 없이 진행한다.
 
 ## 파일명 규칙
 
