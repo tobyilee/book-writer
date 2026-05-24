@@ -3,11 +3,15 @@ name: chapter-writing
 description: Write a single book chapter in Toby's distinctive Korean writing style (평어체 기반, 청유형 적극 활용, 수사적 질문, 상황 가정, 감정적 공감 표현). Use when drafting or revising a book chapter, rewriting prose in Toby's voice, translating an outline into full chapter text, or polishing chapter drafts to match 토비 문체. Triggers on "챕터 써줘", "이 섹션 저술", "토비 스타일로 써줘", "write a chapter in Toby's voice", "rewrite in 평어체", or when a chapter outline needs to become full prose.
 ---
 
-# Chapter Writing (Toby Style)
+# Chapter Writing (장르 프로필 기반)
 
-하나의 챕터를 Toby의 문체로 저술한다. 이 스킬의 목적은 단순한 정보 전달이 아니라, **독자와 함께 사고하는 듯한 친근한 논리 전개**를 구현하는 것이다.
+하나의 챕터를 **활성 장르 프로필의 voice**로 저술한다.
 
-## 핵심 원칙
+> **활성 프로필을 먼저 확인하자.** 우선순위: 오케스트레이터가 전달한 `genre` → `{slug}/book_manifest.json`의 `genre` → 기본값 `tech-book`. 해당 `profiles/{genre}/voice.md`(문체)와 `scaffolds.md`(구조)를 읽고 그 규약을 따른다. 프로필 목록·선택 규칙은 `profiles/_registry.md`.
+>
+> **아래 본문(핵심 원칙·표현 사전·피해야 할 패턴)은 `tech-book` 프로필(기본값 = Toby 문체) 기준이다.** narrative·practical·essay 장르는 본문 대신 해당 프로필의 `voice.md`를 따른다 — 공감어("찜찜하다")·실습 청유("해보자")는 tech-book 전용이다.
+
+## tech-book 핵심 원칙
 
 | 원칙 | 내용 |
 |------|------|
@@ -39,17 +43,12 @@ description: Write a single book chapter in Toby's distinctive Korean writing st
 - "그렇다면 어떻게 해야 할까?"
 - "물론 ~다. 하지만 ~"
 
-상세 가이드와 예시는 `references/toby-style-guide.md` 참조.
+상세 가이드와 예시는 활성 `profiles/{genre}/voice.md` 참조 (tech-book = `profiles/tech-book/voice.md`).
 
 ## 챕터 구성 절차
 
 1. **입력 확인** — 책 계획(`02_plan.md`), 할당된 챕터 번호, 해당 챕터의 "핵심 질문"과 "주요 내용", 리서치 자료(`01_reference.md`)를 읽는다.
-2. **챕터 유형 식별** — 챕터는 대체로 다음 중 하나다. 유형별 스캐폴드는 `references/chapter-scaffolds.md` 참조.
-   - 개념 도입형 (새 개념을 설명)
-   - 문제-해결형 (문제를 제시하고 해결책 제안)
-   - 사례 분석형 (구체 사례로 원리 추출)
-   - 비교 대조형 (여러 접근법 비교)
-   - 종합 정리형 (앞 내용 통합)
+2. **챕터 유형 식별** — 활성 프로필의 `profiles/{genre}/scaffolds.md`에서 이 챕터에 맞는 스캐폴드를 고른다. (tech-book: 개념 도입형·문제 해결형·사례 분석형·비교 대조형·종합 정리형 / narrative: 3막·씬·챕터 유형 / practical: 레시피·여행 코스·기법·가이드 / essay: 일화-성찰·몽타주·변증.) 억지로 맞추지 말고 흐름을 우선한다.
 3. **오프닝 작성** — 상황 가정 또는 수사적 질문으로 시작한다. 절대 "이번 장에서는 ~를 다룬다" 같은 메타 선언으로 시작하지 않는다.
 4. **본문 전개** — 개념을 하나씩 도입한다. 각 개념마다 (a) 상황·질문, (b) 친절한 설명, (c) 때로는 코드·예시, (d) "그렇다면 ~" 식 다음 논점으로의 전환 순서를 유지한다.
 5. **감정적 공감 포인트 배치** — 챕터에 최소 2~3회 "난감하다", "찜찜하다" 같은 공감 표현을 배치해 독자의 경험과 연결한다.

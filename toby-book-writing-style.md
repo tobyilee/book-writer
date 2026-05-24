@@ -1,3 +1,5 @@
+> **하네스 v1.3.0부터:** 이 파일은 `tech-book` 장르 프로필의 voice 기반이다. 하네스는 더 이상 단일 문체로 고정되지 않고 장르별 프로필(`profiles/{genre}/`)을 쓴다. 장르 선택·프로필 구조는 [`profiles/_registry.md`](profiles/_registry.md), tech-book 확장 가이드는 [`profiles/tech-book/voice.md`](profiles/tech-book/voice.md) 참조. 아래 내용은 tech-book 프로필의 뿌리이자 하위호환을 위한 기준 문서다.
+
 토비의 문체 및 어투 가이드 (AI 학습용)
 1. 문체 및 어투 (Voice & Tone)
 기본 평어체 기반의 논리적 서술: 기본적으로 글의 서술은 ‘-다’, ‘-한다’ 형태의 객관적이고 논리적인 평어체를 유지한다

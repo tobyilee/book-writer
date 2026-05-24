@@ -1,11 +1,11 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
-[![Version](https://img.shields.io/badge/harness-v1.2.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/harness-v1.7.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. 모든 챕터는 `toby-book-writing-style.md`에 정의된 **Toby 문체**로 저술되며, 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
+주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. v1.3.0부터 **장르별 문체 프로필**을 지원한다 — 기술서(Toby 문체)·소설·실용서(요리/여행)·에세이. 장르는 자동 감지 후 확인하며, 기본값은 `tech-book`이다 (아래 [장르 프로필](#장르-프로필) 참고). 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
-- **하네스 버전:** `v1.2.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **하네스 버전:** `v1.7.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
 - **라이선스:** 하네스 코드는 **MIT** ([`LICENSE`](LICENSE)). 산출되는 책 콘텐츠 기본값은 **CC BY-NC-SA 4.0** — `book_manifest.json`의 `license` 필드로 책별 오버라이드 가능
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
 - **저자 모델:** Claude Opus (하네스 내 모든 에이전트가 `model: opus` 사용)
@@ -19,7 +19,7 @@
 1. **리서치** — 웹·논문·커뮤니티를 병렬로 뒤져 레퍼런스 문서 작성
 2. **저술 계획** — 제목 후보, 책 특성, 챕터 목록과 내러티브 아크 설계
 3. **계획 리뷰** — 저자와 리뷰어 에이전트가 2회 왕복 토론 후 계획 확정
-4. **챕터 저술** — 에이전트 팀이 Toby 문체로 초안 작성, 스타일 가디언이 실시간 감수
+4. **챕터 저술** — 에이전트 팀이 활성 장르 문체로 초안 작성, 스타일 가디언이 실시간 감수 (tech-book은 팩트체커가 사실 검증, narrative는 연속성 키퍼가 story_bible로 연속성 검수 동반)
 5. **편집** — 챕터 통합, 전환부 다듬기, 서문·에필로그·참고문헌 작성
 6. **표지 + EPUB 빌드 + 책 소개** — 표지 이미지 생성, pandoc으로 EPUB 3 조립, 짝을 이루는 책 소개 markdown 작성
 
@@ -118,9 +118,11 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 ### Phase 4: 챕터 저술 (에이전트 팀 — 핵심)
 
-- `chapter-writer` × N + `style-guardian` + `editor`가 팀으로 구성
+- `chapter-writer` × N + `style-guardian` + `editor`가 팀으로 구성 (tech-book이면 `fact-checker`, narrative면 `continuity-keeper`도 합류)
 - 각 `chapter-writer`는 `{NN}_draft.md` 작성 → `style-guardian`에 리뷰 요청
-- `style-guardian`은 Toby 문체 체크리스트 10개 항목으로 검수
+- `style-guardian`은 활성 장르 프로필의 체크리스트로 검수
+- (tech-book) style 합의 후 `fact-checker`가 구체 사실 주장·`(사실 확인 필요)` 주석을 레퍼런스 대조로 검증 — 사실 오류는 반드시 반영
+- (narrative) style 합의 후 `continuity-keeper`가 `story_bible.md` 대조로 인물·관계·세계관·타임라인·복선 모순을 검증 — 연속성 오류는 반드시 반영
 - 합의 시 `{NN}_final.md`로 저장
 - `editor`가 완료된 챕터들을 `04_manuscript.md`로 통합 + `book_manifest.json` 생성
 
@@ -129,7 +131,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ### Phase 5: 표지 + EPUB 빌드 + 책 소개 (팬아웃)
 
 - `cover-designer`가 이미지 생성 (MCP > API > ImageMagick 폴백 순)
-- `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드
+- `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드 (번들 `styles/epub.css`를 자동 임베드 — 실용서 구조화 블록 스타일)
 - `pandoc`으로 `04_manuscript.md` + `cover.png` + `book_manifest.json`을 EPUB 3로 변환
 - `epubcheck` 설치 시 자동 검증
 - EPUB 빌드 직후 `epub-builder`가 `02_plan.md`·`04_manuscript.md`·매니페스트를 읽어 **책 소개 markdown**(`{책-제목}-v{version}.md`)을 EPUB 옆에 작성
@@ -157,9 +159,26 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 ## 커스터마이징
 
+### 장르 프로필
+
+v1.3.0부터 문체·구조·검수 기준은 장르별 프로필로 관리된다. 각 프로필은 `profiles/{genre}/`에 세 파일로 산다.
+
+| genre | 적용 대상 | voice 한 줄 |
+|-------|----------|-------------|
+| `tech-book` (기본) | IT·기술서·최신 기술 해설 | Toby 문체 — 함께 생각하는 선배 개발자 (+ 신선도·사실 규율) |
+| `narrative` | 소설·서사 | 보여주는 산문 — 씬·시점·대사로 끌고 간다 |
+| `practical` | 요리·여행·DIY 실용서 | 명료한 안내자 — 따라 하면 되는 단계와 안전 |
+| `essay` | 에세이·사색 | 사색하는 1인칭 — 일화에서 통찰로 |
+
+- 각 프로필: `voice.md`(문체)·`scaffolds.md`(구조)·`style-checklist.md`(검수)
+- 장르 선택: 오케스트레이터가 Phase 0에서 주제·대상으로 **자동 감지 후 확인**. 프롬프트에 `장르: {값}`을 넣으면 바로 지정된다. 신호가 약하면 `tech-book` 기본
+- 선택 규칙·자동 감지 표는 [`profiles/_registry.md`](profiles/_registry.md)
+- 확정 장르는 `book_manifest.json`의 `genre` 필드에 기록되어 재실행 시 결정적으로 재사용된다
+- 확장 후속(장르별 fact-checker·구조화 EPUB·소설 연속성 추적)은 [`docs/harness-roadmap.md`](docs/harness-roadmap.md)
+
 ### 문체 조정
 
-프로젝트 루트의 `toby-book-writing-style.md`가 모든 챕터 저술의 제약 조건이다. 여기를 수정하면 저술 톤이 바뀐다. 확장 가이드는 `.claude/skills/chapter-writing/references/toby-style-guide.md`에 있다.
+특정 장르의 톤을 바꾸려면 해당 `profiles/{genre}/voice.md`(와 `scaffolds.md`·`style-checklist.md`)를 수정한다. `tech-book`의 뿌리는 루트 `toby-book-writing-style.md`이며 하위호환을 위해 유지된다. 새 장르를 추가하려면 `profiles/{새장르}/`에 세 파일을 만들고 `profiles/_registry.md` 표에 행을 추가한다.
 
 ### 저자명 변경
 
@@ -189,10 +208,10 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 ### 에이전트·스킬 추가/수정
 
-새로운 역할(예: `fact-checker`)을 추가하려면:
+새로운 역할(예: `translator`)을 추가하려면:
 
-1. `.claude/agents/fact-checker.md` 생성 (핵심 역할, 작업 원칙, 프로토콜)
-2. `.claude/skills/fact-check/SKILL.md` 생성 (description은 pushy하게)
+1. `.claude/agents/translator.md` 생성 (핵심 역할, 작업 원칙, 프로토콜)
+2. `.claude/skills/translate/SKILL.md` 생성 (description은 pushy하게)
 3. 오케스트레이터(`book-writing-orchestrator/SKILL.md`)의 Phase 구성에 통합
 4. `CLAUDE.md`의 변경 이력 테이블에 기록
 
@@ -202,10 +221,19 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 book-writer/
 ├── CLAUDE.md                        # 하네스 포인터 + 변경 이력 (새 세션 자동 로드)
 ├── README.md                        # 이 파일
-├── toby-book-writing-style.md       # Toby 문체 기본 가이드
+├── VERSION                          # 하네스 버전 단일 출처
+├── toby-book-writing-style.md       # tech-book 프로필의 뿌리 (하위호환)
+├── profiles/                        # 장르별 문체 프로필 (v1.3.0+)
+│   ├── _registry.md                 # 장르 목록 + 자동 감지 규칙
+│   ├── tech-book/                   # voice.md / scaffolds.md / style-checklist.md
+│   ├── narrative/                   # 〃
+│   ├── practical/                   # 〃
+│   └── essay/                       # 〃
+├── docs/
+│   └── harness-roadmap.md           # 장르 확장 후속 백로그 (P2·P3·P4)
 ├── .gitignore                       # .omc 등 툴 로컬 파일 제외 (책 산출물은 버전 관리 대상)
 └── .claude/
-    ├── agents/                      # 11개 에이전트 정의
+    ├── agents/                      # 13개 에이전트 정의
     │   ├── research-lead.md
     │   ├── web-researcher.md
     │   ├── paper-researcher.md
@@ -214,10 +242,12 @@ book-writer/
     │   ├── plan-reviewer.md
     │   ├── chapter-writer.md
     │   ├── style-guardian.md
+    │   ├── fact-checker.md          # tech-book 사실 검증 (v1.4.0+)
+    │   ├── continuity-keeper.md     # narrative 연속성 추적 (v1.7.0+)
     │   ├── editor.md
     │   ├── cover-designer.md
     │   └── epub-builder.md
-    └── skills/                      # 오케스트레이터 + 11개 전문 스킬
+    └── skills/                      # 오케스트레이터 + 13개 전문 스킬
         ├── book-writing-orchestrator/   # 최상위 워크플로우
         ├── research-coordination/
         ├── web-research/
@@ -227,14 +257,18 @@ book-writer/
         ├── plan-review/
         ├── chapter-writing/
         │   └── references/
-        │       ├── toby-style-guide.md
-        │       └── chapter-scaffolds.md
+        │       ├── toby-style-guide.md   # → profiles/tech-book/voice.md 포인터
+        │       └── chapter-scaffolds.md  # → profiles/{genre}/scaffolds.md 포인터
         ├── style-review/
+        ├── fact-check/              # tech-book 사실 검증 (v1.4.0+)
+        ├── continuity-check/        # narrative 연속성 검수 (v1.7.0+)
         ├── book-editing/
         ├── cover-design/
         └── epub-build/
-            └── scripts/
-                └── build_epub.sh
+            ├── scripts/
+            │   └── build_epub.sh
+            └── styles/
+                └── epub.css        # 구조화 블록 스타일 (v1.5.0+)
 ```
 
 ## 데이터 전달 규칙

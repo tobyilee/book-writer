@@ -1,6 +1,6 @@
 ---
 name: book-writing-orchestrator
-description: Orchestrate a full book-writing workflow from topic to finished EPUB with cover image. Use when the user asks to "write a book", "draft a book", "author a book", "책 쓰기", "책 저술해줘", "책 만들어줘", "전자책 만들어줘", "EPUB 생성", provides a topic/audience/outline and asks to turn it into a book, or says "~에 대한 책을 써줘". Also triggers on follow-ups like "다시 저술", "계획 수정", "챕터 다시 써줘", "표지 바꿔", "책 업데이트", "특정 챕터 보완", "이전 책 개선", "리서치만 다시". Coordinates research, planning, review, chapter writing in Toby's style, style enforcement, editing, cover design, and EPUB assembly. Author defaults to Toby-AI (overridable via user prompt — include "저자: {이름}").
+description: Orchestrate a full book-writing workflow from topic to finished EPUB with cover image. Use when the user asks to "write a book", "draft a book", "author a book", "책 쓰기", "책 저술해줘", "책 만들어줘", "전자책 만들어줘", "EPUB 생성", provides a topic/audience/outline and asks to turn it into a book, or says "~에 대한 책을 써줘". Also triggers on follow-ups like "다시 저술", "계획 수정", "챕터 다시 써줘", "표지 바꿔", "책 업데이트", "특정 챕터 보완", "이전 책 개선", "리서치만 다시". Coordinates research, planning, review, chapter writing in the active genre voice (auto-detected; defaults to tech-book = Toby's style), style enforcement, editing, cover design, and EPUB assembly. Author defaults to Toby-AI (overridable via user prompt — include "저자: {이름}").
 ---
 
 # Book Writing Orchestrator
@@ -22,10 +22,11 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 워크플로우를 시작하기 전에 기존 산출물 존재 여부를 확인한다.
 
 1. 사용자 입력에서 **주제, 주요 내용, 대상 독자**를 추출한다. 셋 중 하나라도 불명확하면 사용자에게 짧게 질문한다 (AskUserQuestion 사용). 추가로 `저자: {이름}` 형태의 저자 지정이 있는지 확인한다 — 없으면 기본값 `Toby-AI`를 사용하고, 있으면 해당 값을 매니페스트·표지 메타까지 전파한다. `라이선스: {값}` 형태가 있는지도 확인한다 — 없으면 하네스 기본값 `CC BY-NC-SA 4.0`을 매니페스트에 그대로 두고(또는 `license` 필드를 비워두면 빌드 스크립트가 채움), 있으면 해당 값을 매니페스트의 `license` 필드로 전달한다.
-2. 책 제목 후보(슬러그 포함)를 만든다. 예: `AI 시대의 개발자 철학` → 슬러그 `ai-developer-philosophy`.
-3. `{slug}/`의 존재 여부를 확인한다.
+2. **장르 감지 + 확인.** `profiles/_registry.md`의 자동 감지 규칙으로 주제·주요 내용·대상 독자에서 장르를 추정한다 (`tech-book` / `narrative` / `practical` / `essay`, 기본 `tech-book`). 사용자가 `장르: {값}`을 명시했으면 그대로 채택. 아니면 `AskUserQuestion`으로 추정값을 첫 옵션·추천으로 제시해 **확인받는다** (단, 신호가 강하고 명백하면 추정값을 알리고 진행해도 된다). 확정된 `genre`는 이후 모든 Phase로 전파되고, Phase 4의 editor가 `book_manifest.json`의 `genre` 필드에 기록한다. 활성 프로필 경로는 `profiles/{genre}/`.
+3. 책 제목 후보(슬러그 포함)를 만든다. 예: `AI 시대의 개발자 철학` → 슬러그 `ai-developer-philosophy`.
+4. `{slug}/`의 존재 여부를 확인한다.
    - **미존재** → 초기 실행, Phase 1부터 순차 실행
-   - **존재 + 사용자가 부분 수정 요청** (예: "챕터 3만 다시", "계획만 수정") → 부분 재실행, 해당 Phase만 재호출
+   - **존재 + 사용자가 부분 수정 요청** (예: "챕터 3만 다시", "계획만 수정") → 부분 재실행, 해당 Phase만 재호출. 이때 장르는 기존 `book_manifest.json`의 `genre`를 재사용한다 (사용자가 장르 변경을 명시하지 않는 한)
    - **존재 + 새 입력 제공** → 기존 `{slug}/`를 `{slug}_prev-{timestamp}/`로 이동 후 새 실행
 
 ## Phase 1: 리서치 (팬아웃)
@@ -37,6 +38,8 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 **입력:** 주제, 주요 내용, 대상 독자
 **출력:** `{slug}/01_reference.md` — 리서치 종합 문서 (섹션: 개념·정의, 주요 관점, 사례, 논쟁점, 참고문헌)
 
+**신선도 메타:** tech-book·최신 기술 주제에서는 리서처가 각 출처의 발행일과 검색 시점("검색: {날짜} 기준")을 기록한다. 버전·릴리스 정보는 "{버전}/{연도} 기준"으로 못 박는다. 이 메타가 Phase 4 `fact-checker`의 대조 기준이 된다.
+
 Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 ## Phase 2: 저술 계획
@@ -45,7 +48,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 `book-planner` 에이전트를 호출한다.
 
-**입력:** 주제, 주요 내용, 대상 독자, `{slug}/01_reference.md`
+**입력:** `genre`, 주제, 주요 내용, 대상 독자, `{slug}/01_reference.md`, 활성 `profiles/{genre}/scaffolds.md`
 **출력:** `{slug}/02_plan.md` — 책 구조 설계 문서
 - 책 제목 후보 3개
 - 책 특성 (장르, 분량, 난이도, 독자 여정)
@@ -68,23 +71,30 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 가장 중요한 Phase다. 팀 구성:
 
-- `chapter-writer` × N (N = min(챕터 수, 3)) — 챕터별 저술
+- `chapter-writer` × N (N = min(챕터 수, 3); **narrative는 1~2** — 연속성 보호) — 챕터별 저술
 - `style-guardian` × 1 — 실시간 스타일 검수
+- `fact-checker` × 1 — **`genre`가 `tech-book`일 때만 합류** (특히 최신 기술 주제). 구체 사실 주장 검증. 다른 장르면 제외
+- `continuity-keeper` × 1 — **`genre`가 `narrative`일 때만 합류**. story_bible로 인물·관계·세계관·타임라인·복선 연속성 검수. 다른 장르면 제외
 - `editor` × 1 — 챕터 간 전환·일관성 관리
 
 **절차:**
 
 1. `TeamCreate`로 위 팀을 구성한다. 팀 이름: `book-writing-team`.
-2. `TaskCreate`로 각 챕터를 task로 등록한다. task당 `chapter-writer` 1명을 할당한다.
-3. 각 `chapter-writer`는 자기 챕터 초안을 쓰고 `{slug}/chapters/{NN}_draft.md`에 저장한 뒤 `SendMessage`로 `style-guardian`에게 리뷰를 요청한다.
-4. `style-guardian`은 Toby 스타일 기준(평어체, 청유형, 수사적 질문, 공감 표현 등)으로 검수하고, 편차가 있으면 구체적 수정 제안을 작성해 `SendMessage`로 응답한다.
-5. `chapter-writer`가 수정하고 `{NN}_final.md`로 저장한다.
-6. 모든 챕터 완료 후 `editor`가 전환부를 점검하고 `{slug}/04_manuscript.md`에 통합 원고를 만든다.
-7. 팀을 해체한다.
+2. **(narrative만)** `continuity-keeper`가 `02_plan.md`를 읽어 `{slug}/story_bible.md`를 시드한다 (인물·관계·세계관·타임라인·복선 초기 정전). 챕터 저술 전에 끝낸다.
+3. `TaskCreate`로 각 챕터를 task로 등록한다. task당 `chapter-writer` 1명을 할당한다. narrative는 이전 챕터의 캐논이 확정된 뒤 다음 챕터로 넘어가도록 순차성을 우선한다.
+4. 각 `chapter-writer`는 자기 챕터 초안을 쓰고 `{slug}/chapters/{NN}_draft.md`에 저장한 뒤 `SendMessage`로 `style-guardian`에게 리뷰를 요청한다. (narrative는 `story_bible.md`를 읽고 캐논에 맞춰 쓴다.)
+5. `style-guardian`은 활성 프로필의 체크리스트로 검수하고, 편차가 있으면 구체적 수정 제안을 작성해 `SendMessage`로 응답한다.
+6. **장르별 전문 검수 (style 합의 후):**
+   - **tech-book** — `chapter-writer`가 `fact-checker`에게 검증 요청. 구체 사실 주장·`(사실 확인 필요)` 주석을 레퍼런스 대조로 판정·정정.
+   - **narrative** — `chapter-writer`가 `continuity-keeper`에게 검증 요청. story_bible 대조로 인물·관계·세계관·타임라인·복선 모순을 판정. keeper는 새 정전을 bible에 갱신.
+   - 두 경우 모두 사실/연속성 오류(❌)는 반드시 반영한다 — style 이견과 달리 저술가 재량으로 덮지 않는다.
+7. `chapter-writer`가 style + (fact 또는 continuity) 피드백을 반영하고 `{NN}_final.md`로 저장한다 (미해소 `(사실 확인 필요)` 주석이 남으면 안 된다).
+8. 모든 챕터 완료 후 `editor`가 전환부를 점검하고 `{slug}/04_manuscript.md`에 통합 원고를 만든다. (narrative면 `continuity-keeper`에 통합 원고 일괄 대조 + 미회수 복선 점검을 요청한다.)
+9. 팀을 해체한다.
 
-**챕터 수가 3개를 초과하면** chapter-writer를 챕터 수만큼 만들지 않고, 3명으로 시작해 각자 여러 챕터를 순차 처리한다(풀 방식). 너무 많은 팀원은 조율 오버헤드를 만든다.
+**챕터 수가 3개를 초과하면** chapter-writer를 챕터 수만큼 만들지 않고, 3명으로 시작해 각자 여러 챕터를 순차 처리한다(풀 방식). 너무 많은 팀원은 조율 오버헤드를 만든다. **단 `narrative` 장르는** 연속성(인물·복선·타임라인)이 챕터 독립성보다 중요하므로 풀 크기를 1~2로 줄이거나 순차 저술을 우선한다 — 병렬 저술은 서사를 갈라놓기 쉽다.
 
-**스타일 가이드:** `toby-book-writing-style.md`를 모든 chapter-writer가 참조한다. `chapter-writing` 스킬 내 `references/toby-style-guide.md`에 확장된 가이드가 있다.
+**스타일 가이드:** 활성 `profiles/{genre}/voice.md`와 `scaffolds.md`를 모든 chapter-writer가 참조한다 (genre는 Phase 0에서 확정, 기본 `tech-book`). 프로필 목록·선택 규칙은 `profiles/_registry.md`. style-guardian은 `profiles/{genre}/style-checklist.md`로 검수한다.
 
 ## Phase 5: 표지 + EPUB 빌드 (팬아웃)
 
@@ -101,6 +111,7 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 - 버전: 초기 실행 시 `1.0.0`, 재실행 시 사용자 요청에 따라 증가 (예: `1.1.0`)
 - 언어: `ko`
 - 라이선스: `CC BY-NC-SA 4.0` (하네스 기본값, Phase 0에서 사용자가 다른 값을 지정했으면 그 값)
+- 장르: Phase 0에서 확정된 `genre`. editor가 매니페스트 `genre` 필드에 기록한다 (재실행 결정성·프로필 재사용용).
 - 하네스 버전: Phase 4의 editor가 매니페스트 작성 시 루트 `VERSION` 파일을 읽어 `harness_version` 필드에 주입한다. editor가 빠뜨려도 빌드 스크립트가 백업으로 채운다.
 
 **콜로폰 페이지:** editor가 통합 원고(`04_manuscript.md`)에 `## 판권` 섹션을 작성한다 — 책 버전·발행일·라이선스 명문화·CC 마크/링크·하네스 출처 크레딧·식별자가 한 페이지에 들어간다. 매니페스트의 `license`가 기본값과 다르면 콜로폰 본문도 그 라이선스로 갈음하도록 editor에 명시한다.
@@ -113,6 +124,10 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 |---------|------|
 | 리서치 에이전트 하나가 실패 | 1회 재시도, 재실패 시 해당 섹션 누락 명시하고 진행 |
 | 스타일 가디언과 챕터 저술가가 3회 왕복에도 합의 실패 | 저술가의 최종본을 채택하고 reviewlog에 기록 |
+| 팩트체커와 저술가가 3회 왕복에도 사실 미합의 | 사실 오류는 덮지 않는다 — `factcheck_log.md`에 "미해소(위험)" 명시, editor·사용자에 에스컬레이션 (style 이견과 다른 처리) |
+| 레퍼런스가 빈약해 fact-checker가 핵심 주장 검증 불가 | Critical 주장만 웹 에스컬레이션, 나머지는 주장 약화/삭제 권고 + 리서치 보강 필요 보고 |
+| continuity-keeper와 저술가가 3회 왕복에도 연속성 미합의 | 연속성 모순은 덮지 않는다 — `continuity_log.md`에 "미해소(모순 위험)" 명시, editor·사용자에 에스컬레이션 |
+| 계획이 인물·설정을 충분히 명시 안 해 story_bible 시드 부실 | 1장 초안에서 캐논을 추출해 bible 초기화, 이후 챕터에서 누적 보강 |
 | 표지 생성 실패 | 플레이스홀더 이미지(검은 배경 + 제목 텍스트)로 대체, 사용자에게 알림 |
 | EPUB 빌드 실패 | pandoc 에러 메시지 그대로 보고, 원고 마크다운은 보존 |
 

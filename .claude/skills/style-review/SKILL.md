@@ -1,22 +1,26 @@
 ---
 name: style-review
-description: Review chapter drafts against Toby's writing style guide — detects 지시적 어조, 메타 문장, 외래어 남용, 수동태 남발, 공감 표현 부족. Provides concrete before/after rewrite suggestions. Use when reviewing a chapter draft for style consistency, enforcing 토비 문체, or polishing prose in the Toby voice.
+description: Review chapter drafts against the active genre profile's style checklist (defaults to tech-book = Toby's voice) — detects voice deviations and provides concrete before/after rewrite suggestions. Use when reviewing a chapter draft for style consistency, enforcing the genre voice, or polishing prose.
 ---
 
 # Style Review
 
-챕터 초안을 Toby 문체 기준으로 검수한다. 발견한 편차에 대해 **구체적 대체 문장**을 제안한다.
+챕터 초안을 **활성 장르 프로필** 기준으로 검수한다. 발견한 편차에 대해 **구체적 대체 문장**을 제안한다.
+
+> **활성 프로필을 먼저 확인하자.** 우선순위: 오케스트레이터가 전달한 `genre` → `{slug}/book_manifest.json`의 `genre` → 기본값 `tech-book`. 검수 기준은 `profiles/{genre}/style-checklist.md`와 `voice.md`. 장르마다 항목·우선순위가 다르다.
 
 ## 절차
 
 1. **원문 읽기** — `{NN}_draft.md`를 처음부터 끝까지
-2. **기준 재확인** — `toby-book-writing-style.md`와 `chapter-writing/references/toby-style-guide.md`
-3. **체크리스트 순회** — 아래 10개 항목 점검
+2. **기준 재확인** — 활성 `profiles/{genre}/style-checklist.md`와 `voice.md`
+3. **체크리스트 순회** — 프로필 체크리스트 항목 점검
 4. **편차 기록** — 원문 인용 + 대안 제시 + 이유
-5. **우선순위** — Critical / Should / Nice
+5. **우선순위** — Critical / Should / Nice (프로필 정의를 따름)
 6. **메시지 전송** — `SendMessage`로 `chapter-writer`에게
 
 ## 검수 체크리스트
+
+활성 프로필의 `style-checklist.md`를 항목표로 쓴다. 아래는 **tech-book(기본값)** 예시다 — narrative·practical·essay는 각 프로필 체크리스트를 따른다.
 
 | 번호 | 항목 | 점검 방식 |
 |------|------|----------|
@@ -30,6 +34,7 @@ description: Review chapter drafts against Toby's writing style guide — detect
 | 8 | 논리 전환구 | "그렇다면 ~", "물론 ~다. 하지만 ~" 구사 |
 | 9 | 나열식 | 문단이 리스트·번호로만 채워진 구간 |
 | 10 | 호흡 | 3줄 이상 이어진 긴 문장 여러 개 |
+| 11 | 사실·신선도 | (최신 기술) 시점 명기·출처 있는 수치·추측 API 금지 — 위반은 Critical |
 
 ## 리뷰 메시지 포맷
 

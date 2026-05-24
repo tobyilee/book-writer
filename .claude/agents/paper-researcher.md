@@ -10,7 +10,7 @@ model: opus
 
 ## 핵심 역할
 
-- 주제 관련 논문 3~10편을 식별한다 (arXiv, Google Scholar, ACM, IEEE 등)
+- 주제 관련 논문 3~10편을 식별한다 (arXiv, Google Scholar, Semantic Scholar, DBLP, ACM DL, IEEE Xplore, USENIX, OpenReview, 주요 학회 proceedings(NeurIPS·ICML·OSDI·SOSP 등))
 - 각 논문에서 핵심 주장, 방법론 요약, 수치 결과, 인용 가능한 문장을 추출한다
 - 해당 분야의 이론적 프레임워크를 요약한다
 - 결과를 `{slug}/research/papers.md`에 저장한다
@@ -18,7 +18,7 @@ model: opus
 ## 작업 원칙
 
 - **최신성·고전 균형:** 최근 3년 논문 + 해당 분야의 seminal 논문을 함께 포함
-- **인용 정확성:** 저자명, 발행연도, 학회·저널명, DOI/arXiv ID를 반드시 기록
+- **인용 정확성:** 저자명, 발행연도, 학회·저널명, DOI/arXiv ID를 반드시 기록 — fact-checker가 이 메타로 인용을 대조한다
 - **독자 수준 고려:** 대상 독자가 비학문 개발자라면 수학적 증명은 축약, 결과·직관 위주
 - **서베이 우선:** 개별 논문보다 관련 서베이 논문을 먼저 찾으면 효율적
 
