@@ -1,0 +1,18 @@
+{
+  "title": "나노챗 해부학",
+  "subtitle": "한 GPU 노드 3시간으로 ChatGPT를 만든다 — 카르파시 nanochat 8천 줄 코드 해부",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "slug": "나노챗-해부학",
+  "pub_date": "2026-05-24",
+  "publication_date": "2026-05-24",
+  "manuscript": "04_manuscript.md",
+  "cover_image": "cover.png",
+  "cover": "cover.png",
+  "harness_version": "1.2.0",
+  "identifier": "urn:uuid:nanochat-anatomy-v1.0.0",
+  "description": "PyTorch와 Python을 다루지만 LLM 내부와 학습 파이프라인은 모르는 개발자를 위해, 카르파시의 nanochat(약 8천 줄)을 처음부터 끝까지 해부한다. 토크나이저부터 사전학습, SFT, RL, 추론 엔진, 그리고 챗봇 UI까지 — 직접 코드를 펴고 자기 손으로 ChatGPT급 모델을 만드는 12장의 여정.",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
