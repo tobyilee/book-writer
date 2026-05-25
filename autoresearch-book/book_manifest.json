@@ -1,0 +1,20 @@
+{
+  "title": "autoresearch: 사람이 자는 동안 진화하는 코드",
+  "author": "Toby-AI",
+  "version": "1.0.0",
+  "language": "ko",
+  "license": "CC BY-NC-SA 4.0",
+  "harness_version": "1.2.0",
+  "publication_date": "2026-05-24",
+  "pub_date": "2026-05-24",
+  "identifier": "autoresearch-book-v1.0.0",
+  "manuscript_path": "autoresearch-book/04_manuscript.md",
+  "cover_path": "autoresearch-book/cover.png",
+  "cover_image": "cover.png",
+  "logline": "Karpathy의 autoresearch가 무엇인지, 사람들이 그것을 어떻게 변형하고 있는지, 그리고 그 패턴을 Claude Code 환경에서 어떻게 응용할 것인가에 대한 단단한 에세이.",
+  "description": "Karpathy가 2026년 3월에 공개한 autoresearch — AI 코딩 에이전트에게 5분짜리 LLM 훈련 루프를 맡기고 밤새 자율 실험을 돌리는 미니멀 프로젝트. 이 책은 그 사건을 단순 코드 워크스루로 다루지 않고, '편집 가능한 아티팩트 + 자동 메트릭 + keep/discard 루프'라는 일반화 공식을 추출해 Claude Code 환경의 자기 도메인에 어떻게 응용할 수 있는지까지 끌고 간다.",
+  "target_audience": "한국어 시니어 엔지니어, LLM 실무자, Claude Code/Codex 사용자 — 자율 에이전트 패턴을 자기 도메인에 응용하고 싶은 사람",
+  "chapter_count": 12,
+  "estimated_word_count": "약 115,000자",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
