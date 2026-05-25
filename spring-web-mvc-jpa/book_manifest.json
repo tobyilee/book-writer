@@ -1,0 +1,32 @@
+{
+  "title": "React에서 Spring으로",
+  "subtitle": "백엔드를 처음 만드는 프런트엔드 개발자의 안내서",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-25",
+  "identifier": "urn:uuid:9b2f1e6a-7c84-4d2e-b3a1-5f0c2d8e4a17",
+  "description": "React/Next.js로 화면은 잘 만들지만 서버는 'fetch가 때리는 블랙박스'였던 프런트엔드 개발자를 위한 Spring MVC + JPA 백엔드 입문서. 'TaskBoard'라는 하나의 연속 프로젝트를 빈 프로젝트에서 인증·화면까지 키워나가며, 프런트가 이미 아는 것(fetch·CORS·ORM·미들웨어)을 발판으로 백엔드를 익힌다. AI 페어코딩을 동반자로 쓰되 'AI는 만들고 검증은 사람이 한다'는 태도를 책 전체에 녹였고, javax→jakarta·WebSecurityConfigurerAdapter 제거 같은 버전 신선도 함정을 가려내는 눈을 기른다. Spring Boot 3.x / Spring Security 6.x / Java 17·21 기준.",
+  "target_audience": "자바 문법과 SQL 기본은 알지만 백엔드 실무 경험이 없는 프런트엔드(React/Next.js) 개발자. Cursor·Claude Code로 AI 페어코딩은 해봤으나 Spring 생성 코드의 옳고 그름을 판별하지 못하는 입문자.",
+  "cover_image": "cover.png",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "harness_version": "1.7.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "chapters": [
+    { "number": 1, "title": "fetch 너머에 누가 있나 — 클라이언트의 HTTP를 서버의 HTTP로 뒤집기" },
+    { "number": 2, "title": "AI와 함께 배운다는 것 — 동반자이자 의심 대상" },
+    { "number": 3, "title": "첫 엔드포인트 — 빌드 도구부터 동작하는 서버까지" },
+    { "number": 4, "title": "마법 걷어내기 — DI와 IoC가 실제로 하는 일" },
+    { "number": 5, "title": "제대로 된 REST API — DTO·검증·전역 예외·CORS·첫 테스트" },
+    { "number": 6, "title": "메모리에서 데이터베이스로 — JPA를 붙이다" },
+    { "number": 7, "title": "영속성 컨텍스트라는 출석부 — 더티 체킹과 지연 로딩의 마법" },
+    { "number": 8, "title": "운영에서 터지는 것들 — N+1과 SQL 로그 규율" },
+    { "number": 9, "title": "보안의 기초 — 인증·인가와 필터체인이 요청을 가로채는 법" },
+    { "number": 10, "title": "JWT로 인증하기 — stateless 구현과 신선도 함정의 클라이맥스" },
+    { "number": 11, "title": "다른 길 — Spring Security 세션(stateful)과 트레이드오프" },
+    { "number": 12, "title": "서버가 그리는 화면 — Thymeleaf와 SSR vs CSR" },
+    { "number": 13, "title": "스펙에서 동작까지 — Claude Code로 기능 하나를 완주하기" },
+    { "number": 14, "title": "여기서 어디로 — 여정 정리와 3.x에서 4.x로" }
+  ]
+}
