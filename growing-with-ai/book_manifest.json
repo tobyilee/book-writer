@@ -1,0 +1,28 @@
+{
+  "title": "AI에게 맡기고, 함께 자란다",
+  "subtitle": "코드를 다 써주는 시대에 개발자가 둔해지지 않는 법",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-25",
+  "identifier": "urn:uuid:486f930c-3468-48fa-bf31-fbf4b94999c9",
+  "description": "AI에게 코드를 맡길수록 커지는 '내 실력이 녹슬고 있다'는 불안을 정면으로 다룬다. METR 19%와 GitHub 56% 같은 모순된 생산성 데이터를 정직하게 읽는 데서 출발해, 무엇을 맡기고 무엇을 직접 익힐지 가르는 2×2 판단 프레임, agentic·vibe coding 워크플로우, 컨텍스트 엔지니어링, 명세·하네스, 검증 엔지니어링, 검증을 학습으로 바꾸는 루프, 팀의 검증 문화까지 — 현업 중급 이상 개발자가 AI를 증폭기로 삼아 함께 자라는 법을 실전 기법 70%·사색 30%로 엮은 tech-book.",
+  "cover_image": "cover.png",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "harness_version": "1.7.0",
+  "slug": "growing-with-ai",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "chapters": [
+    { "number": 1, "title": "녹슬고 있다는 느낌 — 두려움의 정체", "file": "chapters/01_final.md" },
+    { "number": 2, "title": "19%와 56% 사이 — 모순된 생산성 데이터 정직하게 읽기", "file": "chapters/02_final.md" },
+    { "number": 3, "title": "무엇을 맡기고 무엇을 익힐 것인가 — 위임과 학습의 판단 기준", "file": "chapters/03_final.md" },
+    { "number": 4, "title": "AI와 일하는 법 — Agentic Coding과 Vibe Coding 워크플로우", "file": "chapters/04_final.md" },
+    { "number": 5, "title": "에이전트에게 무엇을 흘려보내는가 — 컨텍스트 엔지니어링과 CLAUDE.md/AGENTS.md", "file": "chapters/05_final.md" },
+    { "number": 6, "title": "큰 작업을 구조화하기 — 명세(Spec-Driven)와 하네스", "file": "chapters/06_final.md" },
+    { "number": 7, "title": "이제 어려운 일은 검증이다 — 검증 엔지니어링과 검증 부채", "file": "chapters/07_final.md" },
+    { "number": 8, "title": "검증하다 배우기 — AI 코드를 읽고 익히는 법", "file": "chapters/08_final.md" },
+    { "number": 9, "title": "시니어와 주니어, 그리고 팀 — 역할이 재정의되는 자리", "file": "chapters/09_final.md" },
+    { "number": 10, "title": "함께 성장하는 개발자 — 대체가 아니라 증폭", "file": "chapters/10_final.md" }
+  ]
+}
