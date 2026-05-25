@@ -89,20 +89,37 @@ if [[ -f "$OUTPUT" ]]; then
   mv "$OUTPUT" "_prev/$(basename "$OUTPUT" .epub)-$(date +%Y%m%d%H%M%S).epub"
 fi
 
-# Build metadata YAML for pandoc.
+# Build metadata YAML for pandoc (use Python to safely escape all fields).
 META_YAML="${WS}/.meta.yaml"
-cat > "$META_YAML" <<YAML
----
-title: "${TITLE}"
-author: "${AUTHOR}"
-lang: "${LANG}"
-date: "${PUB_DATE}"
-identifier: "${IDENTIFIER}"
-description: "${DESCRIPTION}"
-subject: "${GENRE}"
-rights: "${RIGHTS}"
----
-YAML
+export TITLE AUTHOR LANG PUB_DATE IDENTIFIER DESCRIPTION GENRE RIGHTS META_YAML
+python3 - <<'PYEOF'
+import json, sys, os
+
+meta_yaml_path = os.environ.get("META_YAML")
+fields = {
+    "title":       os.environ.get("TITLE", ""),
+    "author":      os.environ.get("AUTHOR", ""),
+    "lang":        os.environ.get("LANG", ""),
+    "date":        os.environ.get("PUB_DATE", ""),
+    "identifier":  os.environ.get("IDENTIFIER", ""),
+    "description": os.environ.get("DESCRIPTION", ""),
+    "subject":     os.environ.get("GENRE", ""),
+    "rights":      os.environ.get("RIGHTS", ""),
+}
+
+def yaml_str(s):
+    """Wrap a string in single quotes, escaping any embedded single quotes."""
+    return "'" + s.replace("'", "''") + "'"
+
+lines = ["---"]
+for key, val in fields.items():
+    lines.append(f"{key}: {yaml_str(val)}")
+lines.append("---")
+lines.append("")
+
+with open(meta_yaml_path, "w", encoding="utf-8") as f:
+    f.write("\n".join(lines))
+PYEOF
 
 # Build cover arg (optional).
 COVER_ARG=()
