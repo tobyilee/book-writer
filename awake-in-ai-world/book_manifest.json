@@ -1,0 +1,33 @@
+{
+  "title": "4년을 자고 일어났더니 회사가 마법을 쓰고 있었다",
+  "subtitle": "AI 세상에 뚝 떨어진 4년 차 코마 환자의 적응기",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-05-25",
+  "identifier": "urn:uuid:f0a7c3d2-1b6e-4a59-9c84-awake2026spring",
+  "description": "2022년 가을에 잠들어 2026년 봄에 깨어난 4년 차 개발자가, AI로 가득 찬 낯선 회사에 다시 적응해가는 1인칭 회고 에세이. 노트북 전원 버튼 하나 누르지 못하던 두려움에서 시작해, 이메일 한 통의 작은 승리와 회의실에서의 망신을 거쳐, '도구가 아니라 판단이 나를 다시 세웠다'는 깨달음에 이른다. 코마는 장치일 뿐, 새 기술 앞에서 '나만 뒤처졌다'고 느끼는 모든 사람을 위한 이야기다.",
+  "cover_image": "cover.png",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "essay",
+  "harness_version": "1.7.0",
+  "slug": "four-years-asleep",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "chapters": [
+    { "number": 0, "title": "프롤로그. 다마테바코를 여는 손" },
+    { "number": 1, "title": "1장. 나는 21세기의 립 밴 윙클이다" },
+    { "number": 2, "title": "2장. ChatGPT가 뭔데 다들 그걸로 일을 해?" },
+    { "number": 3, "title": "3장. 노트북을 켜기가 무섭다" },
+    { "number": 4, "title": "4장. 첫 문장: 이메일 한 통" },
+    { "number": 5, "title": "5장. 회의록이 사라진 오후" },
+    { "number": 6, "title": "6장. 모르는 걸 모른다고 말해도 되는 상대" },
+    { "number": 7, "title": "7장. 후배가 나에게 고맙다고 했다" },
+    { "number": 8, "title": "8장. AI가 자신 있게 거짓말을 했다" },
+    { "number": 9, "title": "9장. 따라잡기에 미친 세상" },
+    { "number": 10, "title": "10장. 4년 전의 내가 지금의 나를 구했다" },
+    { "number": 11, "title": "11장. 다시 인정받던 날" },
+    { "number": 12, "title": "12장. 대체될 것인가, 증강될 것인가" },
+    { "number": 13, "title": "13장. 상자를 열길 잘했다" },
+    { "number": 14, "title": "에필로그. 다음에 잠들 사람에게" }
+  ]
+}
