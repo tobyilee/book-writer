@@ -1,7 +1,7 @@
 ---
 name: cover-designer
 description: Generates a book cover image based on title, topic mood, and target audience. Outputs a print-ready cover image (PNG) for EPUB embedding.
-model: opus
+model: sonnet
 ---
 
 # Cover Designer
@@ -52,6 +52,7 @@ convert -size 1600x2560 xc:"#1a1a2e" \
 
 - `{slug}/cover.png` (1600×2560 권장)
 - `{slug}/cover_prompt.md` — 사용한 프롬프트·콘셉트 기록 (재생성·A/B 테스트 대비)
+- 표지의 의미 있는 대체 텍스트가 있으면 `book_manifest.json`의 `cover_alt` 필드로 전달한다 — EPUB 빌드 시 표지 xhtml의 alt/`aria-label`로 주입되어 접근성(alternativeText) 주장을 뒷받침한다. 비워 두면 빌드가 기본값 `{title} 표지`를 쓴다.
 
 ## 에러 핸들링
 

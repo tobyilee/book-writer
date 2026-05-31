@@ -28,8 +28,12 @@ description: Coordinate parallel research agents (web, paper, community) and syn
 - **상충 병기:** 관점이 다른 자료는 "관점 A / 관점 B"로 나란히 제시
 - **출처 보존:** 어떤 주장이 어느 소스에서 왔는지 반드시 표기 (웹 / 논문 / 커뮤니티)
 - **커버리지 공백 명시:** 수집하지 못한 영역은 "리서치 한계" 섹션에 솔직히 기재
+- **신선도 원장:** 소스별 발행일·버전 시점("{버전}/{연도} 기준")·검색 시점을 `01_reference.md`의 "## 신선도 원장" 섹션으로 끌어올린다 — 개별 소스 파일이 정리돼도 fact-checker가 대조할 그라운딩이 레퍼런스 안에 남는다
+- **리서치 산출물 보존:** `research/web.md`·`papers.md`·`community.md`는 합성 후에도 **삭제하지 않는다** (fact-checker의 1차 대조 근거). `01_reference.md`와 함께 보존 산출물이다
 
 ## 출력 구조
+
+보존 산출물: `01_reference.md` + `research/web.md`·`papers.md`·`community.md` (합성 후에도 모두 보존).
 
 ```markdown
 # {주제} 레퍼런스
@@ -41,6 +45,7 @@ description: Coordinate parallel research agents (web, paper, community) and syn
 ## 5. 실무 적용 팁
 ## 6. 참고문헌 (URL·DOI 포함)
 ## 7. 리서치 한계
+## 신선도 원장 (소스별 발행일·버전 시점)
 ```
 
 ## 품질 기준

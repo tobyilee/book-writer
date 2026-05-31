@@ -1,16 +1,16 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
-[![Version](https://img.shields.io/badge/harness-v1.7.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/harness-v1.8.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. v1.3.0부터 **장르별 문체 프로필**을 지원한다 — 기술서(Toby 문체)·소설·실용서(요리/여행)·에세이. 장르는 자동 감지 후 확인하며, 기본값은 `tech-book`이다 (아래 [장르 프로필](#장르-프로필) 참고). 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
-- **하네스 버전:** `v1.7.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **하네스 버전:** `v1.8.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
 - **라이선스:** 하네스 코드는 **MIT** ([`LICENSE`](LICENSE)). 산출되는 책 콘텐츠 기본값은 **CC BY-NC-SA 4.0** — `book_manifest.json`의 `license` 필드로 책별 오버라이드 가능
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
-- **저자 모델:** Claude Opus (하네스 내 모든 에이전트가 `model: opus` 사용)
+- **저자 모델:** 판단·합성 Phase(리서치·계획·리뷰·챕터 저술·수락 검수)는 Claude Opus, 기계적 Phase(`epub-builder`·`cover-designer`)는 각 에이전트 frontmatter의 sonnet을 따른다
 
-> **버전 두 개를 헷갈리지 말자.** 위 `v1.2.0`은 *하네스 버전*(이 도구 자체)이고, 산출 파일명에 들어가는 `{책-제목}-v{version}.epub`의 `version`은 *책 매니페스트의 책 버전*(각 책의 판본)이다. 둘은 독립적으로 진화한다. 둘 다 v1.2.0부터는 책 본문의 `## 판권` 페이지에 노출된다.
+> **버전 두 개를 헷갈리지 말자.** 위 *하네스 버전*(단일 출처 [`VERSION`](VERSION) 기준, 이 도구 자체)과 산출 파일명에 들어가는 `{책-제목}-v{version}.epub`의 `version`(*책 매니페스트의 책 버전*, 각 책의 판본)은 독립적으로 진화한다. 책 콜로폰(`## 판권`)은 두 버전을 모두 노출한다.
 
 ## 이 하네스가 하는 일
 
@@ -74,7 +74,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 ```
 {slug}/
-├── research/
+├── research/                # Phase 1 원자료 (보존 — 재실행에도 유지)
 │   ├── web.md
 │   ├── papers.md
 │   └── community.md
@@ -86,7 +86,13 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 │   ├── 02_draft.md / 02_final.md
 │   └── ...
 ├── 04_manuscript.md         # 통합 원고
-├── style_log.md             # 스타일 검수 로그
+├── 05_acceptance.md         # 통권 수락 검수 판정 (Phase 4.5, manuscript-reviewer)
+├── style_log.md             # 스타일 검수 로그 (단일 append-only, 샤딩 안 함)
+├── factcheck_log.md         # 사실 검증 로그 (tech-book만, 단일 append-only)
+├── story_bible.md           # 인물·관계·세계관·타임라인·복선 원장 (narrative만)
+├── continuity_log.md        # 연속성 검수 로그 (narrative만, 단일 append-only)
+├── editor_notes.md          # 편집 메모 (선택)
+├── length_report.md         # 분량 준수 리포트
 ├── book_manifest.json       # EPUB 메타데이터
 ├── cover.png                # 표지 이미지
 ├── cover_prompt.md          # 표지 프롬프트 기록
@@ -125,15 +131,23 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 - (narrative) style 합의 후 `continuity-keeper`가 `story_bible.md` 대조로 인물·관계·세계관·타임라인·복선 모순을 검증 — 연속성 오류는 반드시 반영
 - 합의 시 `{NN}_final.md`로 저장
 - `editor`가 완료된 챕터들을 `04_manuscript.md`로 통합 + `book_manifest.json` 생성
+- 검수 로그는 단일 append-only 파일이 단일 진실 원천이다 — `style_log.md`, (tech-book) `factcheck_log.md`, (narrative) `continuity_log.md`. 풀로 여러 저술가가 동시에 써도 같은 파일에 `## {NN}장` 섹션을 append 한다 (샤딩 안 함)
 
 **왜 팀 모드인가?** 여러 챕터를 병렬로 쓸 때 문체가 갈라지는 게 가장 흔한 실패 지점이다. 팀 내 `SendMessage`로 실시간 조율하고, 전담 스타일 가디언이 일관성을 잡는다.
 
-### Phase 5: 표지 + EPUB 빌드 + 책 소개 (팬아웃)
+### Phase 4.5: 통권 수락 검수 (신선 컨텍스트 게이트)
 
+- `manuscript-reviewer`가 `manuscript-acceptance` 스킬로 **editor와 분리된 새 눈**으로 통권을 게이트한다 (같은 컨텍스트에서 자기 승인하지 않음)
+- `04_manuscript.md`를 `02_plan.md` + 에스컬레이션 로그와 대조해 계획 커버리지·통권 일관성·미해소 에스컬레이션·금지 마커(`(사실 확인 필요)`·`[리서치 공백]`·`[미완성]`) 잔존 여부를 점검
+- 판정을 `05_acceptance.md`에 기록 — **ACCEPT**면 Phase 5로, **BLOCK**이면 Phase 4로 1회 되돌리고 그래도 BLOCK이면 사용자에 하드 스톱
+
+### Phase 5: 표지 + EPUB 빌드 + 책 소개 (부분 병렬)
+
+- `cover-designer`를 background로 띄우고, 그 동안 `epub-builder`의 cover-독립 준비(매니페스트 검증·콜로폰·책 소개 초안)를 병행 — `cover.png` 소비 지점에서 join
 - `cover-designer`가 이미지 생성 (MCP > API > ImageMagick 폴백 순)
 - `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드 (번들 `styles/epub.css`를 자동 임베드 — 실용서 구조화 블록 스타일)
 - `pandoc`으로 `04_manuscript.md` + `cover.png` + `book_manifest.json`을 EPUB 3로 변환
-- `epubcheck` 설치 시 자동 검증
+- `epubcheck` 설치 시 자동 검증 (`EPUBCHECK_STRICT` 기본 ON)
 - EPUB 빌드 직후 `epub-builder`가 `02_plan.md`·`04_manuscript.md`·매니페스트를 읽어 **책 소개 markdown**(`{책-제목}-v{version}.md`)을 EPUB 옆에 작성
 
 ## 후속 작업
@@ -155,7 +169,9 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ```
 → Phase 3부터 재실행. 기존 `02_plan.md`는 `02_plan_v1.md`로 백업.
 
-재실행 시 책 버전은 **minor 증가** (`v1.0.0` → `v1.1.0`) 또는 사용자가 명시적으로 지정. 이때 바뀌는 건 **책 매니페스트 버전**이지 하네스 버전이 아니다.
+재실행 시 책 버전은 **minor 증가** (`v1.0.0` → `v1.1.0`) 또는 사용자가 명시적으로 지정. 이때 바뀌는 건 **책 매니페스트 버전**이지 하네스 버전이 아니다. EPUB 식별자(`urn:uuid:*`)는 처음 1회만 민팅되고 재빌드에도 그대로 보존된다 — 버전·발행일만 갱신된다.
+
+요청 유형별 정확한 재실행 범위(리서치 보강→Phase 1, 구성·차례 변경→Phase 2~3, 특정 챕터 수정→Phase 4, 표지→Phase 5 cover, 메타·라이선스→Phase 5 epub)는 오케스트레이터의 **재실행 매트릭스**(`book-writing-orchestrator/SKILL.md`)를 따른다. 장르는 `book_manifest.json`의 `genre`를 재사용한다(사용자가 변경을 명시하지 않는 한).
 
 ## 커스터마이징
 
@@ -233,7 +249,7 @@ book-writer/
 │   └── harness-roadmap.md           # 장르 확장 후속 백로그 (P2·P3·P4)
 ├── .gitignore                       # .omc 등 툴 로컬 파일 제외 (책 산출물은 버전 관리 대상)
 └── .claude/
-    ├── agents/                      # 13개 에이전트 정의
+    ├── agents/                      # 14개 에이전트 정의
     │   ├── research-lead.md
     │   ├── web-researcher.md
     │   ├── paper-researcher.md
@@ -245,9 +261,10 @@ book-writer/
     │   ├── fact-checker.md          # tech-book 사실 검증 (v1.4.0+)
     │   ├── continuity-keeper.md     # narrative 연속성 추적 (v1.7.0+)
     │   ├── editor.md
+    │   ├── manuscript-reviewer.md   # 통권 수락 게이트 (Phase 4.5, v1.8.0+)
     │   ├── cover-designer.md
     │   └── epub-builder.md
-    └── skills/                      # 오케스트레이터 + 13개 전문 스킬
+    └── skills/                      # 오케스트레이터 + 14개 전문 스킬
         ├── book-writing-orchestrator/   # 최상위 워크플로우
         ├── research-coordination/
         ├── web-research/
@@ -263,6 +280,7 @@ book-writer/
         ├── fact-check/              # tech-book 사실 검증 (v1.4.0+)
         ├── continuity-check/        # narrative 연속성 검수 (v1.7.0+)
         ├── book-editing/
+        ├── manuscript-acceptance/   # 통권 수락 게이트 (Phase 4.5, v1.8.0+)
         ├── cover-design/
         └── epub-build/
             ├── scripts/
@@ -280,7 +298,7 @@ book-writer/
 | 태스크 기반 (`TaskCreate`) | Phase 4 챕터 작업 분배·진행 추적 |
 | 반환값 기반 | Phase 1·2·5 서브 에이전트 결과 수집 |
 
-파일명 컨벤션: `{NN}_{artifact}.md` (NN = Phase 번호 2자리)
+파일명 컨벤션: Phase 주요 산출물은 `{NN}_{artifact}.md` (NN = Phase 번호). 챕터는 `chapters/{NN}_draft.md`·`{NN}_final.md` (NN = 챕터 번호). 로그·매니페스트·표지·리포트 등 부산물은 역할별 고정 파일명(`style_log.md`·`factcheck_log.md`·`continuity_log.md`·`book_manifest.json`·`length_report.md` 등)을 쓰며 샤딩하지 않는다.
 
 ## 트러블슈팅
 

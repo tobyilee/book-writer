@@ -15,7 +15,8 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 | 2. 저술 계획 | 단일 서브 | 통합적 사고가 필요, 분할 이점 없음 |
 | 3. 계획 리뷰 | 에이전트 팀(생성-검증 왕복) | 저자와 리뷰어의 토론이 품질을 높임 |
 | 4. 챕터 저술 | **에이전트 팀** | 챕터 저술가 ↔ 스타일 가디언 ↔ 편집자 실시간 조율 |
-| 5. 표지 + EPUB | 서브(병렬) | 독립 작업, 결과만 수집 |
+| 4.5. 통권 수락 검수 | 단일 서브(신선 컨텍스트) | editor와 분리된 새 눈이 통권을 게이트 — 자기 승인 방지 |
+| 5. 표지 + EPUB | 서브(부분 병렬) | cover-designer를 background로 띄우고 epub-builder의 cover-독립 준비를 병행, `cover.png` 소비 지점에서 join |
 
 ## Phase 0: 컨텍스트 확인
 
@@ -40,7 +41,7 @@ description: Orchestrate a full book-writing workflow from topic to finished EPU
 
 **신선도 메타:** tech-book·최신 기술 주제에서는 리서처가 각 출처의 발행일과 검색 시점("검색: {날짜} 기준")을 기록한다. 버전·릴리스 정보는 "{버전}/{연도} 기준"으로 못 박는다. 이 메타가 Phase 4 `fact-checker`의 대조 기준이 된다.
 
-Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
+**모델 라우팅:** 판단·합성이 필요한 Phase(리서치·계획·리뷰·챕터 저술·수락 검수)는 `model: "opus"`를 명시하고, 기계적 Phase(`epub-builder`·`cover-designer`)는 각 에이전트 frontmatter의 `sonnet`을 따른다.
 
 ## Phase 2: 저술 계획
 
@@ -59,7 +60,9 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 **실행 모드:** 에이전트 팀 (생성-검증 왕복)
 
-`TeamCreate`로 `book-planner`와 `plan-reviewer`를 팀으로 구성한다. `plan-reviewer`가 계획을 비판적으로 읽고 `SendMessage`로 `book-planner`에게 피드백을 보낸다. `book-planner`는 피드백을 반영해 계획을 갱신한다. 합의에 도달하거나 최대 2회 왕복 후 팀을 해체한다.
+`TeamCreate`로 `book-planner`와 `plan-reviewer`를 팀으로 구성한다. `plan-reviewer`가 계획을 비판적으로 읽고 `SendMessage`로 `book-planner`에게 피드백을 보낸다. `book-planner`는 피드백을 반영해 계획을 갱신한다.
+
+**수렴 기준:** 왕복은 모든 Critical 항목이 planner가 반영했거나 `03_review_log.md`에 사유와 함께 명시적으로 유보(deferred)될 때, 또는 최대 2회 후 종료한다. 종료 시점에 미해소 Critical이 남아 있으면 위험으로 `03_review_log.md`에 로그한다. 그 뒤 팀을 해체한다.
 
 **산출물:** `{slug}/02_plan.md` (갱신됨) + `{slug}/03_review_log.md` (리뷰 기록)
 
@@ -96,14 +99,42 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 
 **스타일 가이드:** 활성 `profiles/{genre}/voice.md`와 `scaffolds.md`를 모든 chapter-writer가 참조한다 (genre는 Phase 0에서 확정, 기본 `tech-book`). 프로필 목록·선택 규칙은 `profiles/_registry.md`. style-guardian은 `profiles/{genre}/style-checklist.md`로 검수한다.
 
-## Phase 5: 표지 + EPUB 빌드 (팬아웃)
+**산출물 (단일 append-only 로그가 단일 진실 원천):**
+- `{slug}/chapters/{NN}_draft.md`·`{NN}_final.md` — 챕터별 초안·최종
+- `{slug}/04_manuscript.md` — 통합 원고
+- `{slug}/book_manifest.json` — EPUB 메타데이터 (editor가 작성)
+- `{slug}/style_log.md` — 스타일 검수 로그 (전 장르)
+- `{slug}/factcheck_log.md` — 사실 검증 로그 (**tech-book만**)
+- `{slug}/continuity_log.md` — 연속성 검수 로그 (**narrative만**)
 
-**실행 모드:** 서브 에이전트 병렬 호출
+> 로그는 **단일 append-only 파일**이 단일 진실 원천이다. 풀(pool)로 여러 chapter-writer가 동시에 쓰더라도 같은 파일에 `## {NN}장` 섹션을 append 한다 — `style_log_1-6.md`처럼 샤딩하지 않는다. 샤딩하면 감사 추적이 갈라지고 fact-checker·continuity-keeper의 누적 판정이 흩어진다.
 
-두 작업이 독립적이므로 병렬로 호출한다.
+**Phase 4 종료 기준 (모두 충족해야 Phase 4.5로 진행):**
+- 모든 챕터가 `{NN}_final.md`로 존재하고 `04_manuscript.md`에 통합됨
+- fact-checker의 `editor 메모/재확인 권장` 에스컬레이션과 ❌(오류)·🕒(검증 불가) 판정이 모두 해소되었거나 사용자에 에스컬레이션됨 — **자문이 아니라 BLOCKING** (Phase 5 진행 차단)
+- continuity-keeper의 ❌(모순) 판정이 모두 해소되었거나 사용자에 에스컬레이션됨
+- `04_manuscript.md`에 `(사실 확인 필요)` / `[리서치 공백]` / `[미완성]` 마커가 남아 있으면 안 된다 — 남으면 해당 Phase로 되돌린다: `[리서치 공백]`은 Phase 1(리서치 보강), `(사실 확인 필요)`는 fact-checker, `[미완성]`은 chapter-writer
 
-- `cover-designer` → 표지 이미지 생성, `{slug}/cover.png` 저장
-- `epub-builder`는 cover가 준비된 후에 호출 (순서 의존) → `{책-제목}-v{version}.epub` 생성 (프로젝트 루트) **+ 같은 폴더에 책 소개 markdown `{책-제목}-v{version}.md` 동시 산출**
+## Phase 4.5: 통권 수락 검수 (단일 서브, 신선 컨텍스트)
+
+**실행 모드:** 단일 서브 에이전트 (editor와 분리된 **신선 컨텍스트** — 같은 컨텍스트에서 자기 승인하지 않는다)
+
+챕터를 통합한 editor와 **별개의 새 눈**으로 통권을 게이트한다. `manuscript-reviewer` 에이전트를 `model: "opus"`, FRESH 컨텍스트로 스폰한다 (`manuscript-acceptance` 스킬). editor가 검수자를 겸하지 않는다.
+
+**입력:** `{slug}/04_manuscript.md`, `{slug}/02_plan.md`, 에스컬레이션 로그(`style_log.md`·`factcheck_log.md`·`continuity_log.md` 중 존재하는 것)
+**출력:** `{slug}/05_acceptance.md` — 통권 수락 판정 (계획 대비 커버리지·통권 일관성·미해소 에스컬레이션·금지 마커 잔존 여부, 종합 ACCEPT/BLOCK)
+
+- **ACCEPT** → Phase 5로 진행
+- **BLOCK** → Phase 4로 되돌린다(최대 1회 라운드). 1회 라운드 후에도 BLOCK이면 Phase 5로 진행하지 않고 사용자에게 하드 스톱·에스컬레이션한다.
+
+## Phase 5: 표지 + EPUB 빌드 (부분 병렬)
+
+**실행 모드:** 부분 병렬 (cover-designer는 background, epub-builder의 cover-독립 준비를 병행)
+
+표지 생성은 시간이 걸리므로 `cover-designer`를 `run_in_background: true`로 먼저 띄우고, 그 동안 `epub-builder`의 **cover-독립 준비**(매니페스트 검증·콜로폰 작성·책 소개 markdown 초안)를 병행한다. `cover.png`를 실제로 소비하는 지점(EPUB 빌드 호출)에서 join 한다.
+
+- `cover-designer` → 표지 이미지 생성, `{slug}/cover.png` 저장 (background)
+- `epub-builder`는 cover-독립 준비를 먼저 진행하고, `cover.png` 준비 완료 후 빌드를 호출 (cover 소비 지점 의존) → `{책-제목}-v{version}.epub` 생성 (프로젝트 루트) **+ 같은 폴더에 책 소개 markdown `{책-제목}-v{version}.md` 동시 산출**
 
 **EPUB 메타데이터:**
 - 저자: `Toby-AI` (기본값, Phase 0에서 사용자가 지정한 값이 있으면 그 값 사용)
@@ -125,9 +156,12 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 | 리서치 에이전트 하나가 실패 | 1회 재시도, 재실패 시 해당 섹션 누락 명시하고 진행 |
 | 스타일 가디언과 챕터 저술가가 3회 왕복에도 합의 실패 | 저술가의 최종본을 채택하고 reviewlog에 기록 |
 | 팩트체커와 저술가가 3회 왕복에도 사실 미합의 | 사실 오류는 덮지 않는다 — `factcheck_log.md`에 "미해소(위험)" 명시, editor·사용자에 에스컬레이션 (style 이견과 다른 처리) |
-| 레퍼런스가 빈약해 fact-checker가 핵심 주장 검증 불가 | Critical 주장만 웹 에스컬레이션, 나머지는 주장 약화/삭제 권고 + 리서치 보강 필요 보고 |
+| fact-checker의 `editor 메모/재확인 권장` 에스컬레이션 또는 ❌·🕒 판정이 남음 | **BLOCKING (자문 아님)** — Phase 5 진행 전에 반드시 해소하거나 사용자에 에스컬레이션한다. 의심·검증 불가 인용은 정정·삭제·약화하거나 사용자 판단을 받는다. 절대 조용히 출간하지 않는다 |
+| 레퍼런스가 빈약해 fact-checker가 핵심 주장 검증 불가 | Critical 주장만 웹 에스컬레이션, 나머지는 주장 약화/삭제 권고 + 리서치 보강 필요 보고 (해소 전엔 Phase 5 진행 차단) |
 | continuity-keeper와 저술가가 3회 왕복에도 연속성 미합의 | 연속성 모순은 덮지 않는다 — `continuity_log.md`에 "미해소(모순 위험)" 명시, editor·사용자에 에스컬레이션 |
 | 계획이 인물·설정을 충분히 명시 안 해 story_bible 시드 부실 | 1장 초안에서 캐논을 추출해 bible 초기화, 이후 챕터에서 누적 보강 |
+| `04_manuscript.md`에 `(사실 확인 필요)`·`[리서치 공백]`·`[미완성]` 마커 잔존 | **Phase 5 진행 차단** — 해당 Phase로 되돌린다(`[리서치 공백]`→Phase 1, `(사실 확인 필요)`→fact-checker, `[미완성]`→chapter-writer) |
+| Phase 4.5 manuscript-reviewer가 BLOCK 판정 | Phase 4로 되돌린다(최대 1회 라운드). 1회 후에도 BLOCK이면 Phase 5로 진행하지 않고 사용자에 하드 스톱·에스컬레이션 |
 | 표지 생성 실패 | 플레이스홀더 이미지(검은 배경 + 제목 텍스트)로 대체, 사용자에게 알림 |
 | EPUB 빌드 실패 | pandoc 에러 메시지 그대로 보고, 원고 마크다운은 보존 |
 
@@ -140,14 +174,36 @@ Agent 도구 호출 시 반드시 `model: "opus"`를 명시한다.
 | 태스크 기반 (TaskCreate) | Phase 4의 챕터 작업 할당 및 진행 추적 |
 | 반환값 기반 | 서브 에이전트 모드(Phase 1·2·5)의 결과 수집 |
 
-파일명 컨벤션: `{NN}_{artifact}.md` (NN은 Phase 번호 2자리).
+파일명 컨벤션: Phase 주요 산출물은 `{NN}_{artifact}.md` (NN=Phase 번호). 챕터는 `chapters/{NN}_draft.md`·`{NN}_final.md` (NN=챕터 번호). 로그·매니페스트·표지·리포트 등 부산물은 역할별 고정 파일명을 쓴다 (`style_log.md`·`factcheck_log.md`·`continuity_log.md`·`book_manifest.json`·`cover.png`·`length_report.md` 등 — 샤딩하지 않는다).
 
 ## 실행 후 피드백
 
 모든 Phase 완료 및 EPUB 산출 후:
 1. 사용자에게 EPUB 경로 + 책 소개 markdown 경로 + 요약 보고
 2. "개선할 부분이 있나요?"를 짧게 물어본다 (강요하지 않음)
-3. 피드백이 오면 Phase 7-2 매트릭스에 따라 해당 Phase만 재실행
+3. 피드백이 오면 아래 **재실행 매트릭스**에 따라 해당 Phase만 재실행
+
+## 재실행 매트릭스
+
+후속 요청은 전체를 다시 돌리지 않고 해당 Phase만 재호출한다. 이미 확정된 산출물은 `{...}_v{N}.{ext}`로 백업한 뒤 갱신한다.
+
+| 요청 유형 | 재실행 범위 |
+|----------|------------|
+| 리서치 보강 | Phase 1 (리서처 재호출, `01_reference.md` 갱신) |
+| 구성·차례 변경 | Phase 2~3 (계획 재작성 + 리뷰 왕복) |
+| 특정 챕터 수정 | Phase 4 (해당 챕터만 재저술, 나머지 유지) |
+| 표지 변경 | Phase 5 — cover-designer만 재호출 |
+| 메타데이터·라이선스 변경 | Phase 5 — epub-builder만 재호출 (재빌드) |
+
+**장르는 `book_manifest.json`의 `genre`를 재사용한다** — 사용자가 장르 변경을 명시하지 않는 한 다시 감지하지 않는다 (재실행 결정성). 챕터·표지·메타 수정은 모두 같은 장르 프로필·같은 EPUB 식별자(`urn:uuid:*`)를 유지하고, 책 버전(매니페스트 `version`)과 발행일만 증가한다.
+
+## 학습 루프 (append-only, 자문 전용)
+
+하네스가 책을 누적하며 배우도록 가벼운 메모리를 둔다. **읽기 전용 자문이며 절대 블로킹하지 않는다** — 파일이 없으면 조용히 건너뛴다.
+
+- **Phase 5 빌드 직후:** 오케스트레이터가 이번 책의 교훈 한 레코드를 메모리 파일(`{slug}/../book-lessons.md`, 없으면 `.omc/book-lessons.md`)에 **append** 한다 — `{topic, genre, 반복된 style/fact 이슈, 챕터 수, 분량 준수도}`.
+- **Phase 0:** 같은 `genre`의 최근 N개 레코드를 읽어 "이전 책에서 배운 점" soft note를 만들어 `book-planner`·`style-guardian`에 전달한다. 강제하지 않는 참고 신호일 뿐이다.
+- 파일 부재·읽기 실패는 무시하고 진행한다.
 
 ## 테스트 시나리오
 
