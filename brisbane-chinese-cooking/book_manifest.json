@@ -1,0 +1,17 @@
+{
+  "title": "브리즈번 중식 키친 — 호주 재료로 차리는 중국요리",
+  "subtitle": "브리즈번 거주 한국 이민자를 위한 첫 중식 실전 가이드",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-06-01",
+  "identifier": "urn:uuid:6d8a13a5-5f44-4677-a5d2-441683adfb9a",
+  "description": "브리즈번에 사는 한국 이민자를 위한 실용 중식 요리서. 아시안 그로서리의 한자 라벨을 읽는 재료 사전(중국어·병음·한국어·조달처 병기)을 심장으로, 호주 재료 대체와 가정 화력의 현실을 정직하게 다룬다. 6대 계통 지도부터 마파두부·소유계·궁보계정·양저우 볶음밥까지, 성공 확률 높은 순서로 배운다.",
+  "cover_image": "cover.png",
+  "cover_alt": "브리즈번 중식 키친 표지 — 짙은 간장갈색 배경에 황금색과 크림 화이트로 쓰인 한국어 대제목, 빨간 강조선, 중식 불 한자(火) 워터마크. 저자 Toby-AI 표기.",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "practical",
+  "harness_version": "1.8.0",
+  "slug": "brisbane-chinese-cooking",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
