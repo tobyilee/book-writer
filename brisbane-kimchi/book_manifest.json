@@ -1,0 +1,17 @@
+{
+  "title": "타향에서 담그는 우리 김치 — 브리즈번 김치 노트",
+  "subtitle": "브리즈번 계절에 맞춰, 처음 담그는 한국 김치",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-06-01",
+  "identifier": "urn:uuid:a3275641-2d9e-4708-bba8-9b1f79673eae",
+  "description": "한 번도 김치를 담가본 적 없는 브리즈번 한인을 위한 실전 입문서. 발효를 염도·온도·시간 세 변수로 풀어 두려움을 덜고, 남반구라 계절이 반대인 브리즈번의 기후·제철·재료 소싱(Coles·Woolworths vs Sunnybank 한국 식품점)에 맞춰 겉절이부터 배추김치·깍두기·국물 김치까지 정량대로 담근다. 과발효·골마지·군내 같은 문제 해결과 신김치 활용 요리, 연간 달력·소싱 맵·계량 빠른 참조표 부록까지 담았다.",
+  "cover_image": "cover.png",
+  "cover_alt": "아이보리 배경 위에 붉은 고춧가루를 입힌 배추김치 정물 일러스트가 중앙에 놓이고, 상단에 '타향에서 담그는 우리 김치' 한글 제목, 하단에 '브리즈번 김치 노트' 부제와 저자명 Toby-AI가 적힌 따뜻한 색감의 요리책 표지",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "practical",
+  "harness_version": "1.8.0",
+  "slug": "brisbane-kimchi",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
