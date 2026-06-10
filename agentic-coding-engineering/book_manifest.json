@@ -1,0 +1,16 @@
+{
+  "title": "네 겹의 엔지니어링",
+  "subtitle": "프롬프트에서 루프까지, AI 코딩을 떠받치는 4개의 동심원",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-06-10",
+  "identifier": "urn:uuid:8fe8d219-c888-438e-9cd0-a37be4e45209",
+  "description": "Claude Code·Codex를 매일 쓰는 현업 개발자를 위해, prompt·context·harness·loop engineering 네 용어를 각각 한 문장으로 정의하고 동심원(줌 레벨)으로 그 관계를 오래 기억하게 만드는 해설형 기술서. 가장 익숙한 프롬프트에서 출발해 컨텍스트·하네스·루프로 한 겹씩 줌아웃하며, 자기 도구를 네 칸으로 해부하고 현장의 뜨거운 논쟁 다섯 가지에 입장을 세운다.",
+  "cover_image": "cover.png",
+  "cover_alt": "네 겹의 엔지니어링 표지",
+  "version": "1.1.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "harness_version": "1.8.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}

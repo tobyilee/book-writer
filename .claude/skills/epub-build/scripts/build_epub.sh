@@ -186,19 +186,19 @@ def repl(m):
     with tempfile.NamedTemporaryFile("w", suffix=".mmd", delete=False, encoding="utf-8") as tf:
         tf.write(code)
         tfname = tf.name
-    out = os.path.join(figdir, "fig-%02d.svg" % n)
+    out = os.path.join(figdir, "fig-%02d.png" % n)
     try:
-        subprocess.run([mmdc, "-i", tfname, "-o", out], check=True,
+        subprocess.run([mmdc, "-i", tfname, "-o", out, "-b", "white"], check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     finally:
         os.unlink(tfname)
-    return "![](figures/fig-%02d.svg)" % n
+    return "![](figures/fig-%02d.png)" % n
 new = pat.sub(repl, text)
 open(dst, "w", encoding="utf-8").write(new)
 PYMERMAID
     then
       PANDOC_INPUT="$RENDERED_INPUT"
-      MERMAID_NOTE="rendered to figures/fig-NN.svg via mmdc"
+      MERMAID_NOTE="rendered to figures/fig-NN.png via mmdc"
     else
       MERMAID_NOTE="mmdc present but pre-pass failed — fences left as code (see ${WS}/.mermaid_err)"
       echo "warning: mermaid pre-pass failed — leaving diagrams as code fences" >&2
