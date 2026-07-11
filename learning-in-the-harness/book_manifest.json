@@ -1,0 +1,17 @@
+{
+  "title": "하네스 안에서 배우기",
+  "subtitle": "AI와 함께 일하며 함께 자라는 개발자",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-07-11",
+  "identifier": "urn:uuid:e2d73422-44bf-4ed9-9b77-625a28d25fc1",
+  "description": "AI에게 코드를 위임하는 시대에 생산성과 성장은 정말 맞바꿔야 하는가. 이 책은 업계가 에이전트의 피드백 환경은 집요하게 설계하면서 정작 그 코드를 승인하는 사람의 학습 환경은 방치했다는 문제의식에서 출발한다. 통제 실험과 학습과학, 국내외 현장 사례를 근거로 위임의 비용과 그것을 뒤집는 조건을 규명하고, 흐름 안 기본값·흐름 밖 표적 연습·위임 다이얼이라는 세 겹의 처방을 CLAUDE.md 규칙·훅·TDD로 자기 하네스에 새겨 넣는 법을 안내한다. 자바에서 파이썬으로 스택을 옮기는 현업 개발자와 흔들리는 사다리 앞의 주니어를 위한 적용 장까지, '인지 작업의 소유권'이라는 한 문장으로 수렴하는 논증적 기술서.",
+  "cover_image": "cover.png",
+  "cover_alt": "책 표지: '하네스 안에서 배우기 — AI와 함께 일하며 함께 자라는 개발자', 저자 Toby-AI. 증발하는 에이전트의 피드백 루프와 누적되는 사람의 학습 루프, 두 개의 루프를 형상화한 표지.",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "1.9.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
