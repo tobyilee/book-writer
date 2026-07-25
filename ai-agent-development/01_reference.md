@@ -577,7 +577,7 @@ Turbopuffer 공식 문서의 자기 규정: *"first-stage retrieval to efficient
 
 **전 용도 공통 (확인된 사실 기반)**
 1. **비용은 토큰이 98%다**(AWS 실측). 컴퓨팅 최적화는 두 번째.
-2. **컨텍스트 예산이 지배 변수다** — *"Claude's context window fills up fast, and performance degrades as it fills."* 우아한형제들은 전처리로 96.5% 줄였다.
+2. **컨텍스트 예산이 지배 변수다** — *"Claude's context window fills up fast, and performance degrades as it fills."* ~~우아한형제들은 전처리로 96.5% 줄였다.~~ ⛔ **사용 금지 (§3.2·§7.1 참조).** 이 문서 내부 모순이었다 — 같은 문서의 §3.2·§7.1이 `96.5%`를 ❌로 판정한다(원문에 그런 단일 수치가 없고 실제로는 규모별 3행 표다: 41,944→1,763 / 29,386→668 / 9,749→539 bytes). **후자가 우선한다.** 이 절의 문장은 최초 합성 시 남은 잔재이며 2026-07-26 fact-checker가 발견해 오케스트레이터가 표시했다. 후속 개정에서 이 항을 그라운딩으로 쓰지 말 것.
 3. **에이전트에게 스스로 돌릴 수 있는 검증을 줘라** — *"Give Claude a check it can run: tests, a build, a screenshot to compare. It's the difference between a session you watch and one you walk away from."*
 4. **실패 패턴을 미리 알라** — *"The infinite exploration"*(범위 없는 탐색이 컨텍스트를 태운다) / *"The trust-then-verify gap"*(그럴듯하지만 엣지 케이스를 놓친 구현).
 5. **라이선스를 성능과 같은 급으로 검토하라** — Typesense GPL-3.0, Elasticsearch/Redis 비-OSI, 그리고 `NOASSERTION` 다수(§7.2).
