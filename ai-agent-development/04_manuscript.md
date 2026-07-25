@@ -52,13 +52,13 @@ LLM API는 이미 써봤다. chat completion을 호출해봤고, tool use로 함
 
 이 가정에서 네 가지가 따라온다.
 
-**입문 설명을 반복하지 않는다.** "LLM이란 무엇인가"를 설명하는 문단은 이 책에 없다. 토큰이 무엇인지, 프롬프트를 어떻게 쓰는지도 다루지 않는다. 이미 안다고 가정한다.
+입문 설명을 반복하지 않는다. "LLM이란 무엇인가"를 설명하는 문단은 이 책에 없다. 토큰이 무엇인지, 프롬프트를 어떻게 쓰는지도 다루지 않는다. 이미 안다고 가정한다.
 
-**결정할 수 있게 쓴다.** 소개로 끝나면 이 책은 실패한 것이다. 각 장은 "그래서 무엇을 기준으로 고르나"까지 간다.
+결정할 수 있게 쓴다. 소개로 끝나면 이 책은 실패한 것이다. 각 장은 "그래서 무엇을 기준으로 고르나"까지 간다.
 
-**백엔드 감각을 다리로 쓴다.** MCP는 LSP에 비유하고, 메모리 계층은 RAM과 디스크와 페이징으로, 프레임워크 논쟁은 Spring IoC의 모듈성 감각으로 설명한다. 새 어휘를 외우게 하는 대신 이미 가진 감각 위에 얹는다.
+백엔드 감각을 다리로 쓴다. MCP는 LSP에 비유하고, 메모리 계층은 RAM과 디스크와 페이징으로, 프레임워크 논쟁은 Spring IoC의 모듈성 감각으로 설명한다. 새 어휘를 외우게 하는 대신 이미 가진 감각 위에 얹는다.
 
-**양쪽을 준다.** 이 분야에는 아직 닫히지 않은 논쟁이 많다. 워크플로로 충분한가 자율 에이전트가 필요한가, RAG인가 롱 컨텍스트인가, 전용 벡터 DB인가 pgvector인가, 프레임워크를 살 것인가 직접 만들 것인가. 이런 질문을 한쪽으로 봉합하면 독자의 결정을 대신 내려버리는 셈이 된다. 그래서 결론이 나지 않은 곳에서는 양쪽 근거를 나란히 놓고, 무엇이 갈림길인지만 분명히 한다.
+양쪽을 준다. 이 분야에는 아직 닫히지 않은 논쟁이 많다. 워크플로로 충분한가 자율 에이전트가 필요한가, RAG인가 롱 컨텍스트인가, 전용 벡터 DB인가 pgvector인가, 프레임워크를 살 것인가 직접 만들 것인가. 이런 질문을 한쪽으로 봉합하면 독자의 결정을 대신 내려버리는 셈이 된다. 그래서 결론이 나지 않은 곳에서는 양쪽 근거를 나란히 놓고, 무엇이 갈림길인지만 분명히 한다.
 
 전제로 삼는 경험은 HTTP API, 컨테이너, DB 운영 정도다. 머신러닝 배경이나 모델 학습 지식은 필요 없다.
 
@@ -68,14 +68,14 @@ LLM API는 이미 써봤다. chat completion을 호출해봤고, tool use로 함
 
 **도구 이름을 더 많이 아는 상태가 아니라, 새 도구가 나와도 어느 축에 놓고 판단할지 아는 상태.**
 
-이건 겸양이 아니라 설계다. 제품별로 장을 나눠 각각의 사용법을 정리하는 책이 되면, 그 책은 지형이 움직일 때마다 통째로 낡는다. 반면 "명시적 그래프냐 역할 위임이냐" 같은 축은 내년에 나올 프레임워크도 그 위에 놓을 수 있다. 그래서 이 책의 챕터는 제품이 아니라 **독자가 한 번에 내리는 결정**을 단위로 나뉘어 있다.
+이건 겸양이 아니라 설계다. 제품별로 장을 나눠 각각의 사용법을 정리하는 책이 되면, 그 책은 지형이 움직일 때마다 통째로 낡는다. 반면 "명시적 그래프냐 역할 위임이냐" 같은 축은 내년에 나올 프레임워크도 그 위에 놓을 수 있다. 그래서 이 책의 챕터는 제품이 아니라 독자가 한 번에 내리는 결정을 단위로 나뉘어 있다.
 
 여정은 통제 경계가 안에서 밖으로 넓어지는 순서로 흐른다.
 
 - **1~3장 — 원리.** 에이전트 하나의 안쪽을 본다. 에이전트는 마법이 아니라 루프이고, 그 루프의 비용과 실패와 재시도가 전부 구조에서 나온다. 여기서 뒤의 모든 선택에 쓰일 어휘가 만들어진다.
-- **4~7장 — 무엇을 살 것인가.** 어느 층을 사고(SDK인가 하네스인가) 어느 데이터 계층을 붙일지. 각 갈림길이 무엇으로 갈리는지를 축으로 익힌다.
+- **4~7장 — 무엇을 사고 무엇을 사지 않을 것인가.** 어느 층을 사고, 데이터 계층은 아예 붙이지 않아도 되는지. 각 갈림길이 무엇으로 갈리는지를 축으로 익힌다.
 - **8~11장 — 데모와 프로덕션 사이.** 평가·관측성·가드레일·런타임. 데모까지는 잘 되던 것이 프로덕션에서 무너지는 네 지점이다.
-- **12장 — 종합.** 여섯 용도에 대해 다섯 계층을 채우고, 각 조합을 **쓰지 말아야 할 조건**까지 함께 들고 나온다.
+- **12장 — 종합.** 여섯 용도에 대해 다섯 계층을 채우고, 각 조합을 쓰지 말아야 할 조건까지 함께 들고 나온다.
 
 ### 어떻게 읽으면 좋은가
 
@@ -83,12 +83,12 @@ LLM API는 이미 써봤다. chat completion을 호출해봤고, tool use로 함
 
 다만 각 장은 혼자서도 읽히도록 썼다. 지금 당장 걸린 문제가 있다면 거기부터 펼쳐도 된다.
 
-- 프레임워크를 골라야 한다 → **4장, 5장**
-- 벡터 DB를 붙일지 말지 결정해야 한다 → **6장**
-- 이미 붙였는데 검색이 안 맞는다 → **7장**
-- "잘 되는지 어떻게 아냐"는 질문을 받았다 → **8장, 9장**
-- 보안 검토를 통과해야 한다 → **10장**
-- 에이전트가 만든 코드를 실행해야 한다 → **11장**
+- 프레임워크를 골라야 한다 → 4장, 5장
+- 벡터 DB를 붙일지 말지 결정해야 한다 → 6장
+- 이미 붙였는데 검색이 안 맞는다 → 7장
+- "잘 되는지 어떻게 아냐"는 질문을 받았다 → 8장, 9장
+- 보안 검토를 통과해야 한다 → 10장
+- 에이전트가 만든 코드를 실행해야 한다 → 11장
 
 급하다면 **12장부터 읽고 걸리는 셀의 근거 장으로 거슬러 올라가는** 방법도 나쁘지 않다. 12장의 모든 셀은 "무엇 때문에 갈렸나 → 그래서 기본값"의 형태라, 화살표 앞쪽이 곧 앞 장의 목차 역할을 한다.
 
@@ -100,7 +100,7 @@ LLM API는 이미 써봤다. chat completion을 호출해봤고, tool use로 함
 
 이건 이 책의 결함이 아니라 이 분야의 성질이다. 조사 과정에서 실제로 마주친 것들만 적어봐도 이렇다. 어떤 프레임워크는 메이저 버전이 출시된 지 닷새 됐고, 어떤 라이브러리는 자기 소개문을 조용히 바꿔 다른 종류의 제품이 됐고, 어떤 저장소는 이름 자체를 SDK에서 하네스로 갈아치웠다. 표준 규약 하나는 아직 `Status: Development`이고 태그된 릴리스가 없다.
 
-그래서 이 책은 두 가지를 한다. 하나, 수치를 쓸 때마다 **언제 기준인지 붙인다.** 둘, 12장에 **재확인 목록**을 둔다 — 6개월 뒤 다시 열어봐야 할 항목과, 그것을 직접 확인하는 명령까지 함께. 5장의 생존 신호 네 가지는 그 목록을 스스로 돌리기 위한 절차다.
+그래서 이 책은 두 가지를 한다. 하나, 수치를 쓸 때마다 언제 기준인지 붙인다. 둘, 12장에 재확인 목록을 둔다 — 6개월 뒤 다시 열어봐야 할 항목과, 그것을 직접 확인하는 명령까지 함께. 5장의 생존 신호 네 가지는 그 목록을 스스로 돌리기 위한 절차다.
 
 책이 자기 유통기한을 밝히는 것이 손해처럼 보일 수도 있다. 그런데 반대다. 낡을 것과 오래 갈 것을 갈라두면, 독자는 낡은 셀을 만났을 때 책 전체를 버리는 대신 그 셀만 갱신할 수 있다. 오래 가는 쪽은 표 안의 이름이 아니라 그 이름이 그 자리에 놓인 이유다.
 
@@ -108,13 +108,13 @@ LLM API는 이미 써봤다. chat completion을 호출해봤고, tool use로 함
 
 읽기 전에 알아두면 편한 규칙 넷.
 
-**논문은 arXiv ID로만 인용한다.** 발표 학회를 확인하지 못한 논문에 학회명을 붙이지 않았다. 확인된 것만 참고문헌에 적었고, 본문에서는 ID로 통일했다. 검증할 수 없는 문장을 하나라도 줄이는 쪽을 택했다.
+논문은 arXiv ID로만 인용한다. 발표 학회를 확인하지 못한 논문에 학회명을 붙이지 않았다. 확인된 것만 참고문헌에 적었고, 본문에서는 ID로 통일했다. 검증할 수 없는 문장을 하나라도 줄이는 쪽을 택했다.
 
-**2차 소스는 그렇게 표시한다.** 회사 기술블로그에서 온 수치는 본문에서 2차 소스임을 밝힌다. 실측이고 코드가 공개돼 있어도 그렇다.
+2차 소스는 그렇게 표시한다. 회사 기술블로그에서 온 수치는 본문에서 2차 소스임을 밝힌다. 실측이고 코드가 공개돼 있어도 그렇다.
 
-**커뮤니티 발언은 "한 개발자는 ~라고 말한다" 형태로 귀속한다.** 그 발언의 수치를 사실로 단정하지 않는다. 이런 발언이 값진 이유는 통계가 아니라 현장의 감각을 알려주기 때문이다.
+커뮤니티 발언은 "한 개발자는 ~라고 말한다" 형태로 귀속한다. 그 발언의 수치를 사실로 단정하지 않는다. 이런 발언이 값진 이유는 통계가 아니라 현장의 감각을 알려주기 때문이다.
 
-**확인하지 못한 것은 확인하지 못했다고 적는다.** 이 책에는 "이 값은 확인하지 못했다"는 문장이 여러 번 나온다. 청킹 오버랩 권장치, durable execution 가격, 벤더별 프롬프트 캐싱 단가 같은 것들이다. 빈칸을 그럴듯한 숫자로 메우는 대신, 빈칸이 어디인지 알려주고 그 자리에서 무엇을 물어야 하는지를 대신 준다.
+확인하지 못한 것은 확인하지 못했다고 적는다. 이 책에는 "이 값은 확인하지 못했다"는 문장이 여러 번 나온다. 청킹 오버랩 권장치, durable execution 가격, 벤더별 프롬프트 캐싱 단가 같은 것들이다. 빈칸을 그럴듯한 숫자로 메우는 대신, 빈칸이 어디인지 알려주고 그 자리에서 무엇을 물어야 하는지를 대신 준다.
 
 번역어가 정착하지 않은 몇몇 용어는 원어를 유지했다. `durable execution`(실행이 중간에 죽어도 이어서 완주하게 만드는 계층), `pass@k`·`pass^k`, `microVM`이 그렇다. 억지로 옮기면 원문 자료를 찾을 때 오히려 걸림돌이 된다.
 
@@ -372,7 +372,7 @@ flowchart LR
 ```
 그림 1. MCP의 세 역할과 양방향 제공 능력 — 화살표가 한쪽으로만 흐르지 않는다
 
-버전 이야기를 먼저 정리하고 넘어가자. 현행 스펙 리비전은 `2025-11-25`다(2026-07 기준). 이 점은 확인해둘 값이 있다. `2025-06-18`을 최신으로 적어둔 자료가 여전히 많이 돌아다닌다. 그리고 2026년에는 새 리비전이 나오지 않았다. 스펙은 안정화 국면이고, 움직이는 것은 SDK와 레지스트리다. 실제로 Python SDK는 `1.28.1`(2026-06-26), 레지스트리는 `v1.8.0`(2026-07-13)까지 왔지만 TypeScript SDK의 최신 릴리스는 `v1.29.0`(2026-03-30)으로 넉 달 넘게 태그가 멈춰 있다. 같은 프로토콜 이름 아래에서 언어별 SDK의 속도가 다르다는 것은 도입 계획을 세울 때 실제로 걸리는 사정이다. **스펙이 멈춰 있다는 말과 생태계가 멈춰 있다는 말은 다르다.**
+버전 이야기를 먼저 정리하고 넘어가자. 현행 스펙 리비전은 `2025-11-25`다(2026-07 기준). 이 점은 확인해둘 값이 있다. `2025-06-18`을 최신으로 적어둔 자료가 여전히 많이 돌아다닌다. 그리고 2026년에는 새 리비전이 나오지 않았다. 스펙은 안정화 국면이고, 움직이는 것은 SDK와 레지스트리다. 실제로 Python SDK는 `1.28.1`(2026-06-26), 레지스트리는 `v1.8.0`(2026-07-13)까지 왔지만 TypeScript SDK의 최신 릴리스는 `v1.29.0`(2026-03-30)으로 넉 달 가까이 태그가 멈춰 있다. 같은 프로토콜 이름 아래에서 언어별 SDK의 속도가 다르다는 것은 도입 계획을 세울 때 실제로 걸리는 사정이다. **스펙이 멈춰 있다는 말과 생태계가 멈춰 있다는 말은 다르다.**
 
 라이선스는 따로 봐야 한다. MCP 스펙 레포의 라이선스 판정이 `NOASSERTION`이라, 2026년 7월 기준으로는 "MCP는 오픈소스다"라고 단정할 근거가 없다. 사내 배포 정책을 통과해야 한다면 문구를 직접 확인하는 편이 낫다.
 
@@ -947,7 +947,7 @@ ABC(arXiv:2507.02825)는 범위를 넓혀 태스크 설정과 보상 설계를 �
 
 다만 설계를 빌린다는 게 통째로 베낀다는 뜻은 아니다. 방금 본 것처럼 채점 규칙에 결함이 보고된 부분까지 따라가면 같은 함정에 같이 빠진다. 틀을 참고하고, 통과 조건은 우리 손으로 다시 쓴다.
 
-이건 앞 장에서 프레임워크를 판정할 때 썼던 신호와 정확히 같은 신호다. 도구에 쓴 절차를 벤치마크에도 그대로 돌려보자 — 최신 릴리스가 언제인지, 커밋은 계속 올라오는지, 공식 후속이 있는지. "표준 벤치마크입니다"라고 목록만 던지면, 독자든 동료든 죽은 벤치마크로 보내는 셈이 된다.
+이건 5장에서 프레임워크를 판정할 때 썼던 신호와 정확히 같은 신호다. 도구에 쓴 절차를 벤치마크에도 그대로 돌려보자 — 최신 릴리스가 언제인지, 커밋은 계속 올라오는지, 공식 후속이 있는지. "표준 벤치마크입니다"라고 목록만 던지면, 독자든 동료든 죽은 벤치마크로 보내는 셈이 된다.
 
 ### 심판을 세울 때 — judge와 플랫폼
 
@@ -1417,53 +1417,54 @@ LLM 호출이 정확히 그런 작업이다. 같은 입력에 같은 출력이 �
 20. Terminal-Bench. *Leaderboard 2.0*. https://www.tbench.ai/leaderboard/terminal-bench/2.0 (8장, 2026-07-25 스냅샷)
 21. OpenTelemetry. *GenAI semantic conventions* (Status: Development). https://github.com/open-telemetry/semantic-conventions-genai (9장)
 22. Microsoft Azure. *AI Content Safety overview*. 2026-06-05 갱신. https://learn.microsoft.com/en-us/azure/ai-services/content-safety/overview (10장)
-23. Temporal. *Understanding Temporal*. https://docs.temporal.io/evaluate/understanding-temporal (11장)
-24. Vercel. *Sandbox*. https://vercel.com/docs/sandbox (2026-06-30) · *Sandbox Pricing*. https://vercel.com/docs/sandbox/pricing (2026-06-16) (11장)
-25. Modal. *Sandbox*. https://modal.com/docs/guide/sandbox (11장)
-26. E2B. *Sandbox persistence*. https://e2b.dev/docs/sandbox/persistence (11장)
-27. Cloudflare. *Agents*. https://developers.cloudflare.com/agents/ · *Workflows limits*. https://developers.cloudflare.com/workflows/reference/limits/ · *Durable Objects limits*. https://developers.cloudflare.com/durable-objects/platform/limits/ (11장)
+23. Fly.io. *Machines*. https://fly.io/docs/machines/ (11장, 2026-07-25 확인)
+24. Temporal. *Understanding Temporal*. https://docs.temporal.io/evaluate/understanding-temporal (11장)
+25. Vercel. *Sandbox*. https://vercel.com/docs/sandbox (2026-06-30) · *Sandbox Pricing*. https://vercel.com/docs/sandbox/pricing (2026-06-16) (11장)
+26. Modal. *Sandbox*. https://modal.com/docs/guide/sandbox (11장)
+27. E2B. *Sandbox persistence*. https://e2b.dev/docs/sandbox/persistence (11장)
+28. Cloudflare. *Agents*. https://developers.cloudflare.com/agents/ · *Workflows limits*. https://developers.cloudflare.com/workflows/reference/limits/ · *Durable Objects limits*. https://developers.cloudflare.com/durable-objects/platform/limits/ (11장)
 
 각 도구의 버전 값은 해당 프로젝트의 GitHub Releases·PyPI·npm 레지스트리에서 2026년 7월에 직접 확인했다. 확인 절차는 5장에 명령까지 적어뒀다.
 
 ### 회사·벤더 엔지니어링 블로그 (2차 소스)
 
-28. 이재홍. *하네스 엔지니어링으로 팀 맞춤형 AI 환경 구축하기*. 우아한형제들 기술블로그, 2026-04-17. https://techblog.woowahan.com/26177/ (4장)
-29. Yoonseo Kim 외. *하네스 엔지니어링으로 본 Deep Insight*. AWS Korea 기술블로그, 2026-04-22. https://aws.amazon.com/ko/blogs/tech/harness-engineering-from-deep-insight/ · 코드: https://github.com/aws-samples/sample-deep-insight (9·11·12장)
+29. 이재홍. *하네스 엔지니어링으로 팀 맞춤형 AI 환경 구축하기*. 우아한형제들 기술블로그, 2026-04-17. https://techblog.woowahan.com/26177/ (4장)
+30. Yoonseo Kim 외. *하네스 엔지니어링으로 본 Deep Insight*. AWS Korea 기술블로그, 2026-04-22. https://aws.amazon.com/ko/blogs/tech/harness-engineering-from-deep-insight/ · 코드: https://github.com/aws-samples/sample-deep-insight (9·11·12장)
 
 ### 학술 문헌
 
-30. Yao, S. et al. *ReAct: Synergizing Reasoning and Acting in Language Models*. arXiv:2210.03629v3. https://arxiv.org/abs/2210.03629 (1장)
-31. Wei, J. et al. *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*. arXiv:2201.11903v6. (1장)
-32. Sprague, Z. et al. *To CoT or not to CoT? Chain-of-thought helps mainly on math and symbolic reasoning*. arXiv:2409.12183v3. ICLR 2025. (1장)
-33. Shinn, N. et al. *Reflexion: Language Agents with Verbal Reinforcement Learning*. arXiv:2303.11366v4. (1·2장)
-34. Madaan, A. et al. *Self-Refine: Iterative Refinement with Self-Feedback*. arXiv:2303.17651v2. (1·2장)
-35. Xu, B. et al. *ReWOO: Decoupling Reasoning from Observations for Efficient Augmented Language Models*. arXiv:2305.18323v1. (1·2장)
-36. Yao, S. et al. *Tree of Thoughts: Deliberate Problem Solving with Large Language Models*. arXiv:2305.10601v2. NeurIPS 2023. (1·2장)
-37. Schick, T. et al. *Toolformer: Language Models Can Teach Themselves to Use Tools*. arXiv:2302.04761v1. (1장)
-38. Packer, C. et al. *MemGPT: Towards LLMs as Operating Systems*. arXiv:2310.08560v2. (1·2장)
-39. Huang, J. et al. *Large Language Models Cannot Self-Correct Reasoning Yet*. arXiv:2310.01798v2. ICLR 2024. (2장)
-40. Liu, N. F. et al. *Lost in the Middle: How Language Models Use Long Contexts*. arXiv:2307.03172v3. TACL 2023. (2·6장)
-41. Du, Y. et al. *Improving Factuality and Reasoning in Language Models through Multiagent Debate*. arXiv:2305.14325v1. (2장)
-42. Cemri, M. et al. *Why Do Multi-Agent LLM Systems Fail?* (MAST). arXiv:2503.13657v3 (v1 2025-03-17 / v3 2025-10-26). (2장)
-43. Lee, J. et al. *Can Long-Context Language Models Subsume Retrieval, RAG, SQL, and More?* (LOFT). arXiv:2406.13121. (6장)
-44. Xu, P., Ping, W. et al. *Retrieval meets Long Context Large Language Models*. arXiv:2310.03025v2. ICLR 2024. (6장)
-45. Yu, T., Xu, A., Akkiraju, R. *In Defense of RAG in the Era of Long-Context Language Models* (OP-RAG). arXiv:2409.01666. (6·7장)
-46. Jimenez, C. et al. *SWE-bench: Can Language Models Resolve Real-World GitHub Issues?* arXiv:2310.06770v3. ICLR 2024. (8장)
-47. Mialon, G. et al. *GAIA: A Benchmark for General AI Assistants*. arXiv:2311.12983. (8장)
-48. Zhou, S. et al. *WebArena: A Realistic Web Environment for Building Autonomous Agents*. arXiv:2307.13854v4. (8장)
-49. Aleithan, R. et al. *SWE-Bench+: Enhanced Coding Benchmark for LLMs*. arXiv:2410.06992v2. (8장)
-50. Zhu, Y., Jin, X. et al. *Establishing Best Practices for Building Rigorous Agentic Benchmarks* (ABC). arXiv:2507.02825v5. (8장)
-51. Yao, S., Shinn, N. et al. *τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains*. arXiv:2406.12045v1. (8장)
-52. Kapoor, S., Stroebl, B. et al. *AI Agents That Matter*. arXiv:2407.01502. (8장)
-53. Zheng, L. et al. *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. arXiv:2306.05685v4. NeurIPS 2023 Datasets & Benchmarks. (8장)
-54. Wang, P. et al. *Large Language Models are not Fair Evaluators*. arXiv:2305.17926v2. (8장)
-55. Panickssery, A., Bowman, S., Feng, S. *LLM Evaluators Recognize and Favor Their Own Generations*. arXiv:2404.13076. (8장)
-56. Greshake, K. et al. *Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection*. arXiv:2302.12173v2. (10장)
-57. Debenedetti, E. et al. *AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents*. arXiv:2406.13352v3. **본문 수치는 v3 기준이다** — v1에서 v3 사이에 구현 버그가 수정돼 값이 바뀌었다. (10장)
-58. Debenedetti, E. et al. *Defeating Prompt Injections by Design* (CaMeL). arXiv:2503.18813v2. (10장)
-59. Beurer-Kellner, L. et al. *Design Patterns for Securing LLM Agents against Prompt Injections*. arXiv:2506.08837v3. (10장)
-60. Andriushchenko, M. et al. *AgentHarm: A Benchmark for Measuring Harmfulness of LLM Agents*. arXiv:2410.09024v3. ICLR 2025. (10장)
-61. Agache, A. et al. *Firecracker: Lightweight Virtualization for Serverless Applications*. USENIX NSDI '20, 2020-02. https://www.usenix.org/conference/nsdi20/presentation/agache (11장 — 부팅 시간 수치를 **에이전트 샌드박스에 옮기지 않는** 근거로만 참조)
+31. Yao, S. et al. *ReAct: Synergizing Reasoning and Acting in Language Models*. arXiv:2210.03629v3. (1장)
+32. Wei, J. et al. *Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*. arXiv:2201.11903v6. (1장)
+33. Sprague, Z. et al. *To CoT or not to CoT? Chain-of-thought helps mainly on math and symbolic reasoning*. arXiv:2409.12183v3. ICLR 2025. (1장)
+34. Shinn, N. et al. *Reflexion: Language Agents with Verbal Reinforcement Learning*. arXiv:2303.11366v4. (1·2장)
+35. Madaan, A. et al. *Self-Refine: Iterative Refinement with Self-Feedback*. arXiv:2303.17651v2. (1·2장)
+36. Xu, B. et al. *ReWOO: Decoupling Reasoning from Observations for Efficient Augmented Language Models*. arXiv:2305.18323v1. (1·2장)
+37. Yao, S. et al. *Tree of Thoughts: Deliberate Problem Solving with Large Language Models*. arXiv:2305.10601v2. NeurIPS 2023. (1·2장)
+38. Schick, T. et al. *Toolformer: Language Models Can Teach Themselves to Use Tools*. arXiv:2302.04761v1. (1장)
+39. Packer, C. et al. *MemGPT: Towards LLMs as Operating Systems*. arXiv:2310.08560v2. (1·2장)
+40. Huang, J. et al. *Large Language Models Cannot Self-Correct Reasoning Yet*. arXiv:2310.01798v2. ICLR 2024. (2장)
+41. Liu, N. F. et al. *Lost in the Middle: How Language Models Use Long Contexts*. arXiv:2307.03172v3. TACL 2023. (2·6장)
+42. Du, Y. et al. *Improving Factuality and Reasoning in Language Models through Multiagent Debate*. arXiv:2305.14325v1. (2장)
+43. Cemri, M. et al. *Why Do Multi-Agent LLM Systems Fail?* (MAST). arXiv:2503.13657v3 (v1 2025-03-17 / v3 2025-10-26). (2장)
+44. Lee, J. et al. *Can Long-Context Language Models Subsume Retrieval, RAG, SQL, and More?* (LOFT). arXiv:2406.13121 (리비전 미확인). (6장)
+45. Xu, P., Ping, W. et al. *Retrieval meets Long Context Large Language Models*. arXiv:2310.03025v2. ICLR 2024. (6장)
+46. Yu, T., Xu, A., Akkiraju, R. *In Defense of RAG in the Era of Long-Context Language Models* (OP-RAG). arXiv:2409.01666 (리비전 미확인). (6·7장)
+47. Jimenez, C. et al. *SWE-bench: Can Language Models Resolve Real-World GitHub Issues?* arXiv:2310.06770v3. ICLR 2024. (8장)
+48. Mialon, G. et al. *GAIA: A Benchmark for General AI Assistants*. arXiv:2311.12983 (리비전 미확인). (8장)
+49. Zhou, S. et al. *WebArena: A Realistic Web Environment for Building Autonomous Agents*. arXiv:2307.13854v4. (8장)
+50. Aleithan, R. et al. *SWE-Bench+: Enhanced Coding Benchmark for LLMs*. arXiv:2410.06992v2. (8장)
+51. Zhu, Y., Jin, X. et al. *Establishing Best Practices for Building Rigorous Agentic Benchmarks* (ABC). arXiv:2507.02825v5. (8장)
+52. Yao, S., Shinn, N. et al. *τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains*. arXiv:2406.12045v1. (8장)
+53. Kapoor, S., Stroebl, B. et al. *AI Agents That Matter*. arXiv:2407.01502 (리비전 미확인). (8장)
+54. Zheng, L. et al. *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*. arXiv:2306.05685v4. NeurIPS 2023 Datasets & Benchmarks. (8장)
+55. Wang, P. et al. *Large Language Models are not Fair Evaluators*. arXiv:2305.17926v2. (8장)
+56. Panickssery, A., Bowman, S., Feng, S. *LLM Evaluators Recognize and Favor Their Own Generations*. arXiv:2404.13076 (리비전 미확인). (8장)
+57. Greshake, K. et al. *Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection*. arXiv:2302.12173v2. (10장)
+58. Debenedetti, E. et al. *AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents*. arXiv:2406.13352v3. **본문 수치는 v3 기준이다** — v1에서 v3 사이에 구현 버그가 수정돼 값이 바뀌었다. (10장)
+59. Debenedetti, E. et al. *Defeating Prompt Injections by Design* (CaMeL). arXiv:2503.18813v2. (10장)
+60. Beurer-Kellner, L. et al. *Design Patterns for Securing LLM Agents against Prompt Injections*. arXiv:2506.08837v3. (10장)
+61. Andriushchenko, M. et al. *AgentHarm: A Benchmark for Measuring Harmfulness of LLM Agents*. arXiv:2410.09024v3. ICLR 2025. (10장)
+62. Agache, A. et al. *Firecracker: Lightweight Virtualization for Serverless Applications*. USENIX NSDI '20, 2020-02. (11장 — 부팅 시간 수치를 **에이전트 샌드박스에 옮기지 않는** 근거로만 참조)
 
 ### 커뮤니티 소스
 
@@ -1471,4 +1472,4 @@ LLM 호출이 정확히 그런 작업이다. 같은 입력에 같은 출력이 �
 
 저자가 확인되는 소스 하나는 따로 적어둔다.
 
-62. Youngju Kim. *에이전트 프로덕션 실패 분류와 멱등성*. 2026-07-17. https://www.youngju.dev/blog/2026-07-17-agent-production-failure-taxonomy-idempotency (3장 — 재시도·멱등성 논의의 인용 출처)
+63. Youngju Kim. *에이전트 프로덕션 실패 분류와 멱등성*. 2026-07-17. https://www.youngju.dev/blog/2026-07-17-agent-production-failure-taxonomy-idempotency (3장 — 재시도·멱등성 논의의 인용 출처)
