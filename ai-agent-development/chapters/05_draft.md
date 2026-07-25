@@ -10,7 +10,7 @@
 
 첫 축은 제어를 누가 쥐느냐다.
 
-한쪽 극단에는 LangGraph가 있다. 자기 정의가 이미 성격을 다 말해준다 — *"a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents"*. 상태 전이를 그래프로 명시하고, 결정적으로 코딩한 단계와 LLM이 주도하는 단계를 같은 그래프 안에서 섞는다. 감사 추적과 재개, 사람 개입(HITL) 승인이 요구사항이거나 상태 전이를 코드로 설명해야 하는 규제 도메인이라면 이쪽이 맞다.
+한쪽 극단에는 LangGraph가 있다. 자기 정의가 이미 성격을 다 말해준다 — *"a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents"*. 상태 전이를 그래프로 명시하고, 결정적으로 코딩한 단계와 LLM이 주도하는 단계를 같은 그래프 안에서 섞는다. 감사 추적과 재개, 사람 개입 승인이 요구사항이거나 상태 전이를 코드로 설명해야 하는 규제 도메인이라면 이쪽이 맞다.
 
 대가는 보일러플레이트다. 이건 비판자의 주장이 아니라 공식 문서가 스스로 인정하는 부분이다 — 초보자에게는 그래프를 직접 다루는 대신 LangChain의 `create_agent`부터 쓰라고 권한다. 참고로 흔한 오해 하나를 여기서 정리하자. "LangGraph를 쓰려면 LangChain이 필요하다"는 말은 사실이 아니다. 공식 문서가 *"you don't need to use LangChain to use LangGraph"*라고 못 박는다.
 
