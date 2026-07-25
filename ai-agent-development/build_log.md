@@ -1,8 +1,8 @@
 # Build Log — AI 에이전트, 무엇으로 갈리나 v1.0.0
 
-- **Date:** 2026-07-25T22:22:32Z
+- **Date:** 2026-07-25T22:43:14Z
 - **Output:** `AI-에이전트,-무엇으로-갈리나-v1.0.0.epub`
-- **Size:** 1755932 bytes
+- **Size:** 1755882 bytes
 - **Pandoc exit:** 0
 - **epubcheck:** passed
 - **epubcheck strict:** 1
