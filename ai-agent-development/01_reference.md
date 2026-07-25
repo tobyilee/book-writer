@@ -101,7 +101,9 @@ Microsoft는 아예 공식 판단 표를 제공한다 — **에이전트** = 열
 
 ### 1.4 2026년의 새 층 — SDK 위의 "harness"
 
-이번 리서치의 가장 신선한 발견이다. **"프레임워크를 고른다"가 더 이상 마지막 결정이 아니다.** 벤더 3곳이 같은 용어를 동시에 채택했다.
+이번 리서치의 가장 신선한 발견이다. **"프레임워크를 고른다"가 더 이상 마지막 결정이 아니다.** 벤더 네 곳이 같은 용어를 동시에 채택했다.
+
+> **수 정정 (Phase 4 오케스트레이터, 2026-07-26):** 이 문장은 최초 작성 시 "벤더 3곳"이었으나, 아래 열거된 제품은 **네 조직에서 나온 네 개**다 — LangChain(`deepagents`) / AWS(Strands Harness) / Microsoft(Agent Framework Harness) / Anthropic(Claude Agent SDK). Writer A가 4장 저술 중 이 산수 불일치를 발견해 보고했다. **본문에서 이 수를 인용할 때는 "네 곳"이거나, 수를 세지 않는 표현("여러 벤더가 비슷한 시기에")을 쓴다.**
 
 - **SDK 층** — 루프·도구 호출·핸드오프만 제공. OpenAI Agents SDK: *"very few abstractions"*, 원시 개념 5개(Agents/Handoffs/Guardrails/Sessions/Runner)
 - **harness 층** — 계획·todo 추적·컨텍스트 압축·파일/메모리 접근·도구 승인 정책·관측을 **미리 조립해서** 준다
