@@ -1,0 +1,17 @@
+{
+  "title": "AI 에이전트, 무엇으로 갈리나",
+  "subtitle": "프레임워크·데이터·평가·런타임 선택 가이드",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-07-26",
+  "identifier": "urn:uuid:09e884f2-25c5-4a95-947f-1dbc5f2dc617",
+  "description": "LLM API는 써봤지만 에이전트를 직접 설계·배포·운영해본 적 없는 백엔드·풀스택 개발자를 위한 의사결정 가이드. 프레임워크·데이터·평가·관측성·가드레일·런타임 여섯 계층을 제품 목록이 아니라 선택 축으로 정리하고, 여섯 가지 용도별 기본 조합과 각 조합을 쓰지 말아야 할 조건까지 함께 제시한다.",
+  "cover_image": "cover.png",
+  "cover_alt": "짙은 남색 배경의 미니멀 표지. 아래에서 올라온 가느다란 세로선이 중간 아래 지점에서 세 갈래로 갈라지고, 그중 오른쪽 위로 뻗는 한 갈래만 구릿빛으로 강조되어 여러 선택지 가운데 하나의 경로를 고른 상태를 나타낸다. 상단에 흰 제목 「AI 에이전트, 무엇으로 갈리나」가 두 줄로, 그 아래 구릿빛 부제 「프레임워크·데이터·평가·런타임 선택 가이드」가, 맨 아래에 저자 Toby-AI가 놓여 있다.",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "1.9.1",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
