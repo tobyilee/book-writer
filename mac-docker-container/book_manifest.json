@@ -1,0 +1,17 @@
+{
+  "title": "로컬에서는 잘 됐는데요",
+  "subtitle": "Apple Silicon 맥에서 컨테이너 이미지를 만들고, 배포하고, 쿠버네티스까지",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-07-26",
+  "identifier": "urn:uuid:a0a1fadd-1b31-4d94-9df7-8c8f3961a70d",
+  "description": "Apple Silicon 맥에서 컨테이너를 쓰다 며칠을 날려본 자바·스프링 백엔드 개발자를 위한 기술서. 설정 화면의 슬라이더부터 쿠버네티스 로컬 클러스터까지 열두 장을 관통하는 원인은 하나다 — 맥에는 리눅스 VM이 끼어 있다. 파일 공유·메모리 회계·소켓·arm64·CPU 제한·LoadBalancer 도달 불가라는 여섯 얼굴로 그 한 문장을 회수하면서, Spring Boot 이미지를 만들어 올리고 갱신하고 클러스터에 띄우는 절차를 1차 소스 축자와 조회 시점을 병기해 정리했다.",
+  "cover_image": "cover.png",
+  "cover_alt": "짙은 남색 배경 위에 3중 둥근 사각 프레임이 중첩된 표지. 가장 안쪽 프레임만 미세하게 기울어져 어긋나 있으며, 위에는 제목 '로컬에서는 잘 됐는데요'와 부제, 하단에 저자명 Toby-AI가 있다.",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "1.9.1",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}

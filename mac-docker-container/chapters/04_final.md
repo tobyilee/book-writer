@@ -1,0 +1,102 @@
+# 4장. 6GB를 주랬더니 11.5GB를 쓴다
+
+램 6GB를 쓰라고 설정해뒀는데, 11.5GB를 쓴다.
+
+`bastibense`라는 사용자가 GitHub 이슈 docker/for-mac#7749("com.docker.krun using insane amount of memory", 2025년 8월 21일 등록, 2026년 7월 25일 조회 시점 OPEN)에 남긴 한 줄이다. 그가 밝힌 환경은 Docker Desktop 4.44.3에 VMM은 Docker VMM. 축자로는 이렇다.
+
+> "Same here, set Docker Desktop to use 6 GB of RAM, instead it uses 11,5 GB. Using Docker VMM."
+> (여기도 같다. Docker Desktop에 램 6GB를 쓰라고 설정했는데, 대신 11.5GB를 쓴다. Docker VMM 사용 중.)
+
+같은 사람이 뒤에 한 줄을 더 붙인다 — "today I had 122 GB RAM usage for a container that usually took up like 200 MB."(오늘 평소 200MB쯤 쓰던 컨테이너 하나에 램 사용량 122GB가 찍혔다.)
+
+200MB짜리 컨테이너에 122GB. 숫자를 두 번 읽게 되는 종류의 보고다. 물론 이건 한 사용자가 자기 화면에서 본 것을 적은 것이지 측정된 벤치마크가 아니다. 그래도 남는 것이 있다. 앞 장에서 우리는 설정 화면의 슬라이더를 꽤 자세히 들여다봤는데, 정작 그 슬라이더가 무엇을 상대로 한 약속인지는 한 번도 확인하지 않았다. 확인해보면 이야기가 달라진다.
+
+### 슬라이더가 약속하는 것
+
+어긋났다고 말하려면 먼저 무엇을 약속했는지 알아야 한다. Docker Desktop 설정 문서(2026년 7월 검색 기준)가 밝히는 값은 이렇다. 메모리 한도는 **"Defaults to 50% of your host's memory."**, 스왑은 **"1 GB default"**다. CPU 한도와 디스크 이미지 위치는 조정할 수 있고, "Include VM in Time Machine backups"는 기본 Disabled다.
+
+그런데 이 값들이 정하는 대상은 **개별 컨테이너가 아니다.** Docker VMM 문서의 한 문장이 그것을 대신 말해준다 — "Docker VMM requires a minimum of 4GB of memory to be allocated to the Docker Linux VM."(Docker VMM은 Docker 리눅스 VM에 최소 4GB의 메모리가 할당되기를 요구한다.) 메모리는 "Docker 리눅스 VM에 할당"된다.
+
+그러니까 슬라이더를 옮기는 순간 우리가 하는 일은 컨테이너 하나의 상한을 정하는 게 아니라, **맥 안에 사는 리눅스 한 대에게 방을 얼마나 내줄지를 정하는 일**이다. 맥에는 리눅스 VM이 끼어 있다던 2장의 그 문장이 여기서 첫 청구서를 내민다. 이 장에서 만날 이상한 숫자들은 전부 그 경계에서 나온다.
+
+### 설정한 한도와 실제가 어긋날 때
+
+앞서 본 이슈로 돌아가자. 보고는 한 건이 아니다. `YoannD42`(Docker Desktop 4.45.0 / Docker VMM)는 동료들과 자기들 맥에서 40GB까지 올라갔고, 컨테이너 하나만 몇 시간 돌게 놔둬도 사용량이 올라가며 Docker Desktop을 재시작해야만 메모리를 반환한다고 적었다. `VikiAnn`의 보고는 한술 더 뜬다. 맥북이 밤새 재부팅돼서 도커는 아예 돌고 있지도 않은데 활성 상태 보기에는 `com.docker.krun` 프로세스가 "almost 140 GB memory and like 668% CPU"를 쓰고 있었다. `Fail-Safe`는 메모리보다 열로 먼저 알아차렸다고 적었다 — "I notice my MacBook M3 machine getting noticeably warm, which is rare. CPU usage stays constant at ~200%". 이 증언들은 전부 **Docker Desktop 자체**에 대한 것이다.
+
+여기까지만 보면 결론이 간단해 보인다. 버그로 정리하고 넘어가면 그만일 것 같다. 그런데 그렇게 단정하기가 어렵다. 스레드에 Docker 컨트리뷰터 `djs55`가 직접 답을 달았기 때문이다.
+
+> "The current theory is that the memory is being miscounted by the 'footprint' metric … the VM is signalling free memory to the host and macOS is informed with `madvise` … that it can drop the contents, but the footprint metric doesn't currently reflect that reliably."
+> (현재 가설은 '풋프린트' 지표가 — 활성 상태 보기에서 '메모리'라고 붙은 그것이 — 메모리를 잘못 세고 있다는 것이다. 실제로는 VM이 호스트에 여유 메모리를 신호로 보내고 macOS는 `madvise`로 내용을 버려도 된다고 통보받는데, 풋프린트 지표가 아직 그걸 안정적으로 반영하지 못한다.)
+
+읽고 나면 마음이 조금 놓인다. 진짜로 새는 게 아니라 **세는 쪽이 틀렸다**는 이야기니까. 하지만 반박이 바로 그 자리에 붙는다. `YoannD42`가 열을 바꿔 확인해보니 풋프린트는 45GB, 실제 메모리는 7.2GB, 같은 시각 컨테이너 메모리 사용량은 5.3GB였다. 그러고는 이렇게 썼다 — "Nonetheless, the mac displays memory pressure in red, things get in swap"(그런데도 맥은 메모리 압력을 빨간색으로 표시하고, 스왑으로 넘어간다). 단순히 표시만의 문제는 아닌 것 같고, 적어도 OS가 그 표시를 근거로 실제로 행동하고 있다는 이야기다. 컨트리뷰터의 재답변도 그 가능성을 인정한다 — "This is a definite possibility."
+
+그러니까 이 이슈는 조회 시점에 여전히 열려 있고 원인은 규명 중이다. 표시가 틀린 것인지, 그 표시를 보고 OS가 실제로 스왑을 시작한 것인지조차 결론이 나지 않았다. 찜찜하지만 정직하게 말할 수 있는 건 여기까지다.
+
+그래도 진단의 방향은 하나 얻었다. **화면에 뜬 숫자 하나로 결론을 내리지 말자.** 호스트가 세는 값, VM이 세는 값, 컨테이너가 세는 값이 서로 다를 수 있다. 세 값이 다르다는 사실 자체가 거기 VM 경계가 있다는 증거다.
+
+### 나만 죽는 컨테이너 — `exit=137`을 읽는 법
+
+1장에서 인용했던 한국어 글로 돌아가보자. 여러 컨테이너를 띄워놨는데 Redis 컨테이너가 자주 꺼지고, 다른 팀원들은 잘 동작하지만 나만 꺼지는 상황이었다(velog @js03210, 2025-08-13). 글쓴이가 원인을 잡아낸 경로가 깔끔하다.
+
+> "docker inspect 결과: `OOMKilled=true (exit=137)` → 메모리 부족(OOM Kill) 이 원인."
+
+`OOMKilled=true`와 `exit=137`. 이 신호는 언어와 무관하다. Redis든 Spring Boot든 파이썬이든, 컨테이너가 한도를 넘겨 커널에 의해 종료되면 같은 흔적이 남는다. 그러니 컨테이너가 조용히 사라졌을 때 가장 먼저 볼 곳이 여기다. 로그를 뒤지기 전에 종료 코드를 먼저 읽자.
+
+그다음이 이 책의 논지와 정확히 겹친다. 글쓴이는 원인을 "Docker VM에서 사용 가능한 메모리가 적어서"라고 적었다. 컨테이너가 아니라 VM이라고. 남이 알려준 개념이 아니라 자기 문제를 파고들다가 스스로 그 경계에 도달한 것이다.
+
+한 가지는 조심해서 읽자. 글쓴이는 자기 Docker Desktop 메모리 설정이 "기본값(2GB)"이었고 팀원들은 4GB 이상이었다고 적었다. 그런데 앞에서 본 공식 문서의 기본값은 호스트 메모리의 50%다(2026년 7월 검색 기준). 두 값이 왜 다른지는 이 책이 확인하지 못했다. 확실한 것은 **그 맥에서 주어진 몫이 팀원들보다 작았고, 그래서 나만 죽었다**는 사실이다. 그리고 한도를 올리자 Redis는 더 이상 종료되지 않았다.
+
+### 메모리를 늘리면 빨라진다는 오해
+
+방금 한도를 올려서 문제가 풀렸다. 그렇다면 메모리를 넉넉히 주면 이왕이면 빨라지기도 하지 않을까? 두 문제를 구분하자. **한도를 넘겨 죽는 것**과 **느린 것**은 다른 문제다.
+
+2026년 2월 25일 Hacker News에서 오간 대화가 그 구분을 잘 보여준다. Podman Desktop 팀의 `cdrage`는 런타임에 따라 속도가 다른 이유 중 하나로 기본 할당량 차이를 들었다. Docker Desktop은 VM을 만들 때 기본적으로 램의 50%와 CPU 최대치를 쓰는 반면, Podman Desktop의 기본값은 훨씬 낮은 램 4GB에 CPU 50%다. 메인테이너급 발언이니 무게가 있다. 그런데 같은 스레드에서 처음 속도 차이를 보고했던 `p0w3n3d`가 직접 확인해보고 반증을 올린다. 램 양을 기준으로 재봤더니 **Podman에 8GB를 줘도 속도가 안 오르고, Docker는 4GB로도 여전히 9초**였다.
+
+이 초 단위 수치는 한 사용자가 자기 맥에서 재본 자기 보고다. 머신도 이미지 태그도 반복 횟수도 공개되지 않았으니 벤치마크로 읽으면 안 된다. 다만 방향만은 분명하다. "느리면 메모리를 더 줘라"는 흔한 처방이 적어도 이 사람의 환경에서는 통하지 않았다.
+
+기억해두자. 슬라이더를 오른쪽으로 미는 것은 "한도에 부딪혀 죽는 문제"의 처방이지 "느린 문제"의 처방이 아니다. 덤으로 하나 더 알게 됐다 — 런타임마다 기본 할당량이 다르다. 어느 런타임의 데몬에 붙어 있느냐가 숫자를 바꾼다. 이건 곧 다시 만나게 된다.
+
+### 호스트 디스크와 VM 디스크는 다른 디스크다
+
+메모리에서 벌어진 일이 디스크에서도 똑같이 벌어진다. `Stargator`가 2023년 4월 14일에 올린 이슈(rancher-sandbox/rancher-desktop#4457, CLOSED)의 한 줄을 보자 — "My HD has 120 GB free, so I don't understand the 'No space left on device' nor the references to `nerdctl`."(내 하드에 120GB가 남아 있다. 그래서 'No space left on device'도, `nerdctl` 언급도 이해가 안 된다.)
+
+파인더는 120GB가 남았다고 말하는데 컨테이너는 공간이 없다며 죽는다. 아찔한 상황이다. 메인테이너 `jandubois`의 진단은 이랬다 — "You may be out of space inside the VM. The data volume has a default maximum size of 100GiB, so if you created/pulled a lot of images, it may be full."(VM **안**의 공간이 없는 것일 수 있다. 데이터 볼륨의 기본 최대 크기가 100GiB라서, 이미지를 많이 만들거나 받았다면 꽉 찼을 수 있다.) 그러고는 명령 하나를 알려준다.
+
+```
+$ rdctl shell df -h /mnt/data
+```
+
+사용자가 실행한 결과가 이것이다.
+
+```
+Filesystem                Size      Used Available Use% Mounted on
+/dev/disk/by-label/data-volume
+                         97.9G     93.1G         0 100% /mnt/data
+```
+
+97.9G 중 93.1G 사용, **남은 공간 0, 사용률 100%.** 맥의 디스크는 텅텅 비었는데 VM 안의 디스크는 꽉 찼다. 같은 "디스크"라는 단어를 쓰지만 다른 물건이다. 메모리가 호스트·VM·컨테이너 세 층에서 따로 세어지던 것과 정확히 같은 구조다. (100GiB라는 기본값은 2023년 4월 시점 메인테이너의 발언이다. 지금 쓰는 버전의 기본값은 공식 문서로 다시 확인하는 편이 낫다.) 이 이슈의 결말도 기억해둘 만하다. 원인을 찾지 못한 채 초기화(`rdctl factory-reset`)로 끝났다. 진단할 언어가 없으면 남는 선택지는 결국 "다 지우고 다시"뿐이다.
+
+그렇다면 반대로 한 번 커진 VM 디스크를 도로 줄이면 되겠다 싶은데, 이게 생각보다 간단하지 않다. "Simple Way to Shrink Docker.raw Disk"라는 요청 이슈(docker/for-mac#7517, 2025-01-02 등록, CLOSED)에 달린 유일한 댓글은 Docker 컨트리뷰터 `bsousaa`의 한 줄이었다 — "closing as duplicate of https://github.com/docker/roadmap/issues/771". 즉 이 요청은 개별 버그로 닫히고 **로드맵 항목으로 넘어가 있다.** 그 로드맵 이슈의 내용까지는 이 책이 확인하지 않았으므로 해석은 여기서 멈추자.
+
+### 맥에서는 CPU 제한이 잘 안 먹는다
+
+메모리, 디스크 다음은 CPU다. 여기서도 같은 종류의 어긋남이 나온다.
+
+`--cpus=0.5`는 CPU를 절반만 쓰라는 뜻이다. 목표치는 50%다. 그런데 macOS의 Docker Desktop에서 이 값을 걸고 실제 사용률을 잰 결과가 **평균 71.63%, 표준편차 36.14, 이상치 최대 247%**로 보고돼 있다(arXiv 프리프린트, 2026년 측정 — 단서는 이 소절 끝에 붙인다). 논문의 설명은 이렇다.
+
+> "two-level scheduling (macOS → LinuxKit → CFS) produces compounding inaccuracy."
+> (2단 스케줄링 — macOS에서 LinuxKit으로, 다시 CFS로 — 이 부정확성을 누적시킨다.)
+
+맥의 스케줄러가 VM에게 CPU 시간을 나눠주고, VM 안의 리눅스 스케줄러가 그것을 다시 컨테이너에게 나눠준다. 우리가 건 `--cpus`는 **두 번째 층에만** 걸리는 제한이다. 첫 번째 층이 흔들리면 두 번째 층의 약속도 같이 흔들린다. 슬라이더가 VM에게 방을 내주는 일이었다는 첫 소절의 이야기가, 이번엔 CPU 쪽에서 똑같이 반복된다.
+
+같은 자료에서 기동 시간의 변동계수도 macOS가 32.8%로 나온다(같은 실험의 SSD 환경은 3.4%). 평균이 나쁜 것보다 이쪽이 실무에서 더 성가시다. **결과가 재현되지 않는다는 것 자체가 맥 환경의 특징**이라는 뜻이기 때문이다. 어제와 오늘의 기동 시간이 눈에 띄게 다르다면, 무엇을 바꿔야 좋아졌다고 말할 수 있을까? 메모리 쪽 관측도 하나 더 있다. 페이지 캐시 공유 효율은 약 0%로 나타났다 — "three identical nginx containers consume 3× the memory of one"(똑같은 nginx 컨테이너 세 개가 하나의 3배 메모리를 쓴다). 흥미롭게도 이건 맥만의 일이 아니다. 논문은 이 0%가 측정한 모든 플랫폼에서 똑같이 나타났다고 적는다 — 컨테이너를 여러 개 띄우면 메모리는 그 수만큼 곱해서 든다고 보는 편이 안전하다.
+
+다만 출처를 정확히 밝혀두자. arXiv:2602.15214(Khan, 2026)이며 단독 저자의 프리프린트다. 동료 심사 여부는 확인되지 않았다. 그리고 저자 본인이 고지를 달아뒀다 — macOS 결과는 개발자 환경을 특징짓기 위한 것이지 클라우드 CPU와의 아키텍처 비교가 아니라고 적었다. 그러니 "맥이 클라우드보다 부정확하다"로 옮겨 적으면 저자가 하지 않은 말을 하는 셈이 된다. 우리가 가져갈 것은 하나다. 맥에서는 `--cpus`가 건 약속이 그대로 지켜진다고 가정하지 말자.
+
+이 관측은 곧 자바 쪽으로도 이어진다. JVM은 자기가 쓸 수 있는 프로세서 수를 보고 스레드 풀 크기를 계산하는데, 그 수를 손으로 못 박는 `-XX:ActiveProcessorCount` 옵션이 왜 필요한지가 여기서 반쯤 설명된다. 나머지 절반은 8장에서 만나자.
+
+메모리도, 디스크도, CPU도 같은 방식으로 어긋났다. 우리가 정한 한도는 컨테이너가 아니라 그 사이에 낀 리눅스 VM에 걸리고, 값을 세는 주체는 층마다 다르다. 그러니 화면의 숫자 하나를 근거로 판단하기 전에 **어느 층이 센 숫자인지**를 먼저 묻는 습관을 들이는 편이 낫다.
+
+마침 컨트리뷰터 `djs55`가 그 훈련에 딱 맞는 과제를 남겨뒀다 — "Perhaps try adding other memory columns in Activity Monitor … and see how they compare to the footprint metric."(활성 상태 보기에 다른 메모리 열을 추가해서 풋프린트 지표와 비교해보면 어떨까.) 지금 해보자. '메모리' 열 옆에 다른 메모리 열들을 꺼내 놓고, 컨테이너를 하나 띄운 뒤 값들이 어떻게 벌어지는지 보는 것이다. 몇 분이면 된다. 그 벌어진 간격이 바로 이 장에서 이야기한 경계다.
+
+여기까지 오는 동안 우리는 한 가지를 계속 당연하게 여겼다. 그 한도를 강제하고 그 숫자를 보고하는 데몬이, 정말 우리가 생각하는 그 제품이 맞을까?
