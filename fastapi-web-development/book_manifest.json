@@ -1,0 +1,16 @@
+{
+  "title": "이미 웹을 아는 개발자를 위한 FastAPI",
+  "subtitle": "Spring Boot·Express에서 건너온 사람들의 실전 안내서",
+  "author": "Toby-AI",
+  "language": "ko",
+  "version": "1.0.0",
+  "pub_date": "2026-07-26",
+  "identifier": "urn:uuid:804e66c0-c9f2-4c54-9a88-67ea239c4293",
+  "description": "Java(Spring Boot)와 Node.js로 웹 애플리케이션을 만들어 본 개발자를 위한 FastAPI 실전 안내서. 익숙한 개념이 이 생태계의 어느 자리에 놓이는지를 짚으며, 사내 이슈 트래커 예제를 열네 개 장에 걸쳐 함께 키운다. 라우팅과 앱 구조, Pydantic과 에러 계약, Depends와 미들웨어, 이벤트 루프와 스레드풀, SQLAlchemy 2.0 데이터 계층, WebSocket·SSE, 백그라운드 작업과 태스크 큐, 서버 렌더링·GraphQL·BFF, 인증과 인가, 테스트, CI/CD, 컨테이너와 클라우드 배포, 관측성과 성능까지 다룬다. 모든 구체적 주장에 1차 소스 각주와 조회 시점을 붙였다. FastAPI 0.140.0 / 2026년 7월 기준.",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "1.9.1",
+  "rights": "© 2026 Toby-AI. CC BY-NC-SA 4.0으로 배포됨.",
+  "cover_alt": "이미 웹을 아는 개발자를 위한 FastAPI — 표지. 짙은 남색 배경 위, 왼쪽의 반듯한 회색 사각형 격자(스레드 모델을 상징)가 점점 흩어지며 오른쪽의 청록색 발광 루프(이벤트 루프를 상징)로 흘러들어가는 추상 기하 그래픽이 있다. 상단에 제목 '이미 웹을 아는 개발자를 위한 FastAPI', 하단에 부제 'Spring Boot·Express에서 건너온 사람들의 실전 안내서'와 저자명 'Toby-AI'가 흰색·연청록색 타이포그래피로 배치되어 있다."
+}
