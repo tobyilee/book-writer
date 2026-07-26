@@ -1,0 +1,17 @@
+{
+  "title": "이벤트 하나가 캠페인이 되기까지",
+  "subtitle": "Martech 회사로 가는 개발자를 위한 안내서",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-07-26",
+  "identifier": "urn:uuid:1a221305-04fa-4238-a3b3-99bdbf675fda",
+  "description": "마케팅팀이 왜 그 이벤트를 그 이름으로 그 시점에 쏴달라고 하는지 모르는 채 요구사항만 받아 적어온 백엔드 개발자를 위한 책이다. 이벤트 하나가 발생해서 캠페인으로 나가기까지의 경로를 열두 장에 걸쳐 따라가며, CDP의 핵심 스키마가 사실상 두 테이블이라는 발견에서 출발해 수집·스트림·저장·아이덴티티·액티베이션·예측 모델·채널·규제·어트리뷰션까지 훑는다. 마케터의 요구를 지연·기수·조회 패턴 세 축으로 번역하는 법을 익히고, 벤더 주장과 학술 근거와 업계 관행의 강도를 구분해 읽는 습관을 함께 세운다. 인용마다 확인 수준을 밝히는 것이 이 책의 규율이다.",
+  "cover_image": "cover.png",
+  "cover_alt": "이벤트 하나가 캠페인이 되기까지 표지",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "learning",
+  "harness_version": "1.9.1",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
