@@ -127,20 +127,30 @@ if [[ -f "$OUTPUT" ]]; then
   mv "$OUTPUT" "_prev/$(basename "$OUTPUT" .epub)-$(date +%Y%m%d%H%M%S).epub"
 fi
 
-# Build metadata YAML for pandoc.
+# Build metadata YAML for pandoc. Generated via python (not a shell heredoc)
+# so embedded double quotes / backslashes in any field (e.g. a description
+# that quotes a phrase like "MCP 2.0 스펙") are properly escaped instead of
+# breaking the YAML double-quoted scalar. json.dumps() produces a quoting
+# style that is also valid YAML double-quoted-scalar syntax.
 META_YAML="${WS}/.meta.yaml"
-cat > "$META_YAML" <<YAML
----
-title: "${TITLE}"
-author: "${AUTHOR}"
-lang: "${LANG}"
-date: "${PUB_DATE}"
-identifier: "${IDENTIFIER}"
-description: "${DESCRIPTION}"
-subject: "${GENRE}"
-rights: "${RIGHTS}"
----
-YAML
+python3 - "$META_YAML" "$TITLE" "$AUTHOR" "$LANG" "$PUB_DATE" "$IDENTIFIER" "$DESCRIPTION" "$GENRE" "$RIGHTS" <<'PYMETA'
+import json, sys
+path = sys.argv[1]
+title, author, lang, date, identifier, description, subject, rights = sys.argv[2:10]
+def q(s):
+    return json.dumps(s, ensure_ascii=False)
+with open(path, "w", encoding="utf-8") as f:
+    f.write("---\n")
+    f.write(f"title: {q(title)}\n")
+    f.write(f"author: {q(author)}\n")
+    f.write(f"lang: {q(lang)}\n")
+    f.write(f"date: {q(date)}\n")
+    f.write(f"identifier: {q(identifier)}\n")
+    f.write(f"description: {q(description)}\n")
+    f.write(f"subject: {q(subject)}\n")
+    f.write(f"rights: {q(rights)}\n")
+    f.write("---\n")
+PYMETA
 
 # Build cover arg (optional).
 COVER_ARG=()
@@ -190,6 +200,20 @@ def repl(m):
     try:
         subprocess.run([mmdc, "-i", tfname, "-o", out], check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # mmdc emits label text wrapped in bare <p> inside foreignObject/div
+        # (e.g. <span class="nodeLabel"><p>...</p></span>). EPUB's restricted
+        # SVG foreignObject content model is phrasing-only and rejects <p>
+        # (epubcheck RSC-005: "element p not allowed here"), even though the
+        # tag is validly XHTML-namespaced. Swap to <span>, which the schema
+        # allows. Safe here: the only CSS rules keyed on the bare `p` selector
+        # (`#my-svg p{margin:0}`, `.edgeLabel p{background-color:...}`) either
+        # have no visible effect on <span> (margin already 0 by default) or
+        # duplicate a value already set on the enclosing `.edgeLabel`/parent
+        # element, so no visual regression.
+        if os.path.exists(out):
+            svg = open(out, encoding="utf-8").read()
+            svg = svg.replace("<p>", "<span>").replace("</p>", "</span>")
+            open(out, "w", encoding="utf-8").write(svg)
     finally:
         os.unlink(tfname)
     return "![](figures/fig-%02d.svg)" % n
