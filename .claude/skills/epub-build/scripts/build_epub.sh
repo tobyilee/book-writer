@@ -169,13 +169,25 @@ if grep -q '```mermaid' "$MANUSCRIPT" 2>/dev/null; then
   if command -v mmdc >/dev/null 2>&1; then
     mkdir -p "${WS}/figures"
     RENDERED_INPUT="${WS}/.manuscript.mermaid.md"
+    # mmdc's default mermaid rendering emits HTML node labels wrapped in
+    # <foreignObject><div><span><p>...</p></span></div></foreignObject>.
+    # EPUB's embedded-SVG content model does not permit block-level XHTML
+    # elements like <p> inside foreignObject, so epubcheck (RSC-005) rejects
+    # every such diagram. securityLevel:"strict" makes mermaid render node
+    # labels as plain SVG <text>/<tspan> instead, which is schema-valid and
+    # keeps the label text intact (just re-wrapped into tspans).
+    MERMAID_CFG="${WS}/.mermaid_config.json"
+    cat > "$MERMAID_CFG" <<'JSONCFG'
+{"securityLevel": "strict", "flowchart": {"htmlLabels": false}, "htmlLabels": false}
+JSONCFG
     # Python splits the manuscript on ```mermaid fences, renders each block to
     # an SVG with mmdc, and rewrites the fence to ![caption](figures/fig-NN.svg).
     # The caption is taken from a following "그림 N. ..." line if present.
-    if MMDC_BIN="$(command -v mmdc)" python3 - "$MANUSCRIPT" "$RENDERED_INPUT" "${WS}/figures" <<'PYMERMAID' 2>"${WS}/.mermaid_err"
+    if MMDC_BIN="$(command -v mmdc)" MMDC_CFG="$MERMAID_CFG" python3 - "$MANUSCRIPT" "$RENDERED_INPUT" "${WS}/figures" <<'PYMERMAID' 2>"${WS}/.mermaid_err"
 import os, re, subprocess, sys, tempfile
 src, dst, figdir = sys.argv[1], sys.argv[2], sys.argv[3]
 mmdc = os.environ["MMDC_BIN"]
+mmdc_cfg = os.environ["MMDC_CFG"]
 text = open(src, encoding="utf-8").read()
 pat = re.compile(r"```mermaid[ \t]*\n(.*?)\n```", re.DOTALL)
 n = 0
@@ -188,7 +200,7 @@ def repl(m):
         tfname = tf.name
     out = os.path.join(figdir, "fig-%02d.svg" % n)
     try:
-        subprocess.run([mmdc, "-i", tfname, "-o", out], check=True,
+        subprocess.run([mmdc, "-i", tfname, "-o", out, "-c", mmdc_cfg], check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     finally:
         os.unlink(tfname)
@@ -375,7 +387,8 @@ fi
 
 # Cleanup (temp artifacts only — figures/ and the EPUB are kept).
 rm -f "$META_YAML" "${WS}/.pandoc_err" "${WS}/.manuscript.mermaid.md" \
-      "${WS}/.mermaid_err" "${WS}/.coveralt_err" "${WS}/.coveralt.py"
+      "${WS}/.mermaid_err" "${WS}/.mermaid_config.json" \
+      "${WS}/.coveralt_err" "${WS}/.coveralt.py"
 
 if [[ $PANDOC_EXIT -ne 0 ]]; then
   echo "build failed — see $LOG" >&2

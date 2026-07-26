@@ -26,3 +26,6 @@ __pycache__/
 # Logs and temp
 *.log
 .tmp/
+
+# Superseded builds (previous EPUB/md revisions)
+_prev/
