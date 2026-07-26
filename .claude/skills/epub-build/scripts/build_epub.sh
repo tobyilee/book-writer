@@ -192,6 +192,19 @@ def repl(m):
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     finally:
         os.unlink(tfname)
+    # mermaid/mmdc wraps each foreignObject label in <span class="nodeLabel">
+    # <p>...</p></span> (or edgeLabel). A <span> is phrasing content and
+    # cannot contain a block-level <p> per the XHTML content model, so
+    # epubcheck fails EPUB3 validation (RSC-005) on every rendered diagram.
+    # Unwrap the plain, unnested, attribute-less <p>/</p> mmdc emits — the
+    # visible text and any <br /> line breaks are preserved as-is.
+    try:
+        svg_text = open(out, encoding="utf-8").read()
+        fixed_svg = svg_text.replace("<p>", "").replace("</p>", "")
+        if fixed_svg != svg_text:
+            open(out, "w", encoding="utf-8").write(fixed_svg)
+    except OSError:
+        pass
     return "![](figures/fig-%02d.svg)" % n
 new = pat.sub(repl, text)
 open(dst, "w", encoding="utf-8").write(new)
