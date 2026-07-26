@@ -1,0 +1,17 @@
+{
+  "title": "MCP 서버 개발 실전",
+  "subtitle": "TypeScript·Python·Java로 만들고 Claude Code에 붙이기",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-07-26",
+  "identifier": "urn:uuid:14818174-89f1-489b-9314-6326def17e98",
+  "description": "MCP 서버를 직접 만들어 쓰려는 개발자를 위한 실전서. \"MCP 2.0 스펙\"이라는 흔한 오해를 걷어내고 네 개의 버전 축을 분리하는 좌표계에서 출발해, TypeScript·Python·Java(Spring AI)로 같은 서버 하나(team-wiki)를 만들고 Claude Code·Desktop·Agent SDK·Codex에 붙인다. 도구를 몇 개 노출할지 정하는 설계 판단, 에러 없이 침묵으로 실패하는 MCP를 진단하는 절차, npm·PyPI·Docker·레지스트리 배포, 원격 개방과 툴체인 보안, 서버가 코딩 에이전트를 부르는 역방향 패턴까지 다룬다. 모든 버전·수치는 2026-07-26 관측 시점을 명기해 서술하며, 주 서술 대상은 스펙 리비전 2025-11-25다.",
+  "cover_image": "cover.png",
+  "cover_alt": "MCP 서버 개발 실전 표지 — 딥 네이비에서 틸로 이어지는 배경 위에 TypeScript·Python·Java를 뜻하는 세 개의 육각 노드가 얇은 빛나는 선으로 하나의 중앙 원(MCP 서버)에 연결된 추상 다이어그램, 제목과 부제, 하단에 저자명 Toby-AI가 표기되어 있다.",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "1.9.1",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
