@@ -1,0 +1,33 @@
+{
+  "title": "같은 이름, 다른 동작 — Claude Code 사용자를 위한 OpenAI Codex 완전 정리",
+  "subtitle": "Claude Code 사용자를 위한 OpenAI Codex 완전 정리",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-08-02",
+  "identifier": "urn:uuid:882cf2c0-4843-41b5-8799-f979fe9cc244",
+  "description": "Claude Code로 실무를 해본 개발자가 OpenAI Codex를 두 번째 하네스로 손에 익히는 책이다. 같은 이름의 명령이 다른 일을 하는 지점(손버릇 교정표·전환 마찰 원장)에서 출발해 지침·설정·승인·확장·프롬프팅·비용·위임·리뷰·부품화까지 열두 장에 걸쳐 대응 관계로 재구성한다. Codex 공식 문서 148개 URL(고유 문서 약 140개)과 openai/codex 이슈, 국내외 커뮤니티 1차 증언, 학술 문헌을 근거로 삼되 확인할 수 없는 것은 확인할 수 없다고 적었다. 2026-08-02 문서 스냅샷 기준.",
+  "cover_image": "cover.png",
+  "cover_alt": "짙은 네이비 배경 표지. 상단에 제목 '같은 이름, 다른 동작'과 부제 'Claude Code 사용자를 위한 OpenAI Codex 완전 정리'. 중앙에는 하나의 선이 내려오다 호박색과 청록색 두 갈래로 갈라져 각각 다른 지점에 닿는 심볼이 있고, 그 아래 'SAME SHAPE · DIFFERENT BEHAVIOR' 문구. 하단에 저자명 Toby-AI.",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "1.10.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0",
+  "chapters": [
+    { "n": 1, "title": "Codex는 제품이 아니다 — 표면의 집합을 먼저 이해하기" },
+    { "n": 2, "title": "이주는 이미 구현돼 있다 — /codex/import가 말해주는 것" },
+    { "n": 3, "title": "손이 먼저 기억한다 — 첫 주에 나는 사고들" },
+    { "n": 4, "title": "지침과 설정 — AGENTS.md와 config.toml을 다시 세우기" },
+    { "n": 5, "title": "승인은 샌드박스가 아니다 — 세 개의 축과 Beta 딱지" },
+    { "n": 6, "title": "확장 모델 — 스킬·플러그인·훅, 그리고 테스트되는 규칙" },
+    { "n": 7, "title": "한 chat, 한 결과 — 프롬프팅과 작업 운영" },
+    { "n": 8, "title": "모델 선택이 곧 비용 설계다" },
+    { "n": 9, "title": "내 노트북 밖으로 — 위임의 세 가지 모양" },
+    { "n": 10, "title": "두 개의 \"검토\" — 코드 리뷰와 Codex Security" },
+    { "n": 11, "title": "내 손 밖으로 — SDK·app-server·MCP, 그리고 조직이 개인을 이기는 지점" },
+    { "n": 12, "title": "갈라진 진화 — Codex에만 있는 것, 그리고 두 하네스와 함께 사는 법" }
+  ],
+  "front_matter": ["판권", "서문", "목차"],
+  "back_matter": ["에필로그", "참고문헌"]
+}
