@@ -1,0 +1,17 @@
+{
+  "title": "개발 워크플로 전략",
+  "subtitle": "브랜치에서 머지 큐까지, 자주 합치고 안전하게 머지하는 법",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-09-26",
+  "identifier": "urn:uuid:006a729a-0b80-45cb-b7be-4c15669d0239",
+  "description": "PR 두 개가 모두 초록이었는데 main이 깨지는 장면에서 출발해, 통합 빈도와 머지 무결성이라는 두 축으로 개발 워크플로 전체를 설계하는 실무서. 여섯 가지 브랜치 전략과 전환 사례, 보호 규칙·룰셋·CODEOWNERS, 리뷰할 수 있는 PR과 리뷰 지연을 줄이는 합의, 필수 체크 설계와 flaky 테스트, GitHub Actions의 구조·속도·재사용·보안, 그리고 머지 큐의 원리와 도입 실전까지 연구와 공식 문서, 실제 팀의 사례를 근거로 다룬다. 마지막에는 네 가지 팀 유형별 설계도와 DORA 지표로 재며 하나씩 바꿔 나가는 순서를 제시한다.",
+  "cover_image": "cover.png",
+  "cover_alt": "개발 워크플로 전략 표지",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
