@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:NotoKR;src:url("file:///Users/tobylee/Library/Fonts/NotoSansKR-VariableFont_wght.ttf");font-weight:100 900}
+@font-face{font-family:Mono;src:url("file:///Users/tobylee/Library/Fonts/MesloLGSNerdFontMono-Regular.ttf")}
+html,body{margin:0;width:1600px;height:2560px;overflow:hidden}
+body{background:#0D1624;font-family:NotoKR;color:#F2F5F8;position:relative}
+.grid{position:absolute;inset:0;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:80px 80px}
+.tag{position:absolute;left:150px;top:230px;font-family:Mono;font-size:40px;letter-spacing:6px;color:#5FD4C0}
+.rule{position:absolute;left:150px;top:300px;width:120px;height:8px;background:#5FD4C0}
+h1{position:absolute;left:140px;top:380px;margin:0;font-weight:800;font-size:260px;line-height:1.12;letter-spacing:-8px}
+h1 span{color:#5FD4C0}
+.sub{position:absolute;left:150px;top:1040px;font-weight:500;font-size:62px;line-height:1.45;color:#B8C4D2;letter-spacing:-1px}
+svg{position:absolute;left:0;top:1420px}
+.author{position:absolute;left:150px;bottom:190px;font-weight:600;font-size:54px;letter-spacing:2px;color:#E6EBF0}
+.aline{position:absolute;left:150px;bottom:280px;width:1300px;height:2px;background:#ffffff22}
+</style></head><body><div class="grid"></div>
+<div class="tag">CI/CD · VERIFY BEFORE DEPLOY</div><div class="rule"></div>
+<h1>배포는<br><span>검증</span>이다</h1>
+<div class="sub">GitHub·AWS·Cloudflare로 짜는<br>AI 시대의 CI/CD</div>
+<svg width="1600" height="760" viewBox="0 0 1600 760">
+ <g font-family="Mono" font-size="34" fill="#7F90A5" text-anchor="middle">
+  <line x1="150" y1="380" x2="1450" y2="380" stroke="#2E4058" stroke-width="10"/>
+  <line x1="150" y1="380" x2="1170" y2="380" stroke="#5FD4C0" stroke-width="10"/>
+  <!-- nodes -->
+  <circle cx="190" cy="380" r="34" fill="#0D1624" stroke="#5FD4C0" stroke-width="10"/>
+  <text x="190" y="480">commit</text>
+  <circle cx="470" cy="380" r="34" fill="#0D1624" stroke="#5FD4C0" stroke-width="10"/>
+  <text x="470" y="480">build</text>
+  <circle cx="750" cy="380" r="34" fill="#0D1624" stroke="#5FD4C0" stroke-width="10"/>
+  <text x="750" y="480">test</text>
+  <!-- gate -->
+  <rect x="990" y="230" width="36" height="300" rx="6" fill="#F2B84B"/>
+  <rect x="1094" y="230" width="36" height="300" rx="6" fill="#F2B84B"/>
+  <rect x="990" y="230" width="140" height="30" rx="6" fill="#F2B84B"/>
+  <text x="1060" y="600" fill="#F2B84B">gate</text>
+  <circle cx="1060" cy="380" r="46" fill="#F2B84B"/>
+  <path d="M1038 382 l16 16 l30 -34" fill="none" stroke="#0D1624" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- deploy -->
+  <circle cx="1400" cy="380" r="50" fill="#5FD4C0"/>
+  <path d="M1380 380 h40 M1404 362 l18 18 l-18 18" fill="none" stroke="#0D1624" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1400" y="480" fill="#5FD4C0">deploy</text>
+ </g>
+</svg>
+<div class="aline"></div><div class="author">Toby-AI</div>
+</body></html>

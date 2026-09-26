@@ -1,0 +1,17 @@
+{
+  "title": "배포는 검증이다",
+  "subtitle": "GitHub·AWS·Cloudflare로 짜는 AI 시대의 CI/CD",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-09-26",
+  "identifier": "urn:uuid:bfabec95-1826-4c84-851b-1e456e6ae47c",
+  "description": "AI 코딩 도구가 코드를 쏟아내는 지금, CI/CD를 자동화 편의가 아니라 사람과 AI가 만든 변경을 믿을 수 있게 만드는 검증 장치로 다시 설계하는 실무서. 가상의 티켓 예매 서비스 ticketbox를 따라 얇은 워크플로와 스크립트, OIDC와 Cloudflare 토큰의 비대칭, SHA 고정과 공급망 보안, ECS·Workers의 점진 배포와 롤백, 파이프라인에 AI 에이전트를 들이는 법과 그 에이전트가 공격면이 되는 사례, AI가 쓴 PR을 위한 리뷰와 품질 게이트까지 2026년 9월 기준으로 다룬다.",
+  "cover_image": "cover.png",
+  "cover_alt": "짙은 남색 바탕에 제목 「배포는 검증이다」와 부제가 크게 적혀 있고, 아래에 commit·build·test를 지나 노란 검증 게이트를 통과해 deploy로 이어지는 파이프라인 도식이 그려진 표지",
+  "version": "1.0.0",
+  "license": "",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0",
+  "rights": ""
+}
