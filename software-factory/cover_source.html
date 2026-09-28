@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>소프트웨어 팩토리 — cover source</title>
+<style>
+  @font-face { font-family: "NSKR"; font-weight: 800; src: url("file:///Users/tobylee/Library/Fonts/NotoSansKR-ExtraBold.ttf"); }
+  @font-face { font-family: "NSKR"; font-weight: 700; src: url("file:///Users/tobylee/Library/Fonts/NotoSansKR-Bold.ttf"); }
+  @font-face { font-family: "NSKR"; font-weight: 500; src: url("file:///Users/tobylee/Library/Fonts/NotoSansKR-Medium.ttf"); }
+  @font-face { font-family: "NSKR"; font-weight: 400; src: url("file:///Users/tobylee/Library/Fonts/NotoSansKR-Regular.ttf"); }
+  @font-face { font-family: "MONO"; font-weight: 400; src: url("file:///Users/tobylee/Library/Fonts/MesloLGMNerdFontMono-Regular.ttf"); }
+
+  :root {
+    --ink: #0B0F16;
+    --paper: #F3EFE7;
+    --amber: #F0B447;
+    --slate: #8E9AAD;
+    --slate-dim: #56627A;
+  }
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1600px; height: 2560px; overflow: hidden;
+    background: var(--ink);
+    font-family: "NSKR", sans-serif;
+    color: var(--paper);
+    position: relative;
+  }
+  .kicker {
+    position: absolute; left: 130px; top: 168px;
+    font-family: "MONO", monospace; font-size: 30px; letter-spacing: 0.32em;
+    color: var(--amber);
+    display: flex; align-items: center; gap: 26px;
+  }
+  .kicker .dot { width: 22px; height: 22px; background: var(--amber); display: inline-block; }
+  .title {
+    position: absolute; left: 122px; top: 250px;
+    font-weight: 800; font-size: 252px; line-height: 1.12; letter-spacing: -0.035em;
+    margin: 0;
+  }
+  .title .accent { color: var(--amber); }
+  .subtitle {
+    position: absolute; left: 130px; top: 900px;
+    font-weight: 500; font-size: 60px; line-height: 1.45; letter-spacing: -0.01em;
+    color: var(--slate); margin: 0;
+  }
+  svg.plant { position: absolute; left: 0; top: 0; }
+  .footer-rule { position: absolute; left: 130px; right: 130px; top: 2338px; height: 2px; background: #222C3B; }
+  .author {
+    position: absolute; left: 130px; top: 2378px;
+    font-weight: 700; font-size: 46px; letter-spacing: 0.01em; color: var(--paper);
+  }
+  .tagline {
+    position: absolute; right: 130px; top: 2392px;
+    font-family: "MONO", monospace; font-size: 24px; letter-spacing: 0.22em; color: var(--slate-dim);
+  }
+</style>
+</head>
+<body>
+  <div class="kicker"><span class="dot"></span>SOFTWARE FACTORY</div>
+  <h1 class="title">소프트웨어<br><span class="accent">팩토리</span></h1>
+  <p class="subtitle">첫 페어 프로그래밍부터<br>사람을 필요할 때만 부르는 개발 시스템까지</p>
+
+  <svg class="plant" width="1600" height="2560" viewBox="0 0 1600 2560" xmlns="http://www.w3.org/2000/svg" id="plant">
+    <defs>
+      <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="14" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="footer-rule"></div>
+  <div class="author">Toby-AI</div>
+  <div class="tagline">LIGHTS ON WHERE IT MATTERS</div>
+
+<script>
+  // Five stepped factory bays = the autonomy ladder (보조 → 협업 → 위임 → 승인 → 온콜).
+  // Lit windows = points where a human is in the loop; they thin out as autonomy rises,
+  // but the last bay is never fully dark (a "light factory", not a dark one).
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("plant");
+  const el = (name, attrs, parent = svg) => {
+    const n = document.createElementNS(NS, name);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    parent.appendChild(n);
+    return n;
+  };
+
+  const left = 130, right = 1470, baseY = 2140;
+  const bayW = 200, gap = (right - left - bayW * 5) / 4;
+  const pad = 26, win = 62, wgap = 24, pitch = win + wgap;
+  const roof = 64;
+
+  const bays = [
+    { label: "보조", rows: 4, lit: [[0,0],[0,1],[1,0],[1,1],[2,0],[2,1],[3,0]] },
+    { label: "협업", rows: 5, lit: [[0,1],[1,0],[1,1],[2,0],[3,1],[4,0]] },
+    { label: "위임", rows: 6, lit: [[0,0],[1,1],[3,0],[5,1]] },
+    { label: "승인", rows: 7, lit: [[0,0],[0,1]] },
+    { label: "온콜", rows: 8, lit: [[0,1]] },
+  ];
+
+  const bodyLayer = el("g", {});
+  const glowLayer = el("g", { filter: "url(#glow)", opacity: "0.45" });
+  const winLayer = el("g", {});
+
+  // ground line
+  el("line", { x1: left - 10, y1: baseY, x2: right + 10, y2: baseY, stroke: "#2A3548", "stroke-width": 3 }, bodyLayer);
+
+  bays.forEach((b, i) => {
+    const x = left + i * (bayW + gap);
+    const h = pad * 2 + b.rows * pitch - wgap;
+    const top = baseY - h;
+    // sawtooth roof + bay body as one silhouette
+    const d = `M ${x} ${baseY} L ${x} ${top} L ${x + bayW} ${top - roof} L ${x + bayW} ${baseY} Z`;
+    el("path", { d, fill: "#121925", stroke: "#27324A", "stroke-width": 2 }, bodyLayer);
+    // roof glazing: thin vertical light on the tall side of the tooth
+    el("line", { x1: x + bayW - 1, y1: top - roof + 4, x2: x + bayW - 1, y2: top - 2, stroke: "#34425C", "stroke-width": 3 }, bodyLayer);
+
+    const litSet = new Set(b.lit.map(([r, c]) => `${r},${c}`));
+    for (let r = 0; r < b.rows; r++) {
+      for (let c = 0; c < 2; c++) {
+        const wx = x + pad + c * (win + wgap);
+        const wy = top + pad + r * pitch;
+        const on = litSet.has(`${r},${c}`);
+        if (on) {
+          el("rect", { x: wx - 6, y: wy - 6, width: win + 12, height: win + 12, fill: "#F0B447" }, glowLayer);
+          el("rect", { x: wx, y: wy, width: win, height: win, fill: "#F4BC52" }, winLayer);
+        } else {
+          el("rect", { x: wx, y: wy, width: win, height: win, fill: "#19212E", stroke: "#222C3C", "stroke-width": 1.5 }, winLayer);
+        }
+      }
+    }
+    // stage label + step number
+    const cx = x + bayW / 2;
+    const num = el("text", { x: cx, y: baseY + 62, "text-anchor": "middle", "font-family": "MONO", "font-size": 24, "letter-spacing": "0.2em", fill: "#56627A" }, bodyLayer);
+    num.textContent = `L${i + 1}`;
+    const t = el("text", { x: cx, y: baseY + 124, "text-anchor": "middle", "font-family": "NSKR", "font-weight": 500, "font-size": 44, fill: "#8E9AAD" }, bodyLayer);
+    t.textContent = b.label;
+  });
+</script>
+</body>
+</html>
