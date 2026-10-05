@@ -1,0 +1,17 @@
+{
+  "title": "Cloudflare를 나의 클라우드로",
+  "subtitle": "정적 사이트부터 Spring 백엔드까지, 무료로 시작해 안전하게 운영하기",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-10-03",
+  "identifier": "urn:uuid:7ae484e4-06ae-4ec0-8308-d14c91014f75",
+  "description": "DNS와 CDN을 주는 곳으로만 알던 Cloudflare를 내 앱과 서비스를 배포하고 운영하는 클라우드로 쓰는 실전서. 개발자 밋업 신청 서비스 moim을 따라 정적 사이트와 React SPA, Hono API, D1·KV·Durable Objects·R2·Queues·Workflows, Next.js(vinext)를 Workers에 올리고, Tunnel·Containers·Hyperdrive·Queues HTTP pull로 기존 Spring Boot 백엔드를 잇고, Turnstile·WAF·레이트 리미팅과 Cloudflare One(Access·서비스 토큰·Spring Security의 Access JWT 검증)으로 지킨 뒤, 세 가지 캐시 경로와 무료 티어 설계, 하드캡이 없는 유료 계정의 다층 비용 방어까지 2026년 10월 기준으로 다룬다.",
+  "cover_image": "cover.png",
+  "cover_alt": "짙은 남색 바탕 위에 흰 글씨로 제목 「Cloudflare를 나의 클라우드로」와 부제가 놓이고, 아래에는 엣지 노드가 이어진 선형 지구본과 그 중심의 금색 사각형을 감싼 세 겹의 청록색 고리가 그려진 표지. 하단에 저자명 Toby-AI.",
+  "version": "1.0.0",
+  "license": "",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0",
+  "rights": ""
+}
