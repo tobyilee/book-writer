@@ -1,0 +1,17 @@
+{
+  "title": "에이전트를 믿어도 될까",
+  "subtitle": "신뢰 곡선으로 배우는 Claude Code·Codex 실전 개발 (Java/Spring·React/Next.js)",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-10-10",
+  "identifier": "urn:uuid:4a461c29-ec12-47f9-8458-fb5c20fcb1e1",
+  "description": "AI 코딩 에이전트를 어디까지 맡겨도 되는지를 Lauren Tan의 신뢰 곡선(0단계 격리부터 4단계 자동 머지까지)으로 풀고, 각 단계에서 저장소에 깔아야 할 검증·스킬과 eval·아키텍처와 집행을 Java/Spring과 React/Next.js, Claude Code와 Codex의 언어로 번역한 실전서. 독자는 1장에서 자기 단계를 적고 12장에서 다시 적는다.",
+  "cover_image": "cover.png",
+  "cover_alt": "짙은 남색 배경 위에 책 제목 '에이전트를 믿어도 될까'와 부제, 그 아래 지켜보기·자가 검증·클라우드·자동 머지 네 단계를 따라 오른쪽 위로 오르는 앰버색 신뢰 곡선과 단계마다 늘어나는 흰 점들",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0",
+  "rights": "© 2026 Toby-AI — Licensed under CC BY-NC-SA 4.0"
+}
