@@ -1,0 +1,15 @@
+{
+  "title": "쌓이는 지식, 답하는 에이전트",
+  "subtitle": "LLM 위키 패턴으로 짓는 사내 지식 베이스와 Claude 에이전트",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-10-12",
+  "identifier": "urn:uuid:fb5ce39b-7b26-4824-ad9a-d24a49865d1e",
+  "description": "Andrej Karpathy의 LLM Wiki 패턴을 회사 안으로 끌고 들어와 사내 지식 베이스와 Claude Q&A 에이전트를 함께 짓는 결정 가이드. 가상의 32명 SaaS 회사 페이지원이 12장을 관통하며, 위키·RAG·긴 컨텍스트의 포지셔닝, 디렉터리·프런트매터·수집 파이프라인, 스키마(CLAUDE.md)와 답변 프롬프트, 검색 계층과 Agent SDK·직접 API 연결 경로, 호스팅·보안 격리, 조용한 부패와 싸우는 린트·승격·평가 운영까지 각 장이 설계 결정 하나로 끝나고, 마지막 장이 열다섯 항목 결정 목록과 첫 4주 구축 계획으로 접는다. Claude Code를 써 본 중급 개발자 대상. 2026년 10월 기준.",
+  "cover_image": "cover.png",
+  "cover_alt": "쌓이는 지식, 답하는 에이전트 표지 — 어두운 남색 바탕에 흰 제목, 아래에는 마크다운 페이지들이 선으로 이어진 위키 그래프가 있고 가운데 호박색 에이전트 노드에서 읽기 경로가 뻗어 나간다",
+  "version": "1.0.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0"
+}
