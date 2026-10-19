@@ -1,0 +1,31 @@
+{
+  "title": "AI 네이티브 SDLC 플레이북",
+  "subtitle": "Claude Code로 내 개발 루프를 다시 짜는 12가지 플레이",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-10-19",
+  "identifier": "urn:uuid:5f7ffab4-991e-4775-b102-d1712fe5e7a7",
+  "description": "코드는 빨라졌는데 계획·검증·리뷰·배포는 예전 습관 그대로인 Claude Code 사용자를 위한 실무 안내서. Anthropic의 Claude Academy 코스 'The AI-native SDLC playbook' 12개 플레이를 Claude Code 2.1.303(2026-10) 현행 사양으로 바로잡고, 조직용 플레이북을 개인·소규모 팀 규모로 번역한다. intent.md에서 spec.md·plan.md·CLAUDE.md·스킬·훅·검증 루프·eval·PR 리뷰·승인 게이트·헤드리스 파이프라인·컨트롤 밴드까지, 보험사 포털 관통 예제의 파일 체인을 따라 6단계 루프를 한 바퀴 돌리고, 매 장 끝에서 그것을 독자 자신의 리포로 옮긴다.",
+  "cover_image": "cover.png",
+  "cover_alt": "AI 네이티브 SDLC 플레이북 표지 — 짙은 남색 바탕 위에 Plan·Design·Build·Test·Deploy·Maintain 여섯 노드가 원을 이루는 개발 루프 다이어그램, 루프를 닫는 마지막 호만 앰버색",
+  "version": "1.0.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0",
+  "chapters": [
+    "1장. 코드는 빨라졌는데 프로세스는 그대로다",
+    "2장. 루프, 아티팩트, 세 겹의 통제",
+    "3장. 의도에서 명세까지 — intent.md와 spec.md",
+    "4장. 플랜 모드에서 시작한다 — 그리고 auto로 넘긴다",
+    "5장. CLAUDE.md — 읽고, 인정하고, 그러고는 무시한다",
+    "6장. 스킬과 빌드 훅 — 절차는 스킬로, 반드시는 훅으로",
+    "7장. 병렬 세션과 서브에이전트 — 리뷰어는 여전히 한 명이다",
+    "8장. 피드백 루프 — 테스트를 고치지 말고 코드를 고쳐라",
+    "9장. eval — 설정 파일에도 회귀 테스트가 필요하다",
+    "10장. PR 리뷰 — 사람의 눈을 줄에서 의도로 올린다",
+    "11장. 훅은 승인 게이트다 — allow, ask, deny, 그리고 설정의 층",
+    "12장. 파이프라인 안의 Claude — 헤드리스, 샌드박스, 환경별 자율 티어",
+    "13장. 루프를 닫는다 — 컨트롤 밴드에서 새 intent.md까지",
+    "14장. 내 리포에서 루프 돌리기 — 첫 30일"
+  ]
+}
