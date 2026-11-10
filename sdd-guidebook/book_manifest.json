@@ -1,0 +1,16 @@
+{
+  "title": "AI 에이전트와 함께하는 스펙 주도 개발",
+  "subtitle": "도구 없이 시작해 OpenSpec·Spec Kit·Superpowers까지",
+  "author": "Toby-AI",
+  "language": "ko",
+  "pub_date": "2026-11-10",
+  "identifier": "urn:uuid:35706d4e-d35e-49da-bea9-cddd79ade8a6",
+  "description": "코딩 에이전트는 스펙에 없는 결정을 묻지 않고 추측으로 채운다. 이 책은 스펙 주도 개발(SDD)을 모든 작업의 기본값이 아니라 큰 변경마다 고르는 선택지로 다룬다. 스펙의 수명과 통제 단위로 SDD의 지도를 그리고, 요구·수용 기준·비목표·결정 기록을 문장 단위로 해부한 뒤, 동네책방 주문 서비스의 부분 환불 기능 하나를 도구 없이 인터뷰와 SPEC.md로, 그리고 OpenSpec·Spec Kit·Superpowers로 네 번 다시 스펙화한다. 검증 관문을 일한 에이전트 밖에 두는 기준선을 세우고, 네 벌의 스펙을 나란히 세어 본 뒤 변경 크기 사다리로 언제 스펙을 쓰고 언제 쓰지 않을지 고르는 법을 건넨다. 도구 판본은 2026년 11월 10일 기준이다.",
+  "cover_image": "cover.png",
+  "cover_alt": "어두운 청색 블루프린트 격자 위에 스펙 문서의 요구사항 줄이 앰버색 선을 따라 코드 줄로 이어지는 그림과 제목 '스펙 주도 개발'",
+  "version": "1.0.0",
+  "license": "CC BY-NC-SA 4.0",
+  "genre": "tech-book",
+  "delegation_mode": "production",
+  "harness_version": "2.0.0"
+}
