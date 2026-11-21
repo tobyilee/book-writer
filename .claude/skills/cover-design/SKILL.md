@@ -18,7 +18,7 @@ description: Generate a book cover image (1600x2560 PNG) based on title, topic m
 4. **프롬프트 작성** — 영어 프롬프트 권장 (이미지 모델 대부분 영어 최적화)
 5. **이미지 생성** — 사용 가능한 도구 순서로 시도
 6. **결과 검증** — 해상도, 구도, 제목 가독성 확인
-7. **저장** — `cover.png` + `cover_prompt.md`
+7. **저장** — `cover.png` + `cover_prompt.md` (대체 텍스트 한 문장 포함)
 
 ## 콘셉트 선택 가이드
 
@@ -91,6 +91,7 @@ convert -size 1600x2560 \
   ...
   ```
 - Result: cover.png
+- Alt text: {표지를 한 문장으로 묘사 — epub-builder가 매니페스트 `cover_alt`에 옮긴다}
 - Notes: {성공/조정 필요 부분}
 
 ## Version 2 ...

@@ -41,6 +41,7 @@ VERSION=$(read_field version)
 PUB_DATE=$(read_field pub_date)
 IDENTIFIER=$(read_field identifier)
 DESCRIPTION=$(read_field description)
+SUBTITLE=$(read_field subtitle)
 LICENSE=$(read_field license)
 GENRE=$(read_field genre)
 HARNESS_VERSION=$(read_field harness_version)
@@ -128,19 +129,22 @@ if [[ -f "$OUTPUT" ]]; then
 fi
 
 # Build metadata YAML for pandoc.
+# Values are JSON-quoted (a JSON string is a valid YAML double-quoted scalar),
+# so a quote, colon, or backslash in the title/description cannot break the file.
 META_YAML="${WS}/.meta.yaml"
-cat > "$META_YAML" <<YAML
----
-title: "${TITLE}"
-author: "${AUTHOR}"
-lang: "${LANG}"
-date: "${PUB_DATE}"
-identifier: "${IDENTIFIER}"
-description: "${DESCRIPTION}"
-subject: "${GENRE}"
-rights: "${RIGHTS}"
----
-YAML
+python3 - "$META_YAML" "$TITLE" "$SUBTITLE" "$AUTHOR" "$LANG" "$PUB_DATE" \
+  "$IDENTIFIER" "$DESCRIPTION" "$GENRE" "$RIGHTS" <<'PYMETA'
+import json, sys
+keys = ["title", "subtitle", "author", "lang", "date",
+        "identifier", "description", "subject", "rights"]
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    f.write("---\n")
+    for key, value in zip(keys, sys.argv[2:]):
+        if key == "subtitle" and not value:
+            continue
+        f.write(f"{key}: {json.dumps(value, ensure_ascii=False)}\n")
+    f.write("---\n")
+PYMETA
 
 # Build cover arg (optional).
 COVER_ARG=()
@@ -177,7 +181,8 @@ if grep -q '```mermaid' "$MANUSCRIPT" 2>/dev/null; then
         "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge" \
         "$(command -v chromium 2>/dev/null || true)" \
         "$(command -v chromium-browser 2>/dev/null || true)" \
-        "$(command -v google-chrome 2>/dev/null || true)"; do
+        "$(command -v google-chrome 2>/dev/null || true)" \
+        "$(find "$HOME/.cache/puppeteer" -type f \( -name chrome-headless-shell -o -name 'Google Chrome for Testing' -o -name chrome \) 2>/dev/null | sort | tail -1 || true)"; do
         if [[ -n "$cand" && -x "$cand" ]]; then
           export PUPPETEER_EXECUTABLE_PATH="$cand"
           echo "info: mermaid: using browser at ${cand} (PUPPETEER_EXECUTABLE_PATH)" >&2
@@ -199,14 +204,17 @@ if grep -q '```mermaid' "$MANUSCRIPT" 2>/dev/null; then
 MJSON
     # Python splits the manuscript on ```mermaid fences, renders each block to
     # an SVG with mmdc, and rewrites the fence to ![caption](figures/fig-NN.svg).
-    # The caption is taken from a following "그림 N. ..." line if present.
+    # A following "그림 N. ..." line becomes the image's alt text, and an image
+    # alone in its paragraph is a pandoc figure — so the caption renders as a
+    # <figcaption> and the diagram carries real alternative text.
     if MMDC_BIN="$(command -v mmdc)" MMDC_CONF="$MERMAID_CONF" python3 - "$MANUSCRIPT" "$RENDERED_INPUT" "${WS}/figures" <<'PYMERMAID' 2>"${WS}/.mermaid_err"
 import os, re, subprocess, sys, tempfile
 src, dst, figdir = sys.argv[1], sys.argv[2], sys.argv[3]
 mmdc = os.environ["MMDC_BIN"]
 conf = os.environ.get("MMDC_CONF", "")
 text = open(src, encoding="utf-8").read()
-pat = re.compile(r"```mermaid[ \t]*\n(.*?)\n```", re.DOTALL)
+pat = re.compile(
+    r"```mermaid[ \t]*\n(.*?)\n```[ \t]*(?:\n(?:[ \t]*\n)?[ \t]*(그림[ \t]*\d+[.:][^\n]*))?", re.DOTALL)
 n = 0
 def repl(m):
     global n
@@ -224,7 +232,9 @@ def repl(m):
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     finally:
         os.unlink(tfname)
-    return "![](figures/fig-%02d.svg)" % n
+    caption = (m.group(2) or "").strip()
+    caption = re.sub(r"([\[\]])", r"\\\1", caption)
+    return "\n![%s](figures/fig-%02d.svg)\n" % (caption, n)
 new = pat.sub(repl, text)
 open(dst, "w", encoding="utf-8").write(new)
 PYMERMAID
@@ -392,7 +402,11 @@ fi
 EPUBCHECK_STRICT="${EPUBCHECK_STRICT:-1}"
 EPUBCHECK_FAILED=0
 if command -v epubcheck >/dev/null 2>&1 && [[ -f "$OUTPUT" ]]; then
-  if epubcheck "$OUTPUT" >"${WS}/.epubcheck.log" 2>&1; then
+  # Java needs a UTF-8 locale to open a Korean file name; without it epubcheck
+  # reports the EPUB as missing.
+  if LC_ALL="${LC_ALL:-${LANG:-en_US.UTF-8}}" \
+     JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:-} -Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8" \
+     epubcheck "$OUTPUT" >"${WS}/.epubcheck.log" 2>&1; then
     CHECK_RESULT="passed"
   else
     CHECK_RESULT="FAILED — see ${WS}/.epubcheck.log"

@@ -1,6 +1,6 @@
 ---
 name: chapter-writing
-description: Write a single book chapter in Toby's distinctive Korean writing style (평어체 기반, 청유형 적극 활용, 수사적 질문, 상황 가정, 감정적 공감 표현). Use when drafting or revising a book chapter, rewriting prose in Toby's voice, translating an outline into full chapter text, or polishing chapter drafts to match 토비 문체. Triggers on "챕터 써줘", "이 섹션 저술", "토비 스타일로 써줘", "write a chapter in Toby's voice", "rewrite in 평어체", or when a chapter outline needs to become full prose.
+description: Write a book chapter in the active genre profile's voice — tech-book (default, Toby's Korean 평어체 with 청유형·수사적 질문·상황 가정·공감 표현), narrative, practical, or essay. Use when drafting or revising a book chapter, turning a plan's chapter outline into full prose, rewriting prose in Toby's voice, or polishing a draft to match the genre voice. Triggers on "챕터 써줘", "이 섹션 저술", "토비 스타일로 써줘", "write a chapter", "write a chapter in Toby's voice", "rewrite in 평어체".
 ---
 
 # Chapter Writing (장르 프로필 기반)
@@ -47,7 +47,10 @@ description: Write a single book chapter in Toby's distinctive Korean writing st
 
 ## 챕터 구성
 
-- **입력** — `02_plan.md`에서 이 장의 핵심 질문·주요 내용·배정된 오프닝/클로징/스캐폴드, 계획의 "용어 표기", `01_reference.md`에서 이 장과 관련된 부분.
+- **입력** — `02_plan.md`에서 이 장의 핵심 질문·주요 내용·전제·인계·배정된 오프닝/클로징/스캐폴드, 계획의 "용어 표기"와 "공유 정전", `01_reference.md`에서 이 장과 관련된 부분.
+- **공유 정전** — 러닝 예제의 이름·수치·경로·스키마·시그니처는 계획의 공유 정전 그대로 쓴다. 정전에 없어서 새로 정한 것(파일 경로, 클래스 이름, 필드 등)은 반환값에 목록으로 올린다 — 다른 묶음의 저술가가 같은 것을 다르게 정했을 수 있고, editor가 이 목록으로 맞춘다.
+- **다른 장 가리키기** — 다른 저술가가 쓰는 장을 언급할 때는 계획의 그 장 "주요 내용"·"전제·인계"에 적힌 범위만 말한다. 보지 못한 원고에 대해 "3장에서 자세히 살펴봤듯이"처럼 넓게 쓰면 실제 내용과 어긋난다.
+- **분량** — 계획의 예상 분량은 하한이 아니라 목표다. ±15% 안에서 쓴다. 저장한 뒤 `python3 .claude/skills/book-editing/scripts/length_report.py {slug} --chapters`로 실측해 반환값에 적는다.
 - **스캐폴드** — `profiles/{genre}/scaffolds.md`에서 배정된 유형을 따르되, 억지로 맞추기보다 흐름을 우선한다.
 - **오프닝** — 배정된 기법으로 연다 (tech-book 메뉴: 상황 가정·수사적 질문·충격 수치·일화·실패 장면·앞 장 콜백·정의 뒤집기). "이번 장에서는 ~를 다룬다" 같은 메타 선언으로 시작하지 않는다.
 - **본문** — 개념을 하나씩 도입한다. 대개 상황이나 질문 → 친절한 설명 → 필요하면 코드·예시 → "그렇다면 ~" 식 전환의 흐름이 Toby 문체에 맞는다.
@@ -62,10 +65,14 @@ description: Write a single book chapter in Toby's distinctive Korean writing st
 - **외래어 남용:** 한국어로 충분히 표현 가능한 개념을 불필요하게 영어·일본어로 쓰지 말자
 - **과도한 번호 매김:** 서술이 리스트로만 채워지면 목차 같아 보인다. 문단형 서술을 우선한다
 - **무감정한 건조체:** 기술서라도 감각적 단어로 호흡을 만든다
+- **작업 과정의 노출:** "리서처", "레퍼런스 문서", "fact-checker", `research/web.md` 같은 하네스 내부 역할·파일 이름은 독자가 모르는 말이다. 출처는 저자·문서·URL로 밝힌다
+- **인용문 고쳐 쓰기:** 직접 인용은 원문 그대로 둔다. 어미를 평어체로 바꾸거나 두 문장을 합치면 더는 인용이 아니다. 책 문체는 해설에만 쓴다
 
 ## 출력 형식
 
 - 파일: Markdown (`# 챕터 제목` → `## 절 제목` → `### 소절 제목`)
-- 최상위 헤딩(`#`)은 챕터당 1회만 사용
+- 최상위 헤딩(`#`)은 챕터당 1회만 사용. 절은 `##`로 나눈다 — EPUB 목차는 `##`까지만 싣기 때문에 `###`만 쓴 장은 목차에서 절이 사라진다
+- 산문에 `<자리표시자>`처럼 꺾쇠로 감싼 말을 쓸 때는 코드 스팬(`` `<이름>` ``)으로 감싸거나 `\<이름\>`로 이스케이프한다. 그대로 두면 변환기가 HTML 태그로 읽어 EPUB 검증이 실패한다
+- 가로로 긴 흐름도는 폰 화면에서 읽히지 않는다. 노드 5개 이상이 한 줄로 이어지는 mermaid 흐름도는 `TB` 방향으로 그린다
 - 코드 블록은 ```언어 형태로 명시
 - 인용·강조는 `>`, `**` 사용

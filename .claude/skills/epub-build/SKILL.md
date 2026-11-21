@@ -19,7 +19,8 @@ description: Build a standards-compliant EPUB 3 file from a manuscript markdown,
    - `language` 존재 (`ko`)
    - `version` 존재 (예: `1.0.0`)
    - `identifier` (옵션) — 비어 있거나 플레이스홀더 `urn:uuid:...`이면 스크립트가 `urn:uuid:{uuid4}` 한 번 발급 후 매니페스트에 기록한다. **신간에 1회 발급되고 이후 재빌드에서 그대로 보존(불변)** — version/date만 바뀐다. `_prev`에 다른 식별자가 있으면 경고
-   - `cover_alt` (옵션) — 표지 대체 텍스트. 비어 있으면 기본값 `{title} 표지`. 스크립트가 표지 xhtml에 실제 alt(또는 SVG 표지의 `role="img"`+`aria-label`+`<title>`)로 주입해 a11y 대체 텍스트 주장을 뒷받침한다
+   - `subtitle` (옵션) — 있으면 EPUB 속표지에 부제로 실린다
+   - `cover_alt` (옵션) — 표지 대체 텍스트. cover-designer가 반환한 문구가 브리프에 있으면 빌드 전에 매니페스트에 적는다. 비어 있으면 기본값 `{title} 표지`. 스크립트가 표지 xhtml에 실제 alt(또는 SVG 표지의 `role="img"`+`aria-label`+`<title>`)로 주입해 a11y 대체 텍스트 주장을 뒷받침한다
    - `license` (옵션) — 비어 있으면 하네스 기본값 `CC BY-NC-SA 4.0` 적용. 다른 라이선스를 쓰려면 명시 (`"CC BY 4.0"`, `"CC0"`, `"All rights reserved"` 등)
    - `harness_version` (옵션) — 비어 있으면 루트 `VERSION` 파일에서 자동 주입
    - `rights` (옵션) — 비어 있으면 `© {year} {author} — Licensed under {license}`로 자동 생성
@@ -50,7 +51,7 @@ pandoc {manuscript} \
   --output {output_path}
 ```
 
-매니페스트(JSON)를 YAML로 변환한 뒤 pandoc에 전달한다. `--resource-path={slug}`로 상대 이미지 경로(예: `figures/fig-NN.svg`)가 슬러그 디렉터리 기준으로 해석된다. 스크립트 전문은 `scripts/build_epub.sh` 참조.
+매니페스트(JSON)를 YAML로 변환한 뒤 pandoc에 전달한다. 값은 JSON 문자열로 인용되므로 제목·소개에 따옴표나 콜론이 있어도 안전하다. `--resource-path={slug}`로 상대 이미지 경로(예: `figures/fig-NN.svg`)가 슬러그 디렉터리 기준으로 해석된다. 스크립트 전문은 `scripts/build_epub.sh` 참조.
 
 ## 스타일시트 (base 타이포그래피 + 구조화 블록)
 
@@ -62,9 +63,9 @@ EPUB의 `urn:uuid:*` 식별자는 **신간에 1회 발급**되고 이후 재빌�
 
 ## 그림(figure) — mermaid 사전 처리 (옵션)
 
-구조·관계를 나타내는 그림은 본문에 ```` ```mermaid ```` fenced 블록 + `그림 N. {설명}` 캡션 줄로 작성한다(챕터별 N 번호). 빌드 시 `mmdc`가 설치되어 있으면 pandoc 전에 각 블록을 `{slug}/figures/fig-NN.svg`로 렌더하고 fence를 `![caption](figures/fig-NN.svg)`로 치환한다. `mmdc`가 없으면 fence를 그대로 두고(코드 블록으로 렌더) 경고만 남긴다 — **mmdc는 하드 의존성이 아니다**(옵션 epubcheck와 동일 패턴).
+구조·관계를 나타내는 그림은 본문에 ```` ```mermaid ```` fenced 블록 + `그림 N. {설명}` 캡션 줄로 작성한다(챕터별 N 번호). 빌드 시 `mmdc`가 설치되어 있으면 pandoc 전에 각 블록을 `{slug}/figures/fig-NN.svg`로 렌더하고, fence와 바로 아래의 `그림 N. {설명}` 캡션 줄을 함께 `![그림 N. {설명}](figures/fig-NN.svg)`로 치환한다. 캡션이 이미지의 대체 텍스트이자 `<figcaption>`이 된다 (캡션 줄은 `그림 N.`처럼 번호 뒤에 마침표나 콜론이 있어야 인식된다). `mmdc`가 없으면 fence를 그대로 두고(코드 블록으로 렌더) 경고만 남긴다 — **mmdc는 하드 의존성이 아니다**(옵션 epubcheck와 동일 패턴).
 
-**puppeteer 브라우저 자동 탐지:** `mmdc`는 설치돼 있어도 puppeteer용 브라우저가 없으면 조용히 실패하고 그림이 코드 fence로 남는다. 스크립트가 `PUPPETEER_EXECUTABLE_PATH` 미설정 시 Chrome/Chromium/Edge 표준 경로를 자동 탐지해 설정하고, 못 찾으면 stderr에 경고를 남긴다. 빌드 후 반드시 빌드 로그의 `mermaid:` 줄이 `rendered ...`인지 확인한다 — `failed`/`not installed`면 그림 없는 책이 나간 것이다.
+**puppeteer 브라우저 자동 탐지:** `mmdc`는 설치돼 있어도 puppeteer용 브라우저가 없으면 조용히 실패하고 그림이 코드 fence로 남는다. 스크립트가 `PUPPETEER_EXECUTABLE_PATH` 미설정 시 Chrome/Chromium/Edge 표준 경로와 `~/.cache/puppeteer`를 자동 탐지해 설정하고, 못 찾으면 stderr에 경고를 남긴다. 빌드 후 반드시 빌드 로그의 `mermaid:` 줄이 `rendered ...`인지 확인한다 — `failed`/`not installed`면 그림 없는 책이 나간 것이다.
 
 ## 이미지 pre-flight
 
@@ -101,7 +102,7 @@ EPUB의 `urn:uuid:*` 식별자는 **신간에 1회 발급**되고 이후 재빌�
 - [ ] 재빌드 후에도 `identifier`(`urn:uuid:*`)가 직전 빌드와 동일한지
 - [ ] 책 소개 md (`{책-제목}-v{version}.md`)가 EPUB 옆에 존재하고, 차례·저자·버전이 매니페스트와 일치
 - [ ] `unzip -p {output} OEBPS/content.opf | grep -i rights` — `rights` 메타에 라이선스 문구 포함 (`Licensed under {license}` 또는 매니페스트의 명시값)
-- [ ] `04_manuscript.md`의 `## 판권` 섹션이 매니페스트의 `license`/`version`/`pub_date`와 일치 (drift 시 editor 재호출)
+- [ ] `04_manuscript.md`의 `## 판권` 섹션이 매니페스트의 `license`/`version`/`pub_date`/`identifier`와 일치. 판본·발행일·식별자·라이선스 코드 문자열처럼 값만 다른 줄은 빌드 전에 매니페스트 값으로 직접 맞춘다(원고 첫머리의 `**판본:**` 줄 포함). 라이선스가 바뀌어 설명 문단을 새로 써야 할 때만 editor에게 돌린다
 
 ## 실패 대응
 
@@ -109,7 +110,8 @@ EPUB의 `urn:uuid:*` 식별자는 **신간에 1회 발급**되고 이후 재빌�
 |------|------|
 | pandoc 미설치 | `brew install pandoc` 안내, 또는 Calibre `ebook-convert` 폴백 검토 |
 | cover.png 누락 | cover-designer에 폴백 생성 요청, 메타만으로 빌드 후 경고 |
-| 원고 내 비정상 유니코드·XML 문자 | 스크립트가 `iconv`로 정규화 시도, 실패 시 해당 구절 치환 |
+| 원고 내 비정상 유니코드·XML 문자 | 해당 구절을 찾아 치환한 뒤 재빌드 |
+| epubcheck가 산문 속 `<한글…>`을 잘못된 태그로 보고 | 변환기가 꺾쇠를 HTML 태그로 읽은 것. 원고에서 `\<…\>`로 이스케이프하거나 코드 스팬으로 감싼 뒤 재빌드 |
 | `epubcheck` 실패 | **빌드 실패**(각주 아님). 오류 로그(`.epubcheck.log`) 보존, `EPUBCHECK_STRICT` 기본 켜짐 → 종료 코드 `5`. 오류를 고쳐 재빌드. 부득이하게 산출만 필요하면 `EPUBCHECK_STRICT=0`으로 경고 강등 |
 | `epubcheck` 미설치 | EPUB은 검증되지 않은(UNVALIDATED) 상태. stderr·빌드 로그에 `brew install epubcheck` 안내 |
 | `mmdc` 미설치 | mermaid 다이어그램은 코드 fence로 남음(경고만). 그림이 필요하면 `npm i -g @mermaid-js/mermaid-cli` |
@@ -117,5 +119,6 @@ EPUB의 `urn:uuid:*` 식별자는 **신간에 1회 발급**되고 이후 재빌�
 
 ## 재빌드 시
 
-- 이전 결과를 `_prev/`로 이동
+- 책 버전을 올릴 때는 매니페스트의 `version`·`pub_date`와 원고 콜로폰의 판본·발행일을 함께 고친다 (올릴 폭은 오케스트레이터 브리프를 따른다). `identifier`는 그대로 둔다
+- 같은 버전으로 다시 빌드하면 스크립트가 이전 EPUB을 `_prev/`로 옮긴다
 - 사용자가 매니페스트 일부만 수정한 경우 → 원고 재작업 없이 매니페스트만 갱신하고 재빌드 가능

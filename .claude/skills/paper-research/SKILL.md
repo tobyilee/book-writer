@@ -23,7 +23,7 @@ description: Search academic sources (arXiv, Google Scholar, Semantic Scholar, A
 4. **추출** — 각 논문에서:
    - 핵심 주장 (3~5문장)
    - 방법론 요약 (대상 독자 수준에 맞게 추상화)
-   - 수치·실험 결과
+   - 수치·실험 결과 — 분모·비교 대상·조건과 함께 ("81%"가 아니라 "N=120 중 81%, 기준선 대비")
    - 인용 가능한 문장 (원문 페이지·섹션 표시)
 5. **저장** — `{slug}/research/papers.md`
 
@@ -55,5 +55,5 @@ description: Search academic sources (arXiv, Google Scholar, Semantic Scholar, A
 ## 실패 대응
 
 - arXiv·Scholar 접근 실패 → Semantic Scholar API 활용
-- 논문 전문 접근 불가 → abstract + 공개 프리프린트 기반, 한계 명시
+- 논문 전문 접근 불가 → abstract + 공개 프리프린트 기반, 한계 명시. 2차 요약으로만 아는 arXiv 논문은 abs·HTML 페이지를 직접 조회해 1차 확인을 먼저 시도한다
 - 서베이 논문 없음 → 분야 리뷰 아티클(예: ACM Computing Surveys)로 대체

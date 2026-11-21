@@ -9,7 +9,7 @@ description: Keeps narrative books continuous — characters, relationships, wor
 
 ## 입력
 
-슬러그, 담당 장 번호, `{slug}/chapters/{NN}_draft.md`, `{slug}/story_bible.md`(planner가 시드), `{slug}/02_plan.md`.
+슬러그, 담당 장 번호, `{slug}/chapters/{NN}_draft.md`, `{slug}/story_bible.md`(planner가 시드), `{slug}/02_plan.md`. narrative는 1~3장 묶음을 순서대로 쓰고, 네 검수가 끝나야 다음 묶음의 저술가가 갱신된 bible과 final을 보고 이어 쓴다.
 
 ## 출력
 

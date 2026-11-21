@@ -1,11 +1,11 @@
 # Book Writer — AI 책 저술 자동화 하네스
 
-[![Version](https://img.shields.io/badge/harness-v2.0.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/harness-v2.1.0-blue.svg)](VERSION) [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Books: CC BY-NC-SA 4.0](https://img.shields.io/badge/books-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 주제, 주요 내용, 대상 독자만 주면 리서치부터 EPUB 빌드까지 한 번에 수행하는 **에이전트 하네스**다. v1.3.0부터 **장르별 문체 프로필**을 지원한다 — 기술서(Toby 문체)·소설·실용서(요리/여행)·에세이. 장르는 자동 감지 후 확인하며, 기본값은 `tech-book`이다 (아래 [장르 프로필](#장르-프로필) 참고). 저자명은 기본값 `Toby-AI`에서 원하는 값으로 바꿀 수 있다 (아래 [저자명 변경](#저자명-변경) 참고).
 
 - **Repo:** https://github.com/tobyilee/book-writer
-- **하네스 버전:** `v2.0.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
+- **하네스 버전:** `v2.1.0` (단일 출처: 프로젝트 루트 [`VERSION`](VERSION). 변경 이력은 [CLAUDE.md](CLAUDE.md#변경-이력) 참조)
 - **라이선스:** 하네스 코드는 **MIT** ([`LICENSE`](LICENSE)). 산출되는 책 콘텐츠 기본값은 **CC BY-NC-SA 4.0** — `book_manifest.json`의 `license` 필드로 책별 오버라이드 가능
 - **실행 환경:** [Claude Code](https://claude.com/claude-code) + Claude Agent SDK
 - **저자 모델:** 모든 에이전트가 현재 세션의 모델 설정을 그대로 상속한다 (에이전트별 `model` 고정 없음)
@@ -124,11 +124,13 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 ### Phase 4: 챕터 저술 (병렬 묶음 + 묶음별 검수)
 
-- 챕터를 연속 묶음(2~4장)으로 나눠 `chapter-writer` 최대 4명이 병렬 저술 (narrative는 1~2명이 순서대로). 저술가는 활성 프로필의 `style-checklist.md`를 품질 기준으로 삼아 쓰고, 계획의 배정·용어 표기를 따른다
+- 저술을 시작할 때 `cover-designer`를 백그라운드로 띄운다 — 표지에 필요한 것은 계획 승인 시점에 다 정해져 있다
+- 챕터를 연속 묶음(2~4장)으로 나눠 `chapter-writer` 최대 4명이 병렬 저술 (narrative는 1~3장 묶음을 순서대로, 묶음마다 검수 뒤 다음 묶음). 저술가는 활성 프로필의 `style-checklist.md`를 품질 기준으로 삼아 쓰고, 계획의 배정·용어 표기·공유 정전을 따르며, 예상 분량을 ±15% 목표로 삼는다. 정전 밖에서 새로 정한 것은 반환값으로 올리고 오케스트레이터가 `integration_notes.md`에 모은다
 - 묶음이 끝나는 즉시 검수: (tech-book) `fact-checker`가 사실 주장을 `research/*.md` 원장과 대조해 정정·약화·삭제를 직접 반영 / (practical) `fact-checker`가 안전·건강·법규 사실(식품 안전 온도·보관·알레르겐·여행 법규)만 같은 방식으로 / (narrative) `continuity-keeper`가 `story_bible.md`와 대조해 모순을 고치고 bible 갱신, 장별 페이싱 계측 후 마지막에 `pacing_report.md`(자문 전용). 결과가 `{NN}_final.md`
-- 검수자가 스스로 고칠 수 없는 항목만 `미해소`로 남겨 사용자에게 묻는다
-- `editor`가 `04_manuscript.md`로 통합 — 묶음 경계 전환, 용어 통일, 통권 변주(반복되는 오프닝·클로징·말버릇) 교정, 서문·에필로그·참고문헌(원장 그대로)·콜로폰, `book_manifest.json`, `length_report.md`
-- 로그는 역할별 단일 파일(`factcheck_log.md`·`continuity_log.md`)에 장마다 즉시 append
+- 검수자가 스스로 고칠 수 없는 항목만 `미해소`로 남기고, 오케스트레이터가 모아서 통합 전에 한 번에 사용자에게 묻는다
+- `editor`가 `04_manuscript.md`로 통합 — 장 간 정합(묶음마다 갈린 예제 정전, 한 장에서만 정정된 사실), 묶음 경계 전환, 용어 통일, 통권 변주(반복되는 오프닝·클로징·말버릇) 교정, 서문·에필로그·참고문헌(원장 그대로)·콜로폰, `book_manifest.json`, `length_report.md`
+- 로그는 역할별 단일 파일(`factcheck_log.md`·`continuity_log.md`)에 장마다 즉시 append (병렬 검수자가 동시에 쓰므로 셸 `>>`로만)
+- 통합 뒤의 정본은 `04_manuscript.md` — 이후 수정은 원고에 직접 한다
 - (practical 요리 계열) editor가 `profiles/practical/partials/conversion-tables.md`의 환산표를 부록에 싣는다
 
 **왜 이 구조인가?** 현행 Opus 모델은 명확한 기준을 주면 스스로 점검하며 쓴다. 그래서 검수 왕복을 겹겹이 쌓는 대신, 저술가 자신이 알기 어려운 두 가지 — 자기가 쓴 사실의 오류, 다른 장과의 충돌 — 만 독립 검수로 잡고, 책 전체에서만 보이는 문제는 editor와 수락 게이트가 한 번씩 본다.
@@ -139,10 +141,9 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 - 챕터 완비·분량, 금지 마커(`(사실 확인 필요)`·`[리서치 공백]`·`[미완성]`), 사실 미결과 참고문헌 원장 대조, 용어·voice·변주, 상호 참조, 약속 이행, 부속 자료, (narrative) 연속성
 - 판정을 `05_acceptance.md`에 기록 — **ACCEPT**면 Phase 5로, **BLOCK**이면 담당자에게 조치를 한 번 보내고 재판정, 그래도 BLOCK이면 사용자 판단
 
-### Phase 5: 표지 + EPUB 빌드 + 책 소개 (부분 병렬)
+### Phase 5: EPUB 빌드 + 책 소개
 
-- `cover-designer`를 background로 띄우고, 그 동안 `epub-builder`의 cover-독립 준비(매니페스트 검증·콜로폰·책 소개 초안)를 병행 — `cover.png` 소비 지점에서 join
-- `cover-designer`가 이미지 생성 (MCP > API > ImageMagick 폴백 순)
+- 표지는 Phase 4에서 백그라운드로 띄운 `cover-designer`가 만든다 (MCP > API > ImageMagick 폴백 순). 아직 끝나지 않았으면 `epub-builder`가 cover-독립 준비(매니페스트 검증·콜로폰 맞춤·책 소개 초안)를 먼저 한다
 - `epub-builder`가 `scripts/build_epub.sh`를 호출해 결정적 빌드 (번들 `styles/epub.css`를 자동 임베드 — 실용서 구조화 블록 스타일)
 - `pandoc`으로 `04_manuscript.md` + `cover.png` + `book_manifest.json`을 EPUB 3로 변환
 - `epubcheck` 설치 시 자동 검증 (`EPUBCHECK_STRICT` 기본 ON)
@@ -155,12 +156,12 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 ```
 챕터 3 처음 부분이 너무 딱딱해. 다시 써줘.
 ```
-→ 해당 챕터만 재저술, 나머지 유지. `chapter_3_draft_v1.md`로 백업 후 신규 초안.
+→ 통합 원고(`04_manuscript.md`)의 해당 부분만 고치고 수락 게이트·재빌드. 장 전체를 다시 쓰는 요청이면 `03_draft_v1.md`로 백업한 뒤 저술·검수부터 다시 거친다.
 
 ```
 표지를 좀 더 따뜻한 느낌으로 바꿔줘.
 ```
-→ `cover-designer`만 재호출, `cover_v1.png`로 백업.
+→ `cover-designer` 재호출(`cover_v1.png`로 백업) 후 `epub-builder`로 재빌드.
 
 ```
 계획을 좀 더 입문자 친화적으로 다시 세워줘.
@@ -169,7 +170,7 @@ Claude Code 프롬프트에 주제·내용·대상 독자를 자연어로 입력
 
 재실행 시 책 버전은 **minor 증가** (`v1.0.0` → `v1.1.0`) 또는 사용자가 명시적으로 지정. 이때 바뀌는 건 **책 매니페스트 버전**이지 하네스 버전이 아니다. EPUB 식별자(`urn:uuid:*`)는 처음 1회만 민팅되고 재빌드에도 그대로 보존된다 — 버전·발행일만 갱신된다.
 
-요청 유형별 정확한 재실행 범위(리서치 보강→Phase 1, 구성·차례 변경→Phase 2~3, 특정 챕터 수정→Phase 4, 표지→Phase 5 cover, 메타·라이선스→Phase 5 epub)는 오케스트레이터의 **재실행 매트릭스**(`book-writing-orchestrator/SKILL.md`)를 따른다. 장르는 `book_manifest.json`의 `genre`를 재사용한다(사용자가 변경을 명시하지 않는 한).
+요청 유형별 정확한 재실행 범위(리서치 보강→Phase 1, 구성·차례 변경→Phase 2~3, 챕터 부분 수정→원고 직접 수정, 챕터 전체 재작성→Phase 4, 표지→cover-designer+재빌드, 메타·라이선스→epub-builder)는 오케스트레이터의 **재실행 매트릭스**(`book-writing-orchestrator/SKILL.md`)를 따른다. 장르는 `book_manifest.json`의 `genre`를 재사용한다(사용자가 변경을 명시하지 않는 한).
 
 ## 운영자 학습 루프
 
@@ -282,9 +283,6 @@ book-writer/
         ├── book-planning/
         ├── plan-review/
         ├── chapter-writing/
-        │   └── references/
-        │       ├── toby-style-guide.md   # → profiles/tech-book/voice.md 포인터
-        │       └── chapter-scaffolds.md  # → profiles/{genre}/scaffolds.md 포인터
         ├── style-review/
         ├── fact-check/              # tech-book 사실 검증 (v1.4.0+)
         ├── continuity-check/        # narrative 연속성 검수 (v1.7.0+)

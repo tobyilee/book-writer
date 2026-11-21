@@ -13,7 +13,7 @@ description: On-demand style pass. Reviews specified chapters against the active
 
 ## 출력
 
-- 대상 파일에 직접 반영한 수정 (`{NN}_final.md`, 통합 원고가 있으면 `04_manuscript.md`도 함께)
+- 대상 파일에 직접 반영한 수정 — 통합 원고가 있으면 정본인 `04_manuscript.md`에, 없으면 `{NN}_final.md`에
 - `{slug}/style_log.md` — 장마다 끝나는 즉시 `## {NN}장` 섹션 append
 
 ## 이 역할에서 중요한 것

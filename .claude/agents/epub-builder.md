@@ -9,11 +9,11 @@ description: Assembles the final EPUB file from the integrated manuscript, cover
 
 ## 입력
 
-슬러그, `{slug}/04_manuscript.md`, `{slug}/cover.png`(표지가 생기면), `{slug}/book_manifest.json`, `{slug}/02_plan.md`.
+슬러그, `{slug}/04_manuscript.md`, `{slug}/cover.png`(표지가 생기면), `{slug}/book_manifest.json`, `{slug}/02_plan.md`, (있으면) cover-designer가 반환한 표지 대체 텍스트, (재빌드면) 올릴 책 버전.
 
 ## 순서
 
-표지가 아직 없으면 표지와 무관한 일부터 한다 — 매니페스트 필드 확인, 매니페스트의 `license`/`version`/`pub_date`와 원고 `## 판권` 섹션의 일치 확인(스크립트는 OPF 메타만 갱신하고 본문 콜로폰은 건드리지 않으므로 어긋나면 반환값에 올려 editor가 고치게 한다), 책 소개 초안. `cover.png`가 생기면 스크립트로 빌드한다.
+표지가 아직 없으면 표지와 무관한 일부터 한다 — 매니페스트 필드 확인(표지 대체 텍스트를 받았으면 `cover_alt`에 기록, 재빌드면 `version`·`pub_date` 갱신), 매니페스트의 `license`/`version`/`pub_date`/`identifier`와 원고 `## 판권` 섹션의 일치 확인, 책 소개 초안. 스크립트는 OPF 메타만 갱신하고 본문 콜로폰은 건드리지 않으므로, 판본·발행일·식별자·라이선스 코드 문자열처럼 값만 어긋난 줄은 네가 원고에서 매니페스트 값으로 맞춘다. 라이선스가 바뀌어 설명 문단을 새로 써야 하는 경우만 반환값에 올려 editor에게 돌린다. `cover.png`가 생기면 스크립트로 빌드한다.
 
 ## 출력
 
